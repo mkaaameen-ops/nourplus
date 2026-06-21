@@ -379,7 +379,7 @@ var lat=26.5258,lng=49.9981,locName="القطيف";
 var aArm=false;
 var hOffset=0; 
 var calY=0, calM=0; 
-var audioTag=null, lastTrig="", initTrig=false;
+var aCtx=null, lastTrig="", initTrig=false;
 
 function saveAllData() {
   var data = { lat: lat, lng: lng, name: locName, sound: aArm, hOffset: hOffset };
@@ -396,21 +396,8 @@ function loadAllData() {
     }
   } catch(e) {}
 }
-
 loadAllData();
 ld.textContent = locName;
-
-function setAudioBtnActive(){
-  if(!ab) return;
-  ab.innerHTML="<span>✅</span> <span>التنبيهات مفعلة</span>";
-  ab.style.background="rgba(16,185,129,0.1)";
-  ab.style.borderColor="rgba(16,185,129,0.3)";
-  ab.style.color="#6ee7b7";
-}
-
-if(aArm) {
-  setAudioBtnActive();
-}
 
 function qiblaDirection(lat1,lon1,lat2,lon2){
  var dLon = toRad(lon2 - lon1);
@@ -428,32 +415,27 @@ var startAngle = 0;
 
 function updateCompassView(heading) {
     currentHeading = (heading + 360) % 360;
-    if(qiblaRing) qiblaRing.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
-    if(kaabaIcon) kaabaIcon.style.transform = 'rotate(' + (qiblaDeg) + 'deg)';
-    if(targetAngleText) targetAngleText.textContent = Math.round(qiblaDeg) + "°";
-    if(currentAngleText) currentAngleText.textContent = Math.round(currentHeading) + "°";
+    qiblaRing.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
+    kaabaIcon.style.transform = 'rotate(' + (qiblaDeg) + 'deg)';
+    targetAngleText.textContent = Math.round(qiblaDeg) + "°";
+    currentAngleText.textContent = Math.round(currentHeading) + "°";
     
     var diff = Math.abs(currentHeading - qiblaDeg);
     if (diff > 180) diff = 360 - diff;
     
     if (diff <= 5) {
-        if(qiblaRing) qiblaRing.classList.add("aligned");
-        if(statusHint) {
-            statusHint.textContent = "أنت تواجه الكعبة المشرفة تماماً! 🕋";
-            statusHint.style.color = "#10b981";
-        }
+        qiblaRing.classList.add("aligned");
+        statusHint.textContent = "أنت تواجه الكعبة المشرفة تماماً! 🕋";
+        statusHint.style.color = "#10b981";
         if (window.navigator.vibrate) window.navigator.vibrate(40);
     } else {
-        if(qiblaRing) qiblaRing.classList.remove("aligned");
-        if(statusHint) {
-            statusHint.textContent = "قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة";
-            statusHint.style.color = "#94a3b8";
-        }
+        qiblaRing.classList.remove("aligned");
+        statusHint.textContent = "قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة";
+        statusHint.style.color = "#94a3b8";
     }
 }
 
 function getAngle(clientX, clientY) {
-    if(!compassContainer) return 0;
     var rect = compassContainer.getBoundingClientRect();
     var centerX = rect.left + rect.width / 2;
     var centerY = rect.top + rect.height / 2;
@@ -476,14 +458,12 @@ function doDrag(e) {
 }
 function stopDrag() { isDragging = false; }
 
-if(compassContainer) {
-    compassContainer.addEventListener('mousedown', startDrag);
-    compassContainer.addEventListener('mousemove', doDrag);
-    window.addEventListener('mouseup', stopDrag);
-    compassContainer.addEventListener('touchstart', startDrag, {passive: false});
-    compassContainer.addEventListener('touchmove', doDrag, {passive: false});
-    window.addEventListener('touchend', stopDrag);
-}
+compassContainer.addEventListener('mousedown', startDrag);
+compassContainer.addEventListener('mousemove', doDrag);
+window.addEventListener('mouseup', stopDrag);
+compassContainer.addEventListener('touchstart', startDrag, {passive: false});
+compassContainer.addEventListener('touchmove', doDrag, {passive: false});
+window.addEventListener('touchend', stopDrag);
 
 function handleOrientation(e) {
     var heading = e.webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : null);
@@ -492,67 +472,46 @@ function handleOrientation(e) {
     }
 }
 
-if(compassIcon) {
-    compassIcon.onclick = function() {
-        if(compassModal) compassModal.style.display = 'flex';
-        qiblaDeg = qiblaDirection(lat, lng, KAABA_LAT, KAABA_LON);
-        if(qiblaDeg < 0) qiblaDeg += 360;
-        updateCompassView(0);
-        
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission().then(function(s){ if(s==='granted') window.addEventListener('deviceorientation', handleOrientation); });
-        } else {
-            window.addEventListener('deviceorientation', handleOrientation);
-        }
-    };
-}
+compassIcon.onclick = function() {
+    compassModal.style.display = 'flex';
+    qiblaDeg = qiblaDirection(lat, lng, KAABA_LAT, KAABA_LON);
+    if(qiblaDeg < 0) qiblaDeg += 360;
+    updateCompassView(0);
+    
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(function(s){ if(s==='granted') window.addEventListener('deviceorientation', handleOrientation); });
+    } else {
+        window.addEventListener('deviceorientation', handleOrientation);
+    }
+};
 
-if(closeCompassBtn) {
-    closeCompassBtn.onclick = function() {
-        if(compassModal) compassModal.style.display = 'none';
-        window.removeEventListener('deviceorientation', handleOrientation);
-    };
-}
+closeCompassBtn.onclick = function() {
+    compassModal.style.display = 'none';
+    window.removeEventListener('deviceorientation', handleOrientation);
+};
 
-function uc(){
-    var n=new Date();
-    if(clk) clk.textContent=n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true});
-    if(dt) dt.textContent=n.toLocaleDateString("ar-SA",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-}
+function uc(){var n=new Date();clk.textContent=n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true});dt.textContent=n.toLocaleDateString("ar-SA",{weekday:"long",year:"numeric",month:"long",day:"numeric"});}
 function ft(d){return d&&!isNaN(d.getTime())?d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",hour12:true}):"--:--";}
 
-if(ab) {
-    ab.onclick=function(){
-      if(aArm) return;
-      try {
-        audioTag = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"); 
-        audioTag.volume = 0.8;
-        audioTag.play().then(function(){
-           audioTag.pause();
-        }).catch(function(e){});
-        
-        aArm=true;
-        setAudioBtnActive();
-        saveAllData();
-      } catch(e) {}
-    }
-}
-
-function chime(){
-  if(!aArm) return;
+ab.onclick=function(){
+  if(aArm) return;
   try {
-    if(!audioTag) {
-      audioTag = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg");
-    }
-    audioTag.currentTime = 0;
-    audioTag.play().catch(function(e){
-       console.log("Audio play blocked:", e);
-    });
-  } catch(e){}
+    var AC=window.AudioContext||window.webkitAudioContext;
+    aCtx=new AC();
+    var b=aCtx.createBuffer(1,1,22050), s=aCtx.createBufferSource();
+    s.buffer=b; s.connect(aCtx.destination); s.start(0);
+    aArm=true;
+    ab.innerHTML="<span>✅</span> <span>التنبيهات مفعلة</span>";
+    ab.style.background="rgba(16,185,129,0.1)";
+    ab.style.borderColor="rgba(16,185,129,0.3)";
+    ab.style.color="#6ee7b7";
+    saveAllData();
+  } catch(e) {}
 }
 
-function rp(){var n=new Date();var tz=-n.getTimezoneOffset()/60;var p=SPE.calc(lat,lng,tz,n);Object.keys(te).forEach(function(k){if(te[k]) te[k].textContent=ft(p[k]);});var now=n.getTime();var cur="isha",prev=p.isha,nx="fajr",nxL="الفجر";if(now>=p.fajr.getTime()&&now<p.sunrise.getTime()){cur="fajr";prev=p.fajr;nx="sunrise";nxL="الشروق";}else if(now>=p.sunrise.getTime()&&now<p.dhuhr.getTime()){cur="sunrise";prev=p.sunrise;nx="dhuhr";nxL="الظهر";}else if(now>=p.dhuhr.getTime()&&now<p.asr.getTime()){cur="dhuhr";prev=p.dhuhr;nx="asr";nxL="العصر";}else if(now>=p.asr.getTime()&&now<p.maghrib.getTime()){cur="asr";prev=p.asr;nx="maghrib";nxL="المغرب";}else if(now>=p.maghrib.getTime()&&now<p.isha.getTime()){cur="maghrib";prev=p.maghrib;nx="isha";nxL="العشاء";}
-Object.values(pc).forEach(function(c){if(c) c.classList.remove("active");});if(pc[cur])pc[cur].classList.add("active");if(cur!=="sunrise"&&(!initTrig||cur!==lastTrig)){if(initTrig) chime(); initTrig=true;}lastTrig=cur;if(cn) cn.textContent=nxL;var tN=p[nx];if(nx==="fajr"&&now>=p.isha.getTime()){var tom=new Date();tom.setDate(tom.getDate()+1);tN=SPE.calc(lat,lng,tz,tom).fajr;}var diff=tN.getTime()-now;if(diff>0){var sec=Math.floor(diff/1000);if(ct) ct.textContent=String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor((sec%3600)/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");var tw=tN.getTime()-prev.getTime();if(tw>0){var pct=diff/tw;if(arc){arc.style.transition="none";arc.setAttribute("stroke-dashoffset",1068*(1-pct));void arc.offsetWidth;arc.style.transition="stroke-dashoffset 1s linear";}}}else{if(ct) ct.textContent="00:00:00";if(arc) arc.setAttribute("stroke-dashoffset","1068");}}
+function chime(){if(!aArm||!aCtx)return;var t=aCtx.currentTime;[523.25,659.25,783.99,1046.5].forEach(function(f,i){var o=aCtx.createOscillator(),g=aCtx.createGain();o.type="sine";o.frequency.setValueAtTime(f,t+i*0.12);g.gain.setValueAtTime(0.2,t+i*0.12);g.gain.exponentialRampToValueAtTime(0.001,t+i*0.12+0.5);o.connect(g);g.connect(aCtx.destination);o.start(t+i*0.12);o.stop(t+i*0.12+0.5);});}
+function rp(){var n=new Date();var tz=-n.getTimezoneOffset()/60;var p=SPE.calc(lat,lng,tz,n);Object.keys(te).forEach(function(k){te[k].textContent=ft(p[k]);});var now=n.getTime();var cur="isha",prev=p.isha,nx="fajr",nxL="الفجر";if(now>=p.fajr.getTime()&&now<p.sunrise.getTime()){cur="fajr";prev=p.fajr;nx="sunrise";nxL="الشروق";}else if(now>=p.sunrise.getTime()&&now<p.dhuhr.getTime()){cur="sunrise";prev=p.sunrise;nx="dhuhr";nxL="الظهر";}else if(now>=p.dhuhr.getTime()&&now<p.asr.getTime()){cur="dhuhr";prev=p.dhuhr;nx="asr";nxL="العصر";}else if(now>=p.asr.getTime()&&now<p.maghrib.getTime()){cur="asr";prev=p.asr;nx="maghrib";nxL="المغرب";}else if(now>=p.maghrib.getTime()&&now<p.isha.getTime()){cur="maghrib";prev=p.maghrib;nx="isha";nxL="العشاء";}
+Object.values(pc).forEach(function(c){c.classList.remove("active");});if(pc[cur])pc[cur].classList.add("active");if(cur!=="sunrise"&&(!initTrig||cur!==lastTrig)){chime();initTrig=true;}lastTrig=cur;cn.textContent=nxL;var tN=p[nx];if(nx==="fajr"&&now>=p.isha.getTime()){var tom=new Date();tom.setDate(tom.getDate()+1);tN=SPE.calc(lat,lng,tz,tom).fajr;}var diff=tN.getTime()-now;if(diff>0){var sec=Math.floor(diff/1000);ct.textContent=String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor((sec%3600)/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");var tw=tN.getTime()-prev.getTime();if(tw>0){var pct=diff/tw;arc.style.transition="none";arc.setAttribute("stroke-dashoffset",1068*(1-pct));void arc.offsetWidth;arc.style.transition="stroke-dashoffset 1s linear";}}else{ct.textContent="00:00:00";arc.setAttribute("stroke-dashoffset","1068");}}
 
 function getAdjustedHijri(dateObj) {
   var targetDate = new Date(dateObj.getTime());
@@ -565,13 +524,12 @@ function findShiaEvent(hMonth, hDay) {
 }
 
 function rc(){
-  if(!cmn || !cdg) return;
   cmn.textContent = MIL_MONTH_NAMES[calM] + " " + calY;
   var firstMilDate = new Date(calY, calM, 1);
   var dim = new Date(calY, calM + 1, 0).getDate();
   var hFirst = getAdjustedHijri(firstMilDate);
   var hLast = getAdjustedHijri(new Date(calY, calM, dim));
-  if(cgr) cgr.textContent = SCE.monthName(hFirst.hMonth) + " " + hFirst.hYear + " - " + SCE.monthName(hLast.hMonth) + " " + hLast.hYear + " هـ";
+  cgr.textContent = SCE.monthName(hFirst.hMonth) + " " + hFirst.hYear + " - " + SCE.monthName(hLast.hMonth) + " " + hLast.hYear + " هـ";
   cdg.innerHTML = "";
   var sd = firstMilDate.getDay();
   for(var i=0; i<sd; i++){ cdg.appendChild(document.createElement("div")); }
@@ -597,10 +555,7 @@ function rc(){
     cell.className = cls;
     cdg.appendChild(cell);
   }
-  if(todayEventBanner) {
-    if(todayEventText) { todayEventBanner.textContent = todayEventText; todayEventBanner.className = "event-banner " + todayEventType; } 
-    else { todayEventBanner.style.display = "none"; }
-  }
+  if(todayEventText) { todayEventBanner.textContent = todayEventText; todayEventBanner.className = "event-banner " + todayEventType; } else { todayEventBanner.style.display = "none"; }
 }
 
 function ua(){
@@ -609,13 +564,13 @@ function ua(){
   var now = new Date();
   var tH = getAdjustedHijri(now);
   var offsetText = hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + " يوم)" : "";
-  if(thj) thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + offsetText;
+  thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + offsetText;
   if(calY === 0){ calY = now.getFullYear(); calM = now.getMonth(); }
   rc();
 }
 
 function sv(la,lo,lb){
-  lat=la; lng=lo; locName=lb; if(ld) ld.textContent=lb;
+  lat=la; lng=lo; locName=lb; ld.textContent=lb;
   qiblaDeg = qiblaDirection(lat,lng,KAABA_LAT,KAABA_LON); if(qiblaDeg<0) qiblaDeg+=360;
   saveAllData();
 }
@@ -623,35 +578,42 @@ function sv(la,lo,lb){
 function triggerGPS() {
   if (navigator.geolocation) {
     if (window.location.protocol === 'file:') {
-      alert("💡 تنبيه النظام:\nعند تشغيل الملف محلياً بدون سيرفر، يتم حظر الـ GPS تلقائياً لحمايتك. تم تشغيل مواقيت (القطيف الافتراضية) فوراً.");
+      alert("💡 تنبيه الخصوصية والمنظومة:\nالـ GPS محظور عند تشغيل الملف مباشرة. يرجى رفعه عبر الـ https أو تشغيل السيرفر المحلي عبر بايثون.");
       sv(26.5258, 49.9981, "القطيف (افتراضي)");
       ua();
       return;
     }
-    if(ld) ld.textContent = "📡 جاري التزامن...";
+    ld.textContent = "📡 جاري الاتصال بالـ GPS...";
+    var optionsHigh = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+    var optionsLow = { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 };
+
     navigator.geolocation.getCurrentPosition(function(pos) {
-        sv(pos.coords.latitude, pos.coords.longitude, "📍 موقع (GPS)");
+        sv(pos.coords.latitude, pos.coords.longitude, "📍 موقع دقيق (GPS)");
         ua();
     }, function(err) {
-        sv(26.5258, 49.9981, "القطيف (افتراضي)");
-        ua();
-    }, { enableHighAccuracy: false, timeout: 4000 });
+        navigator.geolocation.getCurrentPosition(function(pos2) {
+            sv(pos2.coords.latitude, pos2.coords.longitude, "📍 موقع تقريبي (الشبكة)");
+            ua();
+        }, function(err2) {
+            alert("⚠️ لم نتمكن من الوصول للموقع الفعلي. تأكد من إعطاء صلاحية الموقع لمتصفح Safari من إعدادات الآيفون العامة.");
+            sv(26.5258, 49.9981, "القطيف (افتراضي)");
+            ua();
+        }, optionsLow);
+    }, optionsHigh);
   } else {
-    sv(26.5258, 49.9981, "القطيف (افتراضي)");
-    ua();
+    alert("ميزة الـ GPS غير مدعومة في متصفحك الحالي.");
   }
 }
 
-if(incOffset) incOffset.onclick=function(){ hOffset++; saveAllData(); ua(); };
-if(decOffset) decOffset.onclick=function(){ hOffset--; saveAllData(); ua(); };
-if(pmb) pmb.onclick=function(){calM--;if(calM<0){calM=11;calY--;}rc();};
-if(nmb) nmb.onclick=function(){calM++;if(calM>11){calM=0;calY++;}rc();};
-if(rl) rl.onclick = function() { triggerGPS(); };
+incOffset.onclick=function(){ hOffset++; saveAllData(); ua(); };
+decOffset.onclick=function(){ hOffset--; saveAllData(); ua(); };
+pmb.onclick=function(){calM--;if(calM<0){calM=11;calY--;}rc();};
+nmb.onclick=function(){calM++;if(calM>11){calM=0;calY++;}rc();};
+rl.onclick = function() { triggerGPS(); };
 
 setInterval(function(){uc();rp();},1000);
 document.addEventListener("visibilitychange",function(){if(!document.hidden)rp();});
 
-// تشغيل النظام فورا
 ua();
 })();
 </script>
