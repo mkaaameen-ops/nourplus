@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <title>نور</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="نور">
+    <style>
+        * { -webkit-tap-highlight-color: transparent; outline: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, sans-serif;
+            direction: rtl;
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a);
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px
+        }
+        @supports(padding:max(0px)) {
+            body {
+                padding-top: max(16px, env(safe-area-inset-top));
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+                padding-bottom: max(16px, env(safe-area-inset-bottom))
+            }
+        }
+        .main-grid {
+            max-width: 72rem;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px
+        }
+        @media(min-width:768px) { .main-grid { grid-template-columns: 1fr 1fr; gap: 24px } }
+        @media(min-width:1024px) { .main-grid { grid-template-columns: repeat(12, 1fr); gap: 24px } }
+        .panel {
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .5);
+            position: relative
+        }
+        @media(min-width:640px) { .panel { padding: 24px } }
+        .prayer-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, .05);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .05);
+            transition: all .2s
+        }
+        @media(min-width:640px) { .prayer-card { padding: 14px } }
+        .prayer-card.active {
+            background: rgba(20, 184, 166, .2);
+            border-color: rgba(45, 212, 191, .6);
+            box-shadow: 0 0 20px rgba(20, 184, 166, .2);
+            transform: scale(1.01)
+        }
+        .prayer-card.active span:first-child { color: #2dd4bf; font-weight: 700 }
+        .circle-container { width: 340px; height: 340px; position: relative }
+        @media(min-width:640px) { .circle-container { width: 378px; height: 378px } }
+        .prayer-time { font-family: monospace; font-size: 1.1rem }
+        .digital-clock { font-family: monospace; font-weight: 900; color: #5eead4; text-shadow: 0 0 12px rgba(45, 212, 191, .15) }
+        .countdown-timer { font-family: monospace; font-weight: 700; color: #6ee7b7 }
+        .gradient-text { background: linear-gradient(to right, #2dd4bf, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent }
+        button:active { opacity: .7; transform: scale(.97) }
+        
+        .cal-day {
+            padding: 6px 2px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            min-height: 44px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .cal-day.today {
+            background: linear-gradient(135deg, #14b8a6, #10b981);
+            color: #0f172a;
+            font-weight: 800;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+            border: none
+        }
+        .cal-day.normal { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .02); color: #e2e8f0 }
+        .cal-day.special-sorrow { border: 1px solid rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.12); color: #fca5a5; }
+        .cal-day.special-joy { border: 1px solid rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.12); color: #a7f3d0; }
+        
+        .small-text { font-size: .75rem; color: #94a3b8 }
+        
+        .compass-icon-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(20, 184, 166, .15);
+            border: 1px solid rgba(20, 184, 166, .3);
+            color: #2dd4bf;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 5;
+            transition: all .2s
+        }
+        .compass-icon-btn:hover { background: rgba(20, 184, 166, .25) }
+        
+        /* تصميم واجهة القبلة التفاعلية ومحاكاة قوقل كعبة فايندر */
+        .compass-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, .92); backdrop-filter: blur(12px);
+            z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column
+        }
+        .compass-modal {
+            background: rgba(30, 41, 59, .75); border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 32px; padding: 24px; text-align: center; max-width: 360px; width: 92%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .5);
+            position: relative;
+        }
+        .compass-finder-container {
+            width: 240px; height: 240px; margin: 20px auto; position: relative; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%);
+            border: 3px dashed rgba(255, 255, 255, 0.15);
+            display: flex; align-items: center; justify-content: center;
+            cursor: grab; touch-action: none;
+        }
+        .compass-finder-container:active { cursor: grabbing; }
+        .qibla-ring-indicator {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border: 2px solid rgba(20, 184, 166, 0.2); transition: all 0.15s ease-out;
+        }
+        .qibla-ring-indicator.aligned {
+            border: 4px solid #10b981;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+        }
+        .kaaba-icon {
+            position: absolute; width: 44px; height: 44px;
+            background: #1e293b; border: 2px solid #ef4444; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+            bottom: calc(50% - 22px); left: calc(50% - 22px);
+            transform-origin: center center; z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.15s ease-out;
+        }
+        .qibla-ring-indicator.aligned .kaaba-icon {
+            border-color: #10b981;
+            background-color: #10b981;
+        }
+        .phone-pointer {
+            position: absolute; top: 8px; width: 4px; height: 26px;
+            background: #5eead4; border-radius: 2px; z-index: 15;
+            box-shadow: 0 0 8px #2dd4bf;
+        }
+        .compass-close-btn { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .15); color: white; padding: 10px 32px; border-radius: 24px; margin-top: 16px; font-size: .9rem; cursor: pointer; font-weight: 600; }
+        .compass-close-btn:hover { background: rgba(255,255,255,0.2); }
+        .qibla-info { color: #93c5fd; font-size: .85rem; margin: 8px 0; display: flex; justify-content: center; gap: 16px; font-family: monospace }
+        .compass-hint { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        
+        .sync-btn-container { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+        .offset-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .offset-btn:hover { background: rgba(20, 184, 166, 0.2); border-color: #2dd4bf; }
+        
+        .event-banner {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border-right: 4px solid #94a3b8;
+            color: #cbd5e1;
+            display: none;
+            font-weight: 500;
+        }
+        .event-banner.sorrow { border-right-color: #ef4444; background: rgba(239, 68, 68, 0.06); color: #fca5a5; display: block; }
+        .event-banner.joy { border-right-color: #10b981; background: rgba(16, 185, 129, 0.06); color: #a7f3d0; display: block; }
+    </style>
+</head>
+<body>
+<div class="main-grid">
+    <div style="grid-column:span 6" class="panel">
+        <div class="compass-icon-btn" id="compassIcon" title="البوصلة">🧭</div>
+        <div style="text-align:center;margin-bottom:16px">
+            <h1 class="gradient-text" style="font-size:2rem;font-weight:800">نُور</h1>
+            <div style="display:flex;justify-content:center;align-items:center;gap:8px;direction:ltr;margin-top:4px">
+                <button id="rl" style="font-size:.65rem;background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:bold;">تزامن الموقع 📍</button>
+                <span id="ld" style="font-size:.75rem;color:#94a3b8;max-width:180px;overflow:hidden;white-space:nowrap">القطيف</span>
+            </div>
+            <div style="margin:8px 0"><div id="clk" class="digital-clock" style="font-size:2.5rem"></div></div>
+            <div id="dt" class="small-text"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+            <div id="pf" class="prayer-card"><span>🌙 الفجر</span><span class="prayer-time" id="tf">--:--</span></div>
+            <div id="ps" class="prayer-card" style="opacity:.4"><span>☀️ الشروق</span><span class="prayer-time" id="ts">--:--</span></div>
+            <div id="pd" class="prayer-card"><span>🌞 الظهر</span><span class="prayer-time" id="td">--:--</span></div>
+            <div id="pa" class="prayer-card"><span>⛅ العصر</span><span class="prayer-time" id="ta">--:--</span></div>
+            <div id="pm" class="prayer-card"><span>🌅 المغرب</span><span class="prayer-time" id="tm">--:--</span></div>
+            <div id="pi" class="prayer-card"><span>🌙 العشاء</span><span class="prayer-time" id="ti">--:--</span></div>
+        </div>
+        <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px">
+            <button id="abtn" style="width:100%;padding:12px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d;font-size:.8rem;letter-spacing:.05em"><span id="aic">🔔</span> <span id="atx">تفعيل التنبيهات الصوتية</span></button>
+        </div>
+    </div>
+    
+    <div style="grid-column:span 6;display:flex;flex-direction:column;gap:16px">
+        <div class="panel" style="display:flex;align-items:center;justify-content:center;min-height:360px">
+            <div class="circle-container">
+                <svg width="100%" height="100%" viewBox="0 0 378 378">
+                    <circle cx="189" cy="189" r="170" stroke="rgba(255,255,255,.03)" stroke-width="12" fill="transparent"/>
+                    <circle id="arc" cx="189" cy="189" r="170" stroke="url(#g)" stroke-width="10" stroke-linecap="round" fill="transparent" stroke-dasharray="1068" stroke-dashoffset="0" transform="rotate(-90 189 189)"/>
+                    <defs>
+                        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#10b981"/></linearGradient>
+                    </defs>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+                    <span style="font-size:.7rem;color:#2dd4bf;font-weight:600;letter-spacing:.1em">الصلاة القادمة</span>
+                    <h2 id="cn" style="font-size:1.8rem;color:#fff;margin:6px 0">--</h2>
+                    <div id="ct" class="countdown-timer" style="font-size:2.2rem">00:00:00</div>
+                    <span style="font-size:.65rem;color:#94a3b8;margin-top:4px">الوقت المتبقي</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px;margin-bottom:12px">
+                <button id="pmb" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;padding:4px 12px;border-radius:8px">&gt;</button>
+                <div style="text-align:center">
+                    <h3 id="cmn" style="font-size:1.2rem;color:#2dd4bf;font-weight:700">--</h3>
+                    <p id="cgr" style="font-size:.7rem;color:#94a3b8;margin-top:2px"></p>
+                </div>
+                <button id="nmb" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;padding:4px 12px;border-radius:8px">&lt;</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:.8rem;color:#94a3b8;margin-bottom:8px">
+                <div>ح</div><div>ن</div><div>ث</div><div>ر</div><div>خ</div><div>ج</div><div>س</div>
+            </div>
+            <div id="cdg" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center"></div>
+            
+            <div id="todayEventBanner" class="event-banner"></div>
+
+            <div style="margin-top:12px;background:rgba(20,184,166,.05);border:1px solid rgba(20,184,166,.1);border-radius:12px;padding:12px">
+                <div class="sync-btn-container">
+                    <div style="font-size:.8rem;color:#2dd4bf;display:flex;align-items:center;gap:6px"><span>📅</span> التاريخ الهجري الشرعي اليوم:</div>
+                    <div style="display:flex;gap:4px">
+                        <button class="offset-btn" id="decOffset" title="تأخير يوم">-</button>
+                        <button class="offset-btn" id="incOffset" title="تقديم يوم">+</button>
+                    </div>
+                </div>
+                <p id="thj" style="font-size:.95rem;color:#fff;margin-top:6px;margin-bottom:0;font-weight:600">--</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="compassModal" style="display:none" class="compass-modal-overlay">
+    <div class="compass-modal">
+        <h3 style="margin:0;color:#fff;font-size:1.1rem;">محدد اتجاه القبلة التفاعلي</h3>
+        <p class="compass-hint" id="statusHint">قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة</p>
+        
+        <div class="compass-finder-container" id="compassContainer">
+            <div class="phone-pointer"></div>
+            <div class="qibla-ring-indicator" id="qiblaRing">
+                <div class="kaaba-icon" id="kaabaIcon">🕋</div>
+            </div>
+        </div>
+        
+        <div class="qibla-info">
+            <span>زاوية القبلة: <strong id="targetAngleText" style="color:#2dd4bf">--°</strong></span>
+            <span>اتجاهك الحالي: <strong id="currentAngleText" style="color:#ef4444">--°</strong></span>
+        </div>
+        <button class="compass-close-btn" id="closeCompass">تم</button>
+    </div>
+</div>
+
+<script>
+function toRad(d){return d*Math.PI/180}
+function toDeg(r){return r*180/Math.PI}
+
+var SPE=(function(){function w(x){return x-360*Math.floor(x/360)}return{calc:function(la,lo,tz,D){var y=D.getFullYear(),m=D.getMonth()+1,dd=D.getDate();if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=2-A+Math.floor(A/4);var jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+dd+B-1524.5;var D2=jd-2451545;var g=w(357.529+0.98560028*D2),q=w(280.459+0.98564736*D2);var L=w(q+1.915*Math.sin(toRad(g))+0.020*Math.sin(toRad(2*g)));var e=23.439-0.00000036*D2;var RA=toDeg(Math.atan2(Math.cos(toRad(e))*Math.sin(toRad(L)),Math.cos(toRad(L))))/15;if(RA<0)RA+=24;var dec=toDeg(Math.asin(Math.sin(toRad(e))*Math.sin(toRad(L))));var EqT=q/15-RA;var mid=12+tz-lo/15-EqT;if(mid<0)mid+=24;if(mid>24)mid-=24;function aD(a){var num=-Math.sin(toRad(a))-Math.sin(toRad(la))*Math.sin(toRad(dec));var den=Math.cos(toRad(la))*Math.cos(toRad(dec));var cosH=num/den;if(cosH>1||cosH<-1)return null;return toDeg(Math.acos(cosH))/15}function asrD(){var len=1+Math.tan(toRad(Math.abs(la-dec)));var num=Math.sin(Math.atan(1/len))-Math.sin(toRad(la))*Math.sin(toRad(dec));var den=Math.cos(toRad(la))*Math.cos(toRad(dec));var cosH=num/den;if(cosH>1||cosH<-1)return null;return toDeg(Math.acos(cosH))/15}var fH=aD(16),sH=aD(0.833),aH=asrD(),mH=aD(4),iH=aD(14);var T={fajr:mid-fH,sunrise:mid-sH,dhuhr:mid,asr:mid+aH,maghrib:mid+mH,isha:mid+iH};var res={};Object.keys(T).forEach(function(k){var base=new Date(D.getTime());base.setHours(0,0,0,0);res[k]=new Date(base.getTime()+T[k]*3600000)});return res}}})();
+var SCE=(function(){var M=["محرّم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوّال","ذو القعدة","ذو الحجة"];function g2j(y,m,d){if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=Math.floor(A/4),C=2-A+B;return C+d+Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))-1524.5}function j2h(jd){var z=Math.floor(jd+0.5),c=Math.floor((z-1948439.5)/10631),rem=(z-1948439.5)-c*10631;var yc=Math.floor((rem*30+11)/10631),yr=rem-Math.floor((yc*10631+14)/30);var y=c*30+yc+1,m=Math.floor((yr*11+330)/325),d=Math.floor(yr-Math.floor((m*325-320)/11)+0.5);if(d===0){d=30;m--}if(m===0){m=12;y--}return{hYear:y,hMonth:m,hDay:d}}return{hijri:function(d){return j2h(g2j(d.getFullYear(),d.getMonth()+1,d.getDate()))},monthName:function(i){return M[i-1]||""},daysInMonth:function(y,m){if(m===12)return((y*11+14)%30)<11?30:29;return m%2===1?30:29},h2g:function(y,m,d){var c=Math.floor((y-1)/30),yc=(y-1)%30;var jd=1948439.5+c*10631+Math.floor((yc*10631+14)/30)+Math.floor((m*325-320)/11)+d;var j=Math.floor(jd+0.5),w=Math.floor((j-1867216.25)/36524.25),x=Math.floor(w/4),b=j+1+w-x,c2=b+1524;var dy=Math.floor((c2-122.1)/365.25),e=Math.floor(365.25*dy),g=Math.floor((c2-e)/30.6001);var day=c2-e-Math.floor(30.6001*g),month=g<14?g-1:g-13,year=month>2?dy-4716:dy-4715;return new Date(year,month-1,day)}}})();
+
+// قائمة المناسبات الإسلامية والشرعية الكاملة
+var shiaEvents=[
+  {m:1,d:1,t:"sorrow",n:"رأس السنة الهجرية"},
+  {m:1,d:2,t:"sorrow",n:"ورود القافلة الحسينية كربلاء"},
+  {m:1,d:7,t:"sorrow",n:"منع الماء عن معسكر الحسين (ع)"},
+  {m:1,d:9,t:"sorrow",n:"تأسوعاء الإمام الحسين (ع)"},
+  {m:1,d:10,t:"sorrow",n:"عاشوراء - شهادة الإمام الحسين (ع)"},
+  {m:1,d:12,t:"sorrow",n:"دفن الأجساد الطاهرة بكربلاء"},
+  {m:1,d:25,t:"sorrow",n:"شهادة الإمام علي بن الحسين السجاد (ع)"},
+  {m:2,d:1,t:"sorrow",n:"دخول سبايا آل محمد إلى الشام"},
+  {m:2,d:7,t:"sorrow",n:"شهادة الإمام الحسن المجتبى (ع)"},
+  {m:2,d:20,t:"sorrow",n:"أربعينية الإمام الحسين (ع)"},
+  {m:2,d:28,t:"sorrow",n:"شهادة الرسول الأعظم محمد (ص)"},
+  {m:2,d:29,t:"sorrow",n:"شهادة الإمام علي بن موسى الرضا (ع)"},
+  {m:3,d:1,t:"joy",n:"هجرة النبي (ص) ومبيت الإمام علي بالفراش"},
+  {m:3,d:8,t:"sorrow",n:"شهادة الإمام الحسن العسكري (ع)"},
+  {m:3,d:9,t:"joy",n:"تتويج الإمام المهدي (عج) / فرحة الزهراء"},
+  {m:3,d:17,t:"joy",n:"المولد النبوي الشريف / مولد الإمام الصادق (ع)"},
+  {m:4,d:8,t:"joy",n:"مولد الإمام الحسن العسكري (ع)"},
+  {m:4,d:10,t:"sorrow",n:"وفاة السيدة فاطمة المعصومة (ع)"},
+  {m:5,d:5,t:"joy",n:"مولد بطلة كربلاء السيدة زينب (ع)"},
+  {m:5,d:13,t:"sorrow",n:"شهادة الصديقة الزهراء (ع) - الرواية الثانية"},
+  {m:6,d:3,t:"sorrow",n:"شهادة الصديقة فاطمة الزهراء (ع) - الرواية الثالثة"},
+  {m:6,d:20,t:"joy",n:"مولد السيدة فاطمة الزهراء (ع)"},
+  {m:7,d:1,t:"joy",n:"مولد الإمام محمد الباقر (ع)"},
+  {m:7,d:3,t:"sorrow",n:"شهادة الإمام علي الهادي (ع)"},
+  {m:7,d:10,t:"joy",n:"مولد الإمام محمد الجواد (ع)"},
+  {m:7,d:13,t:"joy",n:"مولد أمير المؤمنين الإمام علي بن أبي طالب (ع)"},
+  {m:7,d:25,t:"sorrow",n:"شهادة الإمام موسى بن جعفر الكاظم (ع)"},
+  {m:7,d:27,t:"joy",n:"المبعث النبوي الشريف"},
+  {m:8,d:3,t:"joy",n:"مولد الإمام الحسين (ع)"},
+  {m:8,d:4,t:"joy",n:"مولد أبو الفضل العباس (ع)"},
+  {m:8,d:5,t:"joy",n:"مولد الإمام علي بن الحسين السجاد (ع)"},
+  {m:8,d:11,t:"joy",n:"مولد شبيه المصطفى علي الأكبر (ع)"},
+  {m:8,d:15,t:"joy",n:"مولد منقذ البشرية الإمام المهدي المنتظر (عج)"},
+  {m:9,d:1,t:"joy",n:"بدء شهر رمضان المبارك"},
+  {m:9,d:15,t:"joy",n:"مولد سبط النبي الإمام الحسن المجتبى (ع)"},
+  {m:9,d:19,t:"sorrow",n:"ضربة أمير المؤمنين (ع) في محرابه"},
+  {m:9,d:21,t:"sorrow",n:"شهادة أمير المؤمنين الإمام علي (ع)"},
+  {m:9,d:23,t:"joy",n:"ليلة القدر المباركة الثالثة"},
+  {m:10,d:1,t:"joy",n:"عيد الفطر المبارك"},
+  {m:10,d:25,t:"sorrow",n:"شهادة الإمام جعفر بن محمد الصادق (ع)"},
+  {m:11,d:1,t:"joy",n:"مولد السيدة فاطمة المعصومة (ع)"},
+  {m:11,d:11,t:"joy",n:"مولد غريب طوس الإمام علي بن موسى الرضا (ع)"},
+  {m:11,d:29,t:"sorrow",n:"شهادة الإمام محمد بن علي الجواد (ع)"},
+  {m:12,d:1,t:"joy",n:"زواج أمير المؤمنين من السيدة الزهراء (ع)"},
+  {m:12,d:7,t:"sorrow",n:"شهادة الإمام محمد بن علي الباقر (ع)"},
+  {m:12,d:9,t:"sorrow",n:"يوم عرفة المبارك"},
+  {m:12,d:10,t:"joy",n:"عيد الأضحى المبارك"},
+  {m:12,d:15,t:"joy",n:"مولد الإمام علي بن محمد الهادي (ع)"},
+  {m:12,d:18,t:"joy",n:"عيد الغدير الأغر - تنصيب الولاية"},
+  {m:12,d:24,t:"joy",n:"يوم مباهلة النبي وتصدق أمير المؤمنين بالخاتم"}
+];
+
+var MIL_MONTH_NAMES = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+
+(function(){
+var ld=document.getElementById("ld"),clk=document.getElementById("clk"),dt=document.getElementById("dt"),cn=document.getElementById("cn"),ct=document.getElementById("ct"),arc=document.getElementById("arc"),ab=document.getElementById("abtn"),cmn=document.getElementById("cmn"),cgr=document.getElementById("cgr"),cdg=document.getElementById("cdg"),thj=document.getElementById("thj"),pmb=document.getElementById("pmb"),nmb=document.getElementById("nmb"),rl=document.getElementById("rl");
+var incOffset=document.getElementById("incOffset"), decOffset=document.getElementById("decOffset");
+var todayEventBanner=document.getElementById("todayEventBanner");
+
+var compassIcon = document.getElementById("compassIcon"), compassModal = document.getElementById("compassModal"), closeCompassBtn = document.getElementById("closeCompass");
+var compassContainer = document.getElementById("compassContainer"), qiblaRing = document.getElementById("qiblaRing"), kaabaIcon = document.getElementById("kaabaIcon");
+var targetAngleText = document.getElementById("targetAngleText"), currentAngleText = document.getElementById("currentAngleText"), statusHint = document.getElementById("statusHint");
+
+var pc={fajr:document.getElementById("pf"),sunrise:document.getElementById("ps"),dhuhr:document.getElementById("pd"),asr:document.getElementById("pa"),maghrib:document.getElementById("pm"),isha:document.getElementById("pi")};
+var te={fajr:document.getElementById("tf"),sunrise:document.getElementById("ts"),dhuhr:document.getElementById("td"),asr:document.getElementById("ta"),maghrib:document.getElementById("tm"),isha:document.getElementById("ti")};
+
+var lat=26.5258,lng=49.9981,locName="القطيف";
+var aArm=false;
+var hOffset=0; 
+var calY=0, calM=0; 
+var aCtx=null, lastTrig="", initTrig=false;
+
+function saveAllData() {
+  var data = { lat: lat, lng: lng, name: locName, sound: aArm, hOffset: hOffset };
+  try { localStorage.setItem('nur_full_data', JSON.stringify(data)); } catch(e) {}
+}
+function loadAllData() {
+  try {
+    var saved = localStorage.getItem('nur_full_data');
+    if (saved) {
+      var d = JSON.parse(saved);
+      if (d.lat && d.lng && d.name) { lat = d.lat; lng = d.lng; locName = d.name; }
+      if (typeof d.sound === 'boolean') { aArm = d.sound; }
+      if (typeof d.hOffset === 'number') { hOffset = d.hOffset; }
+    }
+  } catch(e) {}
+}
+loadAllData();
+ld.textContent = locName;
+
+function qiblaDirection(lat1,lon1,lat2,lon2){
+ var dLon = toRad(lon2 - lon1);
+ var y = Math.sin(dLon);
+ var x = Math.cos(toRad(lat1))*Math.tan(toRad(lat2)) - Math.sin(toRad(lat1))*Math.cos(dLon);
+ return toDeg(Math.atan2(y,x));
+}
+var KAABA_LAT = 21.4225, KAABA_LON = 39.8262;
+var qiblaDeg = qiblaDirection(lat,lng,KAABA_LAT,KAABA_LON);
+if(qiblaDeg<0) qiblaDeg+=360;
+
+// البوصلة التفاعلية ومحاكاة قوقل كعبة فايندر بالسحب والدوران بلمس اليد والماوس
+var currentHeading = 0; 
+var isDragging = false;
+var startAngle = 0;
+
+function updateCompassView(heading) {
+    currentHeading = (heading + 360) % 360;
+    qiblaRing.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
+    kaabaIcon.style.transform = 'rotate(' + (qiblaDeg) + 'deg)';
+    targetAngleText.textContent = Math.round(qiblaDeg) + "°";
+    currentAngleText.textContent = Math.round(currentHeading) + "°";
+    
+    var diff = Math.abs(currentHeading - qiblaDeg);
+    if (diff > 180) diff = 360 - diff;
+    
+    if (diff <= 5) {
+        qiblaRing.classList.add("aligned");
+        statusHint.textContent = "أنت تواجه الكعبة المشرفة تماماً! 🕋";
+        statusHint.style.color = "#10b981";
+        if (window.navigator.vibrate) window.navigator.vibrate(40);
+    } else {
+        qiblaRing.classList.remove("aligned");
+        statusHint.textContent = "قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة";
+        statusHint.style.color = "#94a3b8";
+    }
+}
+
+function getAngle(clientX, clientY) {
+    var rect = compassContainer.getBoundingClientRect();
+    var centerX = rect.left + rect.width / 2;
+    var centerY = rect.top + rect.height / 2;
+    return toDeg(Math.atan2(clientY - centerY, clientX - centerX));
+}
+
+function startDrag(e) {
+    isDragging = true;
+    var pageX = e.touches ? e.touches[0].clientX : e.clientX;
+    var pageY = e.touches ? e.touches[0].clientY : e.clientY;
+    startAngle = getAngle(pageX, pageY) - currentHeading;
+    e.preventDefault();
+}
+function doDrag(e) {
+    if (!isDragging) return;
+    var pageX = e.touches ? e.touches[0].clientX : e.clientX;
+    var pageY = e.touches ? e.touches[0].clientY : e.clientY;
+    var angle = getAngle(pageX, pageY);
+    updateCompassView(angle - startAngle);
+}
+function stopDrag() { isDragging = false; }
+
+compassContainer.addEventListener('mousedown', startDrag);
+compassContainer.addEventListener('mousemove', doDrag);
+window.addEventListener('mouseup', stopDrag);
+compassContainer.addEventListener('touchstart', startDrag, {passive: false});
+compassContainer.addEventListener('touchmove', doDrag, {passive: false});
+window.addEventListener('touchend', stopDrag);
+
+function handleOrientation(e) {
+    var heading = e.webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : null);
+    if (heading !== null && !isDragging) {
+        updateCompassView(heading);
+    }
+}
+
+compassIcon.onclick = function() {
+    compassModal.style.display = 'flex';
+    qiblaDeg = qiblaDirection(lat, lng, KAABA_LAT, KAABA_LON);
+    if(qiblaDeg < 0) qiblaDeg += 360;
+    updateCompassView(0);
+    
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(function(s){ if(s==='granted') window.addEventListener('deviceorientation', handleOrientation); });
+    } else {
+        window.addEventListener('deviceorientation', handleOrientation);
+    }
+};
+
+closeCompassBtn.onclick = function() {
+    compassModal.style.display = 'none';
+    window.removeEventListener('deviceorientation', handleOrientation);
+};
+
+function uc(){var n=new Date();clk.textContent=n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true});dt.textContent=n.toLocaleDateString("ar-SA",{weekday:"long",year:"numeric",month:"long",day:"numeric"});}
+function ft(d){return d&&!isNaN(d.getTime())?d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",hour12:true}):"--:--";}
+
+ab.onclick=function(){
+  if(aArm) return;
+  try {
+    var AC=window.AudioContext||window.webkitAudioContext;
+    aCtx=new AC();
+    var b=aCtx.createBuffer(1,1,22050), s=aCtx.createBufferSource();
+    s.buffer=b; s.connect(aCtx.destination); s.start(0);
+    aArm=true;
+    ab.innerHTML="<span>✅</span> <span>التنبيهات مفعلة</span>";
+    ab.style.background="rgba(16,185,129,0.1)";
+    ab.style.borderColor="rgba(16,185,129,0.3)";
+    ab.style.color="#6ee7b7";
+    saveAllData();
+  } catch(e) {}
+}
+
+function chime(){if(!aArm||!aCtx)return;var t=aCtx.currentTime;[523.25,659.25,783.99,1046.5].forEach(function(f,i){var o=aCtx.createOscillator(),g=aCtx.createGain();o.type="sine";o.frequency.setValueAtTime(f,t+i*0.12);g.gain.setValueAtTime(0.2,t+i*0.12);g.gain.exponentialRampToValueAtTime(0.001,t+i*0.12+0.5);o.connect(g);g.connect(aCtx.destination);o.start(t+i*0.12);o.stop(t+i*0.12+0.5);});}
+function rp(){var n=new Date();var tz=-n.getTimezoneOffset()/60;var p=SPE.calc(lat,lng,tz,n);Object.keys(te).forEach(function(k){te[k].textContent=ft(p[k]);});var now=n.getTime();var cur="isha",prev=p.isha,nx="fajr",nxL="الفجر";if(now>=p.fajr.getTime()&&now<p.sunrise.getTime()){cur="fajr";prev=p.fajr;nx="sunrise";nxL="الشروق";}else if(now>=p.sunrise.getTime()&&now<p.dhuhr.getTime()){cur="sunrise";prev=p.sunrise;nx="dhuhr";nxL="الظهر";}else if(now>=p.dhuhr.getTime()&&now<p.asr.getTime()){cur="dhuhr";prev=p.dhuhr;nx="asr";nxL="العصر";}else if(now>=p.asr.getTime()&&now<p.maghrib.getTime()){cur="asr";prev=p.asr;nx="maghrib";nxL="المغرب";}else if(now>=p.maghrib.getTime()&&now<p.isha.getTime()){cur="maghrib";prev=p.maghrib;nx="isha";nxL="العشاء";}
+Object.values(pc).forEach(function(c){c.classList.remove("active");});if(pc[cur])pc[cur].classList.add("active");if(cur!=="sunrise"&&(!initTrig||cur!==lastTrig)){chime();initTrig=true;}lastTrig=cur;cn.textContent=nxL;var tN=p[nx];if(nx==="fajr"&&now>=p.isha.getTime()){var tom=new Date();tom.setDate(tom.getDate()+1);tN=SPE.calc(lat,lng,tz,tom).fajr;}var diff=tN.getTime()-now;if(diff>0){var sec=Math.floor(diff/1000);ct.textContent=String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor((sec%3600)/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0");var tw=tN.getTime()-prev.getTime();if(tw>0){var pct=diff/tw;arc.style.transition="none";arc.setAttribute("stroke-dashoffset",1068*(1-pct));void arc.offsetWidth;arc.style.transition="stroke-dashoffset 1s linear";}}else{ct.textContent="00:00:00";arc.setAttribute("stroke-dashoffset","1068");}}
+
+function getAdjustedHijri(dateObj) {
+  var targetDate = new Date(dateObj.getTime());
+  targetDate.setDate(targetDate.getDate() + hOffset);
+  return SCE.hijri(targetDate);
+}
+
+function findShiaEvent(hMonth, hDay) {
+  return shiaEvents.find(function(e) { return e.m === hMonth && e.d === hDay; }) || null;
+}
+
+function rc(){
+  cmn.textContent = MIL_MONTH_NAMES[calM] + " " + calY;
+  var firstMilDate = new Date(calY, calM, 1);
+  var dim = new Date(calY, calM + 1, 0).getDate();
+  var hFirst = getAdjustedHijri(firstMilDate);
+  var hLast = getAdjustedHijri(new Date(calY, calM, dim));
+  cgr.textContent = SCE.monthName(hFirst.hMonth) + " " + hFirst.hYear + " - " + SCE.monthName(hLast.hMonth) + " " + hLast.hYear + " هـ";
+  cdg.innerHTML = "";
+  var sd = firstMilDate.getDay();
+  for(var i=0; i<sd; i++){ cdg.appendChild(document.createElement("div")); }
+  var now = new Date();
+  var todayEventText = "";
+  var todayEventType = "";
+  for(var d=1; d<=dim; d++){
+    var cell = document.createElement("div");
+    var currentMilDate = new Date(calY, calM, d);
+    var hObj = getAdjustedHijri(currentMilDate);
+    cell.innerHTML = "<span>" + d + "</span><span style='font-size:0.7rem;color:#94a3b8;margin-top:1px;font-weight:normal;'>" + hObj.hDay + "</span>";
+    var cls = "cal-day ";
+    if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) { cls += "today"; } else { cls += "normal"; }
+    var ev = findShiaEvent(hObj.hMonth, hObj.hDay);
+    if(ev) {
+      if(ev.t === "sorrow") cls += " special-sorrow";
+      else if(ev.t === "joy") cls += " special-joy";
+      if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) {
+        todayEventText = "مناسبة اليوم: " + ev.n + " (" + hObj.hDay + " " + SCE.monthName(hObj.hMonth) + ")";
+        todayEventType = ev.t;
+      }
+    }
+    cell.className = cls;
+    cdg.appendChild(cell);
+  }
+  if(todayEventText) { todayEventBanner.textContent = todayEventText; todayEventBanner.className = "event-banner " + todayEventType; } else { todayEventBanner.style.display = "none"; }
+}
+
+function ua(){
+  uc();
+  rp();
+  var now = new Date();
+  var tH = getAdjustedHijri(now);
+  var offsetText = hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + " يوم)" : "";
+  thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + offsetText;
+  if(calY === 0){ calY = now.getFullYear(); calM = now.getMonth(); }
+  rc();
+}
+
+function sv(la,lo,lb){
+  lat=la; lng=lo; locName=lb; ld.textContent=lb;
+  qiblaDeg = qiblaDirection(lat,lng,KAABA_LAT,KAABA_LON); if(qiblaDeg<0) qiblaDeg+=360;
+  saveAllData();
+}
+
+// دالة إصلاح وجلب الـ GPS ذكياً للسيرفرات المشفرة وغير المشفرة
+function triggerGPS() {
+  if (navigator.geolocation) {
+    if (window.location.protocol === 'file:') {
+      alert("💡 تنبيه الخصوصية والمنظومة:\nالـ GPS محظور عند تشغيل الملف مباشرة. يرجى رفعه عبر الـ https أو تشغيل السيرفر المحلي عبر بايثون.");
+      sv(26.5258, 49.9981, "القطيف (افتراضي)");
+      ua();
+      return;
+    }
+    ld.textContent = "📡 جاري الاتصال بالـ GPS...";
+    var optionsHigh = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+    var optionsLow = { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 };
+
+    navigator.geolocation.getCurrentPosition(function(pos) {
+        sv(pos.coords.latitude, pos.coords.longitude, "📍 موقع دقيق (GPS)");
+        ua();
+    }, function(err) {
+        navigator.geolocation.getCurrentPosition(function(pos2) {
+            sv(pos2.coords.latitude, pos2.coords.longitude, "📍 موقع تقريبي (الشبكة)");
+            ua();
+        }, function(err2) {
+            alert("⚠️ لم نتمكن من الوصول للموقع الفعلي. تأكد من إعطاء صلاحية الموقع لمتصفح Safari من إعدادات الآيفون العامة.");
+            sv(26.5258, 49.9981, "القطيف (افتراضي)");
+            ua();
+        }, optionsLow);
+    }, optionsHigh);
+  } else {
+    alert("ميزة الـ GPS غير مدعومة في متصفحك الحالي.");
+  }
+}
+
+incOffset.onclick=function(){ hOffset++; saveAllData(); ua(); };
+decOffset.onclick=function(){ hOffset--; saveAllData(); ua(); };
+pmb.onclick=function(){calM--;if(calM<0){calM=11;calY--;}rc();};
+nmb.onclick=function(){calM++;if(calM>11){calM=0;calY++;}rc();};
+rl.onclick = function() { triggerGPS(); };
+
+setInterval(function(){uc();rp();},1000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)rp();});
+
+// تشغيل المنظومة تلقائياً
+ua();
+})();
+</script>
+</body>
+</html>
