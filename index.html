@@ -6,12 +6,28 @@
     <title>نور – الأذان والمواقيت</title>
     <meta name="theme-color" content="#0f172a">
     
-    <link rel="manifest" href="manifest.json">
+    <script>
+        const manifest = {
+            "short_name": "نور",
+            "name": "نور – الأذان والمواقيت",
+            "start_url": window.location.href,
+            "background_color": "#0f172a",
+            "theme_color": "#0f172a",
+            "display": "standalone",
+            "orientation": "portrait"
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
+    </script>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="نور">
-    <link rel="apple-touch-icon" href="icon-192.png">
     
     <style>
         /* ===== reset & base ===== */
@@ -693,11 +709,47 @@
         function toDeg(r) { return r * 180 / Math.PI }
         function wrap360(x) { return ((x % 360) + 360) % 360 }
 
-        // ---- Service Worker Registration for Offline Use ----
+        // ---- دمج برمجيات الـ Service Worker كـ Inline Data URI لتجنيب القيود ----
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                .then(function(reg) { console.log('Service Worker Registered Successfully', reg.scope); })
+                const swCode = `
+                    const CACHE_NAME = 'nur-cache-v2';
+                    const ASSETS = [window.location.pathname];
+                    
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return cache.addAll(ASSETS);
+                            }).then(() => self.skipWaiting())
+                        );
+                    });
+
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(
+                            caches.keys().then((keys) => {
+                                return Promise.all(
+                                    keys.map((key) => {
+                                        if (key !== CACHE_NAME) return caches.delete(key);
+                                    })
+                                );
+                            }).then(() => self.clients.claim())
+                        );
+                    });
+
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            caches.match(e.request).then((cachedResponse) => {
+                                return cachedResponse || fetch(e.request);
+                            })
+                        );
+                    });
+                `;
+                
+                const blobSW = new Blob([swCode], { type: 'text/javascript' });
+                const swURL = URL.createObjectURL(blobSW);
+
+                navigator.serviceWorker.register(swURL)
+                .then(function(reg) { console.log('Inline Service Worker Registered Successfully'); })
                 .catch(function(err) { console.log('Service Worker Registration Failed', err); });
             });
         }
@@ -896,10 +948,10 @@
             ab.style.color = "#6ee7b7";
         }
 
-        // ==== FIXED QIBLA FORMULA (Corrected to 244 degrees for Eastern Province) ====
+        // ==== FIXED QIBLA FORMULA (Eastern Province ≈ 244°) ====
         function calcQibla() {
-            var mLat = toRad(21.4225);  // Mecca Latitude
-            var mLng = toRad(39.8262);  // Mecca Longitude
+            var mLat = toRad(21.4225);  // مكة
+            var mLng = toRad(39.8262);  
             var uLat = toRad(lat);
             var uLng = toRad(lng);
             
@@ -1136,12 +1188,8 @@
 
         function handleOrientation(e) {
             var heading = e.webkitCompassHeading;
-            if (heading === undefined && e.alpha !== null) {
-                heading = 360 - e.alpha; 
-            }
-            if (heading !== undefined && heading !== null && !isDragging) {
-                updateCompassView(heading);
-            }
+            if (heading === undefined && e.alpha !== null) { heading = 360 - e.alpha; }
+            if (heading !== undefined && heading !== null && !isDragging) { updateCompassView(heading); }
         }
 
         function getAngle(clientX, clientY) {
@@ -1166,18 +1214,11 @@
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(function(response) {
-                        if (response === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation, true);
-                        } else {
-                            statusHint.textContent = "اسحب الدائرة يدويًا لعدم توفر صلاحية المستشعر";
-                        }
+                        if (response === 'granted') { window.addEventListener('deviceorientation', handleOrientation, true); }
+                        else { statusHint.textContent = "اسحب الدائرة يدويًا لعدم توفر صلاحية المستشعر"; }
                     })
-                    .catch(function() {
-                        statusHint.textContent = "اسحب الدائرة يدويًا أو اضغط إعادة ضبط لتفعيل الحساس";
-                    });
-            } else {
-                window.addEventListener('deviceorientation', handleOrientation, true);
-            }
+                    .catch(function() { statusHint.textContent = "اسحب الدائرة يدويًا أو اضغط إعادة ضبط لتفعيل الحساس"; });
+            } else { window.addEventListener('deviceorientation', handleOrientation, true); }
         };
 
         closeCompassBtn.onclick = function() {
