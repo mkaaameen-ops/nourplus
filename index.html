@@ -262,7 +262,6 @@
             font-size: 1.4rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             transition: transform 0.08s ease-out;
-            transform-origin: center center;
         }
         .qibla-ring-indicator.aligned .kaaba-icon {
             border-color: #10b981;
@@ -564,6 +563,7 @@
 
     <div class="main-grid">
 
+        <!-- ===== PANEL 1: Prayer times + clock ===== -->
         <div style="grid-column:span 6" class="panel">
             <div class="compass-icon-btn" id="compassIcon" title="البوصلة">🧭</div>
 
@@ -571,7 +571,7 @@
                 <h1 class="gradient-text" style="font-size:2rem;font-weight:800;margin:0">نُور</h1>
                 <div class="flex-between" style="justify-content:center;gap:10px;margin-top:4px;flex-wrap:wrap">
                     <button id="rl" style="font-size:.65rem;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600;touch-action:manipulation">📍 تزامن الموقع</button>
-                    <span id="ld" style="font-size:.75rem;color:#94a3b8;max-width:200px;overflow:hidden;white-space:nowrap">الدمام</span>
+                    <span id="ld" style="font-size:.75rem;color:#94a3b8;max-width:200px;overflow:hidden;white-space:nowrap">القطيف</span>
                     <span class="loc-status"><span class="dot" id="locDot"></span><span id="locStatusText">جاري...</span></span>
                 </div>
                 <div style="margin:4px 0"><div id="clk" class="digital-clock" style="font-size:2.5rem"></div></div>
@@ -587,6 +587,7 @@
                 <div id="pi" class="prayer-card"><span>🌙 العشاء</span><span class="prayer-time" id="ti">--:--</span></div>
             </div>
 
+            <!-- Audio Settings -->
             <div class="audio-settings">
                 <label>🔊 الأذان <select id="adhanSelect"><option value="melodic">لحني</option><option value="simple">بسيط</option></select></label>
                 <label>🔔 التكبير <select id="takbeerSelect"><option value="melodic">لحني</option><option value="simple">بسيط</option></select></label>
@@ -596,20 +597,23 @@
             </div>
 
             <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-                <button id="abtn" style="flex:1;padding:10px;border-radius:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fcd34d;font-size:.75rem;cursor:pointer;touch-action:manipulation;min-width:120px"><span id="aic">🔔</span> <span id="atx">تفعيل التنبيهات</span></button>
+                <button id="abtn" style="flex:1;padding:10px;border-radius:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fcd34d;font-size:.75rem;cursor:pointer;touch-action:manipulation;min-width:120px"><span id="aic">🔔</span> <span id="atx">تفعيل التنبيهات الصوتية</span></button>
                 <button id="notifPermBtn" style="flex:1;padding:10px;border-radius:10px;background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.15);color:#2dd4bf;font-size:.75rem;cursor:pointer;touch-action:manipulation;min-width:100px">📨 إذن الإشعارات</button>
             </div>
 
+            <!-- Manual location input -->
             <div class="manual-loc">
                 <span style="font-size:.65rem;color:#94a3b8;">📍 ضبط يدوي:</span>
-                <input type="number" id="manualLat" step="any" placeholder="خط العرض" value="26.4207">
-                <input type="number" id="manualLng" step="any" placeholder="خط الطول" value="50.0888">
+                <input type="number" id="manualLat" step="any" placeholder="خط العرض" value="26.5558">
+                <input type="number" id="manualLng" step="any" placeholder="خط الطول" value="49.9972">
                 <button id="applyManualLoc">تطبيق</button>
             </div>
         </div>
 
+        <!-- ===== PANEL 2: Countdown + Calendar ===== -->
         <div style="grid-column:span 6;display:flex;flex-direction:column;gap:16px">
 
+            <!-- Countdown circle -->
             <div class="panel" style="display:flex;align-items:center;justify-content:center;min-height:300px">
                 <div class="circle-container">
                     <svg width="100%" height="100%" viewBox="0 0 378 378">
@@ -626,6 +630,7 @@
                 </div>
             </div>
 
+            <!-- Calendar -->
             <div class="panel">
                 <div class="flex-between" style="border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;margin-bottom:10px">
                     <button id="pmb" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#cbd5e1;padding:4px 12px;border-radius:8px;cursor:pointer;touch-action:manipulation">&gt;</button>
@@ -659,6 +664,7 @@
         </div>
     </div>
 
+    <!-- ===== COMPASS MODAL ===== -->
     <div id="compassModal" style="display:none" class="compass-modal-overlay">
         <div class="compass-modal">
             <h3 style="margin:0;color:#fff;font-size:1rem;">محدد اتجاه القبلة</h3>
@@ -682,7 +688,7 @@
 
     <script>
         // ================================================================
-        //  C O R E   E N G I N E   (improved)
+        //  C O R E   E N G I N E   (Fixed Qibla Formula Included)
         // ================================================================
 
         function toRad(d) { return d * Math.PI / 180 }
@@ -841,8 +847,8 @@
         var pc = { fajr: document.getElementById("pf"), sunrise: document.getElementById("ps"), dhuhr: document.getElementById("pd"), asr: document.getElementById("pa"), maghrib: document.getElementById("pm"), isha: document.getElementById("pi") };
         var te = { fajr: document.getElementById("tf"), sunrise: document.getElementById("ts"), dhuhr: document.getElementById("td"), asr: document.getElementById("ta"), maghrib: document.getElementById("tm"), isha: document.getElementById("ti") };
 
-        // ---- state (Default Changed to Dammam) ----
-        var lat = 26.4207, lng = 50.0888, locName = "الدمام";
+        // ---- state (Default: Qatif) ----
+        var lat = 26.5558, lng = 49.9972, locName = "القطيف";
         var aArm = false; var hOffset = 0; var calY = 0, calM = 0; var aCtx = null;
         var notificationPerm = false; var adhanMode = "melodic"; var takbeerMode = "melodic"; var volume = 0.7;
         var qiblaDeg = 0; var currentHeading = 0; var isDragging = false; var startAngle = 0; var lastPlayedPrayer = "";
@@ -883,10 +889,17 @@
             ab.style.color = "#6ee7b7";
         }
 
+        // ==== FIXED QIBLA FORMULA (Corrected to 244 degrees for Eastern Province) ====
         function calcQibla() {
-            var dLon = toRad(lng - 39.8262);
+            var mLat = toRad(21.4225);  // Mecca Latitude
+            var mLng = toRad(39.8262);  // Mecca Longitude
+            var uLat = toRad(lat);
+            var uLng = toRad(lng);
+            
+            var dLon = mLng - uLng; // Corrected subtraction order
             var y = Math.sin(dLon);
-            var x = Math.cos(toRad(lat)) * Math.tan(toRad(21.4225)) - Math.sin(toRad(lat)) * Math.cos(dLon);
+            var x = Math.cos(uLat) * Math.tan(mLat) - Math.sin(uLat) * Math.cos(dLon);
+            
             qiblaDeg = wrap360(toDeg(Math.atan2(y, x)));
         }
         calcQibla();
@@ -952,7 +965,7 @@
             });
         }
 
-        // ---- GPS Locator Logic Fixed for standalone/iOS ----
+        // ---- GPS Locator Logic ----
         function setLocation(la, lo, name) {
             lat = la; lng = lo; locName = name || "📍 موقعي";
             ld.textContent = locName; manualLat.value = lat; manualLng.value = lng;
@@ -983,12 +996,11 @@
                     }
                 },
                 function(err) {
-                    // One-shot fallback fallback
                     navigator.geolocation.getCurrentPosition(
                         function(pos2) { setLocation(pos2.coords.latitude, pos2.coords.longitude, "📍 الشبكة"); },
                         function() {
-                            locDot.className = "dot"; locStatusText.textContent = "الدمام (افتراضي)";
-                            setLocation(26.4207, 50.0888, "الدمام (افتراضي)");
+                            locDot.className = "dot"; locStatusText.textContent = "القطيف (افتراضي)";
+                            setLocation(26.5558, 49.9972, "القطيف (افتراضي)");
                         },
                         { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
                     );
@@ -1093,11 +1105,10 @@
 
         function ua() { uc(); rp(); if (calY === 0) { calY = new Date().getFullYear(); calM = new Date().getMonth(); } rc(); }
 
-        // ---- Fixed iPhone Qibla Compass integration ----
+        // ---- Compass Alignment ----
         function updateCompassView(heading) {
             currentHeading = wrap360(heading);
-            qiblaRing.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
-            kaabaIcon.style.transform = 'rotate(' + qiblaDeg + 'deg)';
+            qiblaRing.style.transform = 'rotate(' + (qiblaDeg - currentHeading) + 'deg)';
             targetAngleText.textContent = Math.round(qiblaDeg) + "°";
             currentAngleText.textContent = Math.round(currentHeading) + "°";
 
@@ -1117,7 +1128,6 @@
         }
 
         function handleOrientation(e) {
-            // Priority given to absolute iOS webkit heading
             var heading = e.webkitCompassHeading;
             if (heading === undefined && e.alpha !== null) {
                 heading = 360 - e.alpha; 
@@ -1141,7 +1151,6 @@
             updateCompassView(getAngle(px, py) - startAngle);
         }
 
-        // --- iPhone Compass Security Permissions Request ---
         compassIcon.onclick = function() {
             compassModal.style.display = 'flex';
             calcQibla();
@@ -1189,7 +1198,7 @@
         ab.onclick = function() {
             var ctx = getAudioContext(); if (ctx && ctx.state === 'suspended') ctx.resume();
             aArm = !aArm;
-            this.innerHTML = aArm ? "<span>✅</span> <span>التنبيهات مفعلة</span>" : "<span>🔔</span> <span>تفعيل التنبيهات</span>";
+            this.innerHTML = aArm ? "<span>✅</span> <span>التنبيهات مفعلة</span>" : "<span>🔔</span> <span>تفعيل التنبيهات الصوتية</span>";
             this.style.background = aArm ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)";
             this.style.borderColor = aArm ? "rgba(16,185,129,0.3)" : "rgba(245,158,11,0.2)";
             this.style.color = aArm ? "#6ee7b7" : "#fcd34d";
@@ -1209,7 +1218,7 @@
 
         // ---- Initializer ----
         setTimeout(function() {
-            if (lat !== 26.4207 || lng !== 50.0888) {
+            if (lat !== 26.5558 || lng !== 49.9972) {
                 locDot.className = "dot active"; locStatusText.textContent = "محدد ✓"; ua();
             } else { triggerGPS(); }
         }, 600);
