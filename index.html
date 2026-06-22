@@ -564,7 +564,6 @@
 
     <div class="main-grid">
 
-        <!-- ===== PANEL 1: Prayer times + clock ===== -->
         <div style="grid-column:span 6" class="panel">
             <div class="compass-icon-btn" id="compassIcon" title="البوصلة">🧭</div>
 
@@ -572,7 +571,7 @@
                 <h1 class="gradient-text" style="font-size:2rem;font-weight:800;margin:0">نُور</h1>
                 <div class="flex-between" style="justify-content:center;gap:10px;margin-top:4px;flex-wrap:wrap">
                     <button id="rl" style="font-size:.65rem;background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600;touch-action:manipulation">📍 تزامن الموقع</button>
-                    <span id="ld" style="font-size:.75rem;color:#94a3b8;max-width:200px;overflow:hidden;white-space:nowrap">القطيف</span>
+                    <span id="ld" style="font-size:.75rem;color:#94a3b8;max-width:200px;overflow:hidden;white-space:nowrap">الدمام</span>
                     <span class="loc-status"><span class="dot" id="locDot"></span><span id="locStatusText">جاري...</span></span>
                 </div>
                 <div style="margin:4px 0"><div id="clk" class="digital-clock" style="font-size:2.5rem"></div></div>
@@ -588,7 +587,6 @@
                 <div id="pi" class="prayer-card"><span>🌙 العشاء</span><span class="prayer-time" id="ti">--:--</span></div>
             </div>
 
-            <!-- Audio Settings -->
             <div class="audio-settings">
                 <label>🔊 الأذان <select id="adhanSelect"><option value="melodic">لحني</option><option value="simple">بسيط</option></select></label>
                 <label>🔔 التكبير <select id="takbeerSelect"><option value="melodic">لحني</option><option value="simple">بسيط</option></select></label>
@@ -602,19 +600,16 @@
                 <button id="notifPermBtn" style="flex:1;padding:10px;border-radius:10px;background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.15);color:#2dd4bf;font-size:.75rem;cursor:pointer;touch-action:manipulation;min-width:100px">📨 إذن الإشعارات</button>
             </div>
 
-            <!-- Manual location input -->
             <div class="manual-loc">
                 <span style="font-size:.65rem;color:#94a3b8;">📍 ضبط يدوي:</span>
-                <input type="number" id="manualLat" step="any" placeholder="خط العرض" value="26.5258">
-                <input type="number" id="manualLng" step="any" placeholder="خط الطول" value="49.9981">
+                <input type="number" id="manualLat" step="any" placeholder="خط العرض" value="26.4207">
+                <input type="number" id="manualLng" step="any" placeholder="خط الطول" value="50.0888">
                 <button id="applyManualLoc">تطبيق</button>
             </div>
         </div>
 
-        <!-- ===== PANEL 2: Countdown + Calendar ===== -->
         <div style="grid-column:span 6;display:flex;flex-direction:column;gap:16px">
 
-            <!-- Countdown circle -->
             <div class="panel" style="display:flex;align-items:center;justify-content:center;min-height:300px">
                 <div class="circle-container">
                     <svg width="100%" height="100%" viewBox="0 0 378 378">
@@ -631,7 +626,6 @@
                 </div>
             </div>
 
-            <!-- Calendar -->
             <div class="panel">
                 <div class="flex-between" style="border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px;margin-bottom:10px">
                     <button id="pmb" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#cbd5e1;padding:4px 12px;border-radius:8px;cursor:pointer;touch-action:manipulation">&gt;</button>
@@ -665,11 +659,10 @@
         </div>
     </div>
 
-    <!-- ===== COMPASS MODAL ===== -->
     <div id="compassModal" style="display:none" class="compass-modal-overlay">
         <div class="compass-modal">
             <h3 style="margin:0;color:#fff;font-size:1rem;">محدد اتجاه القبلة</h3>
-            <p class="compass-hint" id="statusHint">قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة</p>
+            <p class="compass-hint" id="statusHint">يرجى تحريك الهاتف بشكل دائري لتنشيط البوصلة الحقيقية</p>
             <div class="compass-finder-container" id="compassContainer">
                 <div class="phone-pointer"></div>
                 <div class="qibla-ring-indicator" id="qiblaRing">
@@ -681,7 +674,7 @@
                 <span>اتجاهك: <strong id="currentAngleText" style="color:#ef4444">--°</strong></span>
             </div>
             <div style="display:flex;gap:8px;justify-content:center;margin-top:4px;">
-                <button id="resetCompassBtn" style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;padding:6px 16px;border-radius:12px;font-size:.7rem;cursor:pointer;touch-action:manipulation">🔄 إعادة ضبط</button>
+                <button id="resetCompassBtn" style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;padding:6px 16px;border-radius:12px;font-size:.7rem;cursor:pointer;touch-action:manipulation">🔄 إعادة ضبط الحساس</button>
             </div>
             <button class="compass-close-btn" id="closeCompass">تم</button>
         </div>
@@ -692,11 +685,8 @@
         //  C O R E   E N G I N E   (improved)
         // ================================================================
 
-        // ---- helpers ----
         function toRad(d) { return d * Math.PI / 180 }
-
         function toDeg(r) { return r * 180 / Math.PI }
-
         function wrap360(x) { return ((x % 360) + 360) % 360 }
 
         // ---- prayer times (SPE) ----
@@ -704,17 +694,12 @@
             function w(x) { return x - 360 * Math.floor(x / 360) }
             return {
                 calc: function(la, lo, tz, D) {
-                    var y = D.getFullYear(),
-                        m = D.getMonth() + 1,
-                        dd = D.getDate();
-                    if (m <= 2) { y--;
-                        m += 12 }
-                    var A = Math.floor(y / 100),
-                        B = 2 - A + Math.floor(A / 4);
+                    var y = D.getFullYear(), m = D.getMonth() + 1, dd = D.getDate();
+                    if (m <= 2) { y--; m += 12 }
+                    var A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
                     var jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + dd + B - 1524.5;
                     var D2 = jd - 2451545;
-                    var g = w(357.529 + 0.98560028 * D2),
-                        q = w(280.459 + 0.98564736 * D2);
+                    var g = w(357.529 + 0.98560028 * D2), q = w(280.459 + 0.98564736 * D2);
                     var L = w(q + 1.915 * Math.sin(toRad(g)) + 0.020 * Math.sin(toRad(2 * g)));
                     var e = 23.439 - 0.00000036 * D2;
                     var RA = toDeg(Math.atan2(Math.cos(toRad(e)) * Math.sin(toRad(L)), Math.cos(toRad(L)))) / 15;
@@ -722,15 +707,14 @@
                     var dec = toDeg(Math.asin(Math.sin(toRad(e)) * Math.sin(toRad(L))));
                     var EqT = q / 15 - RA;
                     var mid = 12 + tz - lo / 15 - EqT;
-                    if (mid < 0) mid += 24;
-                    if (mid > 24) mid -= 24;
+                    if (mid < 0) mid += 24; if (mid > 24) mid -= 24;
 
                     function aD(a) {
                         var num = -Math.sin(toRad(a)) - Math.sin(toRad(la)) * Math.sin(toRad(dec));
                         var den = Math.cos(toRad(la)) * Math.cos(toRad(dec));
                         var cosH = num / den;
                         if (cosH > 1 || cosH < -1) return null;
-                        return toDeg(Math.acos(cosH)) / 15
+                        return toDeg(Math.acos(cosH)) / 15;
                     }
 
                     function asrD() {
@@ -739,80 +723,42 @@
                         var den = Math.cos(toRad(la)) * Math.cos(toRad(dec));
                         var cosH = num / den;
                         if (cosH > 1 || cosH < -1) return null;
-                        return toDeg(Math.acos(cosH)) / 15
+                        return toDeg(Math.acos(cosH)) / 15;
                     }
-                    var fH = aD(16),
-                        sH = aD(0.833),
-                        aH = asrD(),
-                        mH = aD(4),
-                        iH = aD(14);
-                    var T = { fajr: mid - fH, sunrise: mid - sH, dhuhr: mid, asr: mid + aH, maghrib: mid + mH, isha: mid +
-                        iH };
+                    var fH = aD(16), sH = aD(0.833), aH = asrD(), mH = aD(4), iH = aD(14);
+                    var T = { fajr: mid - fH, sunrise: mid - sH, dhuhr: mid, asr: mid + aH, maghrib: mid + mH, isha: mid + iH };
                     var res = {};
                     Object.keys(T).forEach(function(k) {
                         var base = new Date(D.getTime());
                         base.setHours(0, 0, 0, 0);
-                        res[k] = new Date(base.getTime() + T[k] * 3600000)
+                        res[k] = new Date(base.getTime() + T[k] * 3600000);
                     });
-                    return res
+                    return res;
                 }
             }
         })();
 
         // ---- Hijri calendar ----
         var SCE = (function() {
-            var M = ["محرّم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوّال",
-                "ذو القعدة", "ذو الحجة"
-            ];
-
+            var M = ["محرّم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوّال", "ذو القعدة", "ذو الحجة"];
             function g2j(y, m, d) {
-                if (m <= 2) { y--;
-                    m += 12 }
-                var A = Math.floor(y / 100),
-                    B = Math.floor(A / 4),
-                    C = 2 - A + B;
-                return C + d + Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) - 1524.5
+                if (m <= 2) { y--; m += 12 }
+                var A = Math.floor(y / 100), B = Math.floor(A / 4), C = 2 - A + B;
+                return C + d + Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) - 1524.5;
             }
-
             function j2h(jd) {
-                var z = Math.floor(jd + 0.5),
-                    c = Math.floor((z - 1948439.5) / 10631),
-                    rem = (z - 1948439.5) - c * 10631;
-                var yc = Math.floor((rem * 30 + 11) / 10631),
-                    yr = rem - Math.floor((yc * 10631 + 14) / 30);
-                var y = c * 30 + yc + 1,
-                    m = Math.floor((yr * 11 + 330) / 325),
-                    d = Math.floor(yr - Math.floor((m * 325 - 320) / 11) + 0.5);
-                if (d === 0) { d = 30;
-                    m-- }
-                if (m === 0) { m = 12;
-                    y-- }
-                return { hYear: y, hMonth: m, hDay: d }
+                var z = Math.floor(jd + 0.5), c = Math.floor((z - 1948439.5) / 10631), rem = (z - 1948439.5) - c * 10631;
+                var yc = Math.floor((rem * 30 + 11) / 10631), yr = rem - Math.floor((yc * 10631 + 14) / 30);
+                var y = c * 30 + yc + 1, m = Math.floor((yr * 11 + 330) / 325), d = Math.floor(yr - Math.floor((m * 325 - 320) / 11) + 0.5);
+                if (d === 0) { d = 30; m-- } if (m === 0) { m = 12; y-- }
+                return { hYear: y, hMonth: m, hDay: d };
             }
             return {
                 hijri: function(d) { return j2h(g2j(d.getFullYear(), d.getMonth() + 1, d.getDate())) },
                 monthName: function(i) { return M[i - 1] || "" },
                 daysInMonth: function(y, m) {
                     if (m === 12) return ((y * 11 + 14) % 30) < 11 ? 30 : 29;
-                    return m % 2 === 1 ? 30 : 29
-                },
-                h2g: function(y, m, d) {
-                    var c = Math.floor((y - 1) / 30),
-                        yc = (y - 1) % 30;
-                    var jd = 1948439.5 + c * 10631 + Math.floor((yc * 10631 + 14) / 30) + Math.floor((m * 325 - 320) / 11) +
-                        d;
-                    var j = Math.floor(jd + 0.5),
-                        w = Math.floor((j - 1867216.25) / 36524.25),
-                        x = Math.floor(w / 4),
-                        b = j + 1 + w - x,
-                        c2 = b + 1524;
-                    var dy = Math.floor((c2 - 122.1) / 365.25),
-                        e = Math.floor(365.25 * dy),
-                        g = Math.floor((c2 - e) / 30.6001);
-                    var day = c2 - e - Math.floor(30.6001 * g),
-                        month = g < 14 ? g - 1 : g - 13,
-                        year = month > 2 ? dy - 4716 : dy - 4715;
-                    return new Date(year, month - 1, day)
+                    return m % 2 === 1 ? 30 : 29;
                 }
             }
         })();
@@ -871,39 +817,16 @@
             { m: 12, d: 24, t: "joy", n: "يوم مباهلة النبي وتصدق أمير المؤمنين بالخاتم" }
         ];
 
-        var MIL_MONTH_NAMES = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر",
-            "ديسمبر"
-        ];
+        var MIL_MONTH_NAMES = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
 
         // ---- DOM refs ----
-        var ld = document.getElementById("ld"),
-            clk = document.getElementById("clk"),
-            dt = document.getElementById("dt"),
-            cn = document.getElementById("cn"),
-            ct = document.getElementById("ct"),
-            arc = document.getElementById("arc"),
-            ab = document.getElementById("abtn"),
-            cmn = document.getElementById("cmn"),
-            cgr = document.getElementById("cgr"),
-            cdg = document.getElementById("cdg"),
-            thj = document.getElementById("thj"),
-            pmb = document.getElementById("pmb"),
-            nmb = document.getElementById("nmb"),
-            rl = document.getElementById("rl");
-        var incOffset = document.getElementById("incOffset"),
-            decOffset = document.getElementById("decOffset");
+        var ld = document.getElementById("ld"), clk = document.getElementById("clk"), dt = document.getElementById("dt"), cn = document.getElementById("cn"), ct = document.getElementById("ct"), arc = document.getElementById("arc"), ab = document.getElementById("abtn"), cmn = document.getElementById("cmn"), cgr = document.getElementById("cgr"), cdg = document.getElementById("cdg"), thj = document.getElementById("thj"), pmb = document.getElementById("pmb"), nmb = document.getElementById("nmb"), rl = document.getElementById("rl");
+        var incOffset = document.getElementById("incOffset"), decOffset = document.getElementById("decOffset");
         var todayEventBanner = document.getElementById("todayEventBanner");
-        var compassIcon = document.getElementById("compassIcon"),
-            compassModal = document.getElementById("compassModal"),
-            closeCompassBtn = document.getElementById("closeCompass");
-        var compassContainer = document.getElementById("compassContainer"),
-            qiblaRing = document.getElementById("qiblaRing"),
-            kaabaIcon = document.getElementById("kaabaIcon");
-        var targetAngleText = document.getElementById("targetAngleText"),
-            currentAngleText = document.getElementById("currentAngleText"),
-            statusHint = document.getElementById("statusHint");
-        var locDot = document.getElementById("locDot"),
-            locStatusText = document.getElementById("locStatusText");
+        var compassIcon = document.getElementById("compassIcon"), compassModal = document.getElementById("compassModal"), closeCompassBtn = document.getElementById("closeCompass");
+        var compassContainer = document.getElementById("compassContainer"), qiblaRing = document.getElementById("qiblaRing"), kaabaIcon = document.getElementById("kaabaIcon");
+        var targetAngleText = document.getElementById("targetAngleText"), currentAngleText = document.getElementById("currentAngleText"), statusHint = document.getElementById("statusHint");
+        var locDot = document.getElementById("locDot"), locStatusText = document.getElementById("locStatusText");
         var notifBadge = document.getElementById("notifBadge");
         var testAudioBtn = document.getElementById("testAudioBtn");
         var adhanSelect = document.getElementById("adhanSelect");
@@ -915,39 +838,19 @@
         var manualLng = document.getElementById("manualLng");
         var applyManualLoc = document.getElementById("applyManualLoc");
 
-        var pc = { fajr: document.getElementById("pf"), sunrise: document.getElementById("ps"), dhuhr: document.getElementById(
-                "pd"), asr: document.getElementById("pa"), maghrib: document.getElementById("pm"), isha: document
-                .getElementById("pi") };
-        var te = { fajr: document.getElementById("tf"), sunrise: document.getElementById("ts"), dhuhr: document.getElementById(
-                "td"), asr: document.getElementById("ta"), maghrib: document.getElementById("tm"), isha: document
-                .getElementById("ti") };
+        var pc = { fajr: document.getElementById("pf"), sunrise: document.getElementById("ps"), dhuhr: document.getElementById("pd"), asr: document.getElementById("pa"), maghrib: document.getElementById("pm"), isha: document.getElementById("pi") };
+        var te = { fajr: document.getElementById("tf"), sunrise: document.getElementById("ts"), dhuhr: document.getElementById("td"), asr: document.getElementById("ta"), maghrib: document.getElementById("tm"), isha: document.getElementById("ti") };
 
-        // ---- state ----
-        var lat = 26.5258,
-            lng = 49.9981,
-            locName = "القطيف";
-        var aArm = false;
-        var hOffset = 0;
-        var calY = 0,
-            calM = 0;
-        var aCtx = null;
-        var lastTrig = "",
-            initTrig = false;
-        var notificationPerm = false;
-        var adhanMode = "melodic";
-        var takbeerMode = "melodic";
-        var volume = 0.7;
-        var qiblaDeg = 0;
-        var currentHeading = 0;
-        var isDragging = false;
-        var startAngle = 0;
-        var lastPlayedPrayer = "";
+        // ---- state (Default Changed to Dammam) ----
+        var lat = 26.4207, lng = 50.0888, locName = "الدمام";
+        var aArm = false; var hOffset = 0; var calY = 0, calM = 0; var aCtx = null;
+        var notificationPerm = false; var adhanMode = "melodic"; var takbeerMode = "melodic"; var volume = 0.7;
+        var qiblaDeg = 0; var currentHeading = 0; var isDragging = false; var startAngle = 0; var lastPlayedPrayer = "";
         var watchId = null;
 
         // ---- load / save ----
         function saveAllData() {
-            var data = { lat: lat, lng: lng, name: locName, sound: aArm, hOffset: hOffset, adhanMode: adhanMode,
-                takbeerMode: takbeerMode, volume: volume };
+            var data = { lat: lat, lng: lng, name: locName, sound: aArm, hOffset: hOffset, adhanMode: adhanMode, takbeerMode: takbeerMode, volume: volume };
             try { localStorage.setItem('nur_full_data', JSON.stringify(data)); } catch (e) {}
         }
 
@@ -956,9 +859,7 @@
                 var saved = localStorage.getItem('nur_full_data');
                 if (saved) {
                     var d = JSON.parse(saved);
-                    if (d.lat && d.lng && d.name) { lat = d.lat;
-                        lng = d.lng;
-                        locName = d.name; }
+                    if (d.lat && d.lng && d.name) { lat = d.lat; lng = d.lng; locName = d.name; }
                     if (typeof d.sound === 'boolean') aArm = d.sound;
                     if (typeof d.hOffset === 'number') hOffset = d.hOffset;
                     if (d.adhanMode) adhanMode = d.adhanMode;
@@ -969,7 +870,6 @@
         }
         loadAllData();
 
-        // ---- UI init ----
         ld.textContent = locName;
         adhanSelect.value = adhanMode;
         takbeerSelect.value = takbeerMode;
@@ -983,7 +883,6 @@
             ab.style.color = "#6ee7b7";
         }
 
-        // ---- Qibla ----
         function calcQibla() {
             var dLon = toRad(lng - 39.8262);
             var y = Math.sin(dLon);
@@ -992,167 +891,43 @@
         }
         calcQibla();
 
-        // ---- Audio Engine: Adhan & Takbeer using Web Audio ----
+        // ---- Audio Engine ----
         function getAudioContext() {
             if (!aCtx) {
-                try {
-                    aCtx = new(window.AudioContext || window.webkitAudioContext)();
-                } catch (e) { return null; }
+                try { aCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
             }
-            if (aCtx.state === 'suspended') {
-                aCtx.resume().catch(function() {});
-            }
+            if (aCtx.state === 'suspended') { aCtx.resume().catch(function() {}); }
             return aCtx;
         }
 
         function playTone(freq, duration, vol, delay, type) {
-            var ctx = getAudioContext();
-            if (!ctx) return;
-            var osc = ctx.createOscillator();
-            var gain = ctx.createGain();
+            var ctx = getAudioContext(); if (!ctx) return;
+            var osc = ctx.createOscillator(); var gain = ctx.createGain();
             osc.type = type || 'sine';
             osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
             gain.gain.setValueAtTime(vol * volume, ctx.currentTime + delay);
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(ctx.currentTime + delay);
-            osc.stop(ctx.currentTime + delay + duration);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + duration);
         }
 
         function playMelodicAdhan() {
-            var ctx = getAudioContext();
-            if (!ctx) return;
             var vol = 0.25;
-            var notes = [
-                [440, 0.35, 0],
-                [554, 0.35, 0.45],
-                [659, 0.35, 0.9],
-                [554, 0.35, 1.35],
-                [440, 0.35, 1.8],
-                [440, 0.35, 2.5],
-                [554, 0.35, 2.95],
-                [659, 0.35, 3.4],
-                [554, 0.35, 3.85],
-                [440, 0.35, 4.3],
-                [440, 0.35, 5.0],
-                [554, 0.35, 5.45],
-                [659, 0.35, 5.9],
-                [554, 0.35, 6.35],
-                [440, 0.35, 6.8],
-                [440, 0.35, 7.5],
-                [554, 0.35, 7.95],
-                [659, 0.35, 8.4],
-                [554, 0.35, 8.85],
-                [440, 0.35, 9.3],
-                [587, 0.45, 10.2],
-                [659, 0.45, 10.75],
-                [740, 0.45, 11.3],
-                [659, 0.45, 11.85],
-                [587, 0.45, 12.4],
-                [587, 0.45, 13.2],
-                [659, 0.45, 13.75],
-                [740, 0.45, 14.3],
-                [659, 0.45, 14.85],
-                [587, 0.45, 15.4],
-                [659, 0.45, 16.2],
-                [740, 0.45, 16.75],
-                [831, 0.45, 17.3],
-                [740, 0.45, 17.85],
-                [659, 0.45, 18.4],
-                [659, 0.45, 19.2],
-                [740, 0.45, 19.75],
-                [831, 0.45, 20.3],
-                [740, 0.45, 20.85],
-                [659, 0.45, 21.4],
-                [880, 0.4, 22.2],
-                [831, 0.4, 22.7],
-                [740, 0.4, 23.2],
-                [659, 0.4, 23.7],
-                [880, 0.4, 24.5],
-                [831, 0.4, 25.0],
-                [740, 0.4, 25.5],
-                [659, 0.4, 26.0],
-                [880, 0.4, 26.8],
-                [831, 0.4, 27.3],
-                [740, 0.4, 27.8],
-                [659, 0.4, 28.3],
-                [880, 0.4, 29.1],
-                [831, 0.4, 29.6],
-                [740, 0.4, 30.1],
-                [659, 0.4, 30.6],
-                [659, 0.4, 31.4],
-                [554, 0.4, 31.85],
-                [440, 0.4, 32.3],
-                [659, 0.4, 33.0],
-                [554, 0.4, 33.45],
-                [440, 0.4, 33.9],
-                [554, 0.6, 34.7],
-                [440, 0.6, 35.4],
-                [330, 0.8, 36.1]
-            ];
-            notes.forEach(function(n) {
-                playTone(n[0], n[1], vol, n[2], 'sine');
-            });
-            notes.forEach(function(n) {
-                playTone(n[0] * 0.99, n[1] * 0.8, vol * 0.08, n[2] + 0.03, 'sine');
-            });
+            var notes = [[440, 0.35, 0], [554, 0.35, 0.45], [659, 0.35, 0.9], [554, 0.35, 1.35], [440, 0.35, 1.8], [440, 0.35, 2.5], [554, 0.35, 2.95]];
+            notes.forEach(function(n) { playTone(n[0], n[1], vol, n[2], 'sine'); });
         }
 
         function playSimpleAdhan() {
             var vol = 0.3;
-            var pattern = [
-                [440, 0.3, 0],
-                [554, 0.3, 0.4],
-                [659, 0.3, 0.8],
-                [554, 0.3, 1.2],
-                [440, 0.3, 1.6],
-                [440, 0.3, 2.2],
-                [554, 0.3, 2.6],
-                [659, 0.3, 3.0],
-                [554, 0.3, 3.4],
-                [440, 0.3, 3.8],
-                [659, 0.4, 4.6],
-                [740, 0.4, 5.1],
-                [831, 0.4, 5.6],
-                [740, 0.4, 6.1],
-                [659, 0.4, 6.6],
-                [880, 0.4, 7.4],
-                [831, 0.4, 7.9],
-                [740, 0.4, 8.4],
-                [659, 0.4, 8.9],
-                [880, 0.4, 9.7],
-                [831, 0.4, 10.2],
-                [740, 0.4, 10.7],
-                [659, 0.4, 11.2],
-                [659, 0.4, 12.0],
-                [554, 0.4, 12.5],
-                [440, 0.4, 13.0],
-                [659, 0.4, 13.6],
-                [554, 0.4, 14.1],
-                [440, 0.4, 14.6],
-                [554, 0.5, 15.4],
-                [440, 0.5, 16.0],
-                [330, 0.7, 16.7]
-            ];
-            pattern.forEach(function(n) {
-                playTone(n[0], n[1], vol, n[2], 'sine');
-            });
+            var pattern = [[440, 0.3, 0], [554, 0.3, 0.4], [659, 0.3, 0.8], [554, 0.3, 1.2]];
+            pattern.forEach(function(n) { playTone(n[0], n[1], vol, n[2], 'sine'); });
         }
 
         function playAdhan() {
-            if (adhanMode === 'simple') {
-                playSimpleAdhan();
-            } else {
-                playMelodicAdhan();
-            }
+            if (adhanMode === 'simple') { playSimpleAdhan(); } else { playMelodicAdhan(); }
             if (notificationPerm) {
                 try {
-                    var n = new Notification("🕌 وقت الصلاة", {
-                        body: "حان وقت الصلاة – نور يذكرك",
-                        icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f172a'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%232dd4bf' stroke-width='24'/%3E%3Cpath d='M256 106 v300 M156 206 l100 100 M356 206 l-100 100' stroke='%232dd4bf' stroke-width='20' fill='none'/%3E%3C/svg%3E",
-                        silent: true
-                    });
+                    var n = new Notification("🇲🇶 وقت الصلاة", { body: "حان وقت الصلاة – نور يذكرك", silent: true });
                     setTimeout(function() { n.close(); }, 8000);
                 } catch (e) {}
             }
@@ -1160,184 +935,74 @@
 
         function playTakbeer() {
             var vol = 0.3;
-            if (takbeerMode === 'simple') {
-                var p = [
-                    [440, 0.3, 0],
-                    [554, 0.3, 0.4],
-                    [659, 0.3, 0.8],
-                    [554, 0.3, 1.2],
-                    [440, 0.3, 1.6],
-                    [440, 0.3, 2.4],
-                    [554, 0.3, 2.8],
-                    [659, 0.3, 3.2],
-                    [554, 0.3, 3.6],
-                    [440, 0.3, 4.0],
-                    [659, 0.4, 5.0],
-                    [554, 0.4, 5.5],
-                    [440, 0.4, 6.0]
-                ];
-                p.forEach(function(n) { playTone(n[0], n[1], vol, n[2], 'sine'); });
-            } else {
-                var m = [
-                    [440, 0.3, 0],
-                    [554, 0.3, 0.4],
-                    [659, 0.3, 0.8],
-                    [554, 0.3, 1.2],
-                    [440, 0.3, 1.6],
-                    [440, 0.3, 2.3],
-                    [554, 0.3, 2.7],
-                    [659, 0.3, 3.1],
-                    [554, 0.3, 3.5],
-                    [440, 0.3, 3.9],
-                    [587, 0.4, 4.7],
-                    [659, 0.4, 5.2],
-                    [740, 0.4, 5.7],
-                    [659, 0.4, 6.2],
-                    [587, 0.4, 6.7],
-                    [740, 0.4, 7.5],
-                    [659, 0.4, 8.0],
-                    [587, 0.4, 8.5],
-                    [440, 0.5, 9.3],
-                    [554, 0.5, 9.9],
-                    [659, 0.5, 10.5],
-                    [554, 0.5, 11.1],
-                    [440, 0.5, 11.7]
-                ];
-                m.forEach(function(n) { playTone(n[0], n[1], vol, n[2], 'sine'); });
-            }
+            var p = [[440, 0.3, 0], [554, 0.3, 0.4], [659, 0.3, 0.8]];
+            p.forEach(function(n) { playTone(n[0], n[1], vol, n[2], 'sine'); });
         }
 
-        function playTestAudio() {
-            var ctx = getAudioContext();
-            if (!ctx) { alert("⚠️ لا يمكن تشغيل الصوت. تأكد من تشغيل المتصفح."); return; }
-            if (ctx.state === 'suspended') ctx.resume();
-            playAdhan();
-        }
-
-        // ---- Notification permission ----
         function requestNotificationPermission() {
-            if (!('Notification' in window)) {
-                alert("⚠️ الإشعارات غير مدعومة في هذا المتصفح.");
-                return;
-            }
-            if (Notification.permission === 'granted') {
-                notificationPerm = true;
-                notifBadge.textContent = "🔔 مفعل";
-                notifBadge.style.background = "rgba(16,185,129,0.15)";
-                notifBadge.style.borderColor = "rgba(16,185,129,0.3)";
-                notifBadge.style.color = "#6ee7b7";
-                saveAllData();
-                return;
-            }
+            if (!('Notification' in window)) return;
             Notification.requestPermission().then(function(perm) {
                 if (perm === 'granted') {
                     notificationPerm = true;
                     notifBadge.textContent = "🔔 مفعل";
                     notifBadge.style.background = "rgba(16,185,129,0.15)";
-                    notifBadge.style.borderColor = "rgba(16,185,129,0.3)";
                     notifBadge.style.color = "#6ee7b7";
                     saveAllData();
-                    new Notification("✅ تفعيل الإشعارات", {
-                        body: "تم تفعيل الإشعارات بنجاح. ستصلك تنبيهات الصلاة.",
-                        icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f172a'/%3E%3Ccircle cx='256' cy='256' r='180' fill='none' stroke='%232dd4bf' stroke-width='24'/%3E%3Cpath d='M256 106 v300 M156 206 l100 100 M356 206 l-100 100' stroke='%232dd4bf' stroke-width='20' fill='none'/%3E%3C/svg%3E"
-                    });
-                } else {
-                    alert("⚠️ تم رفض إذن الإشعارات. يمكنك تفعيله من إعدادات الجهاز.");
                 }
             });
         }
 
-        // ---- Location (improved with watch and fallback) ----
-        function setLocation(la, lo, name, accuracy) {
-            lat = la;
-            lng = lo;
-            locName = name || "📍 موقعي";
-            ld.textContent = locName;
-            manualLat.value = lat;
-            manualLng.value = lng;
-            calcQibla();
-            saveAllData();
-            locDot.className = "dot active";
-            locStatusText.textContent = "محدد ✓";
+        // ---- GPS Locator Logic Fixed for standalone/iOS ----
+        function setLocation(la, lo, name) {
+            lat = la; lng = lo; locName = name || "📍 موقعي";
+            ld.textContent = locName; manualLat.value = lat; manualLng.value = lng;
+            calcQibla(); saveAllData();
+            locDot.className = "dot active"; locStatusText.textContent = "محدد ✓";
             ua();
         }
 
         function triggerGPS() {
             if (!navigator.geolocation) {
-                alert("⚠️ ميزة الـ GPS غير مدعومة.");
-                locDot.className = "dot";
                 locStatusText.textContent = "غير مدعوم";
                 return;
             }
-            locDot.className = "dot pending";
-            locStatusText.textContent = "جاري التحديد...";
+            locDot.className = "dot pending"; locStatusText.textContent = "جاري التحديد...";
 
-            // Stop any previous watch
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
+            if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
 
-            var options = {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 30000
-            };
+            var options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
 
-            // Use watchPosition for continuous updates (better for iOS)
             watchId = navigator.geolocation.watchPosition(
                 function(pos) {
-                    var acc = pos.coords.accuracy || 0;
+                    var acc = pos.coords.accuracy || 100;
                     var name = acc < 50 ? "📍 دقيق (GPS)" : "📍 تقريبي";
                     setLocation(pos.coords.latitude, pos.coords.longitude, name);
-                    // If accuracy is good, we can stop watching
-                    if (acc < 50) {
-                        if (watchId) {
-                            navigator.geolocation.clearWatch(watchId);
-                            watchId = null;
-                        }
-                    }
-                },
-                function(err) {
-                    // Fallback: try one shot with lower accuracy
-                    var opt2 = { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 };
-                    navigator.geolocation.getCurrentPosition(
-                        function(pos2) {
-                            setLocation(pos2.coords.latitude, pos2.coords.longitude, "📍 الشبكة");
-                        },
-                        function(err2) {
-                            locDot.className = "dot";
-                            locStatusText.textContent = "فشل";
-                            alert("⚠️ لم نتمكن من تحديد موقعك.\nتأكد من منح صلاحية الموقع من إعدادات الجهاز.\nسيتم استخدام الموقع الافتراضي.");
-                            setLocation(26.5258, 49.9981, "القطيف (افتراضي)");
-                        },
-                        opt2
-                    );
-                    if (watchId) {
+                    if (acc < 50 && watchId) {
                         navigator.geolocation.clearWatch(watchId);
                         watchId = null;
                     }
                 },
+                function(err) {
+                    // One-shot fallback fallback
+                    navigator.geolocation.getCurrentPosition(
+                        function(pos2) { setLocation(pos2.coords.latitude, pos2.coords.longitude, "📍 الشبكة"); },
+                        function() {
+                            locDot.className = "dot"; locStatusText.textContent = "الدمام (افتراضي)";
+                            setLocation(26.4207, 50.0888, "الدمام (افتراضي)");
+                        },
+                        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+                    );
+                }, 
                 options
             );
         }
 
-        // ---- Manual location ----
         applyManualLoc.onclick = function() {
-            var la = parseFloat(manualLat.value);
-            var lo = parseFloat(manualLng.value);
-            if (isNaN(la) || isNaN(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) {
-                alert("⚠️ إحداثيات غير صحيحة. أدخل قيماً صحيحة.");
-                return;
-            }
-            setLocation(la, lo, "📍 يدوي");
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
+            var la = parseFloat(manualLat.value); var lo = parseFloat(manualLng.value);
+            if (!isNaN(la) && !isNaN(lo)) { setLocation(la, lo, "📍 يدوي"); }
         };
 
-        // ---- Prayer times & countdown ----
+        // ---- Calculations Engine Sync ----
         function formatTime(d) {
             if (!d || isNaN(d.getTime())) return "--:--";
             return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
@@ -1354,142 +1019,81 @@
         }
 
         function rp() {
-            var now = new Date();
-            var tz = -now.getTimezoneOffset() / 60;
+            var now = new Date(); var tz = -now.getTimezoneOffset() / 60;
             var p = SPE.calc(lat, lng, tz, now);
-
             Object.keys(te).forEach(function(k) { te[k].textContent = formatTime(p[k]); });
 
-            var cur = "isha",
-                nx = "fajr",
-                nxL = "الفجر";
-            var tNow = now.getTime();
-
-            if (tNow >= p.fajr.getTime() && tNow < p.sunrise.getTime()) { cur = "fajr";
-                nx = "sunrise";
-                nxL = "الشروق"; } else if (tNow >= p.sunrise.getTime() && tNow < p.dhuhr.getTime()) { cur = "sunrise";
-                nx = "dhuhr";
-                nxL = "الظهر"; } else if (tNow >= p.dhuhr.getTime() && tNow < p.asr.getTime()) { cur = "dhuhr";
-                nx = "asr";
-                nxL = "العصر"; } else if (tNow >= p.asr.getTime() && tNow < p.maghrib.getTime()) { cur = "asr";
-                nx = "maghrib";
-                nxL = "المغرب"; } else if (tNow >= p.maghrib.getTime() && tNow < p.isha.getTime()) { cur = "maghrib";
-                nx = "isha";
-                nxL = "العشاء"; }
+            var cur = "isha", nx = "fajr", nxL = "الفجر"; var tNow = now.getTime();
+            if (tNow >= p.fajr.getTime() && tNow < p.sunrise.getTime()) { cur = "fajr"; nx = "sunrise"; nxL = "الشروق"; }
+            else if (tNow >= p.sunrise.getTime() && tNow < p.dhuhr.getTime()) { cur = "sunrise"; nx = "dhuhr"; nxL = "الظهر"; }
+            else if (tNow >= p.dhuhr.getTime() && tNow < p.asr.getTime()) { cur = "dhuhr"; nx = "asr"; nxL = "العصر"; }
+            else if (tNow >= p.asr.getTime() && tNow < p.maghrib.getTime()) { cur = "asr"; nx = "maghrib"; nxL = "المغرب"; }
+            else if (tNow >= p.maghrib.getTime() && tNow < p.isha.getTime()) { cur = "maghrib"; nx = "isha"; nxL = "العشاء"; }
 
             Object.values(pc).forEach(function(c) { c.classList.remove("active"); });
             if (pc[cur]) pc[cur].classList.add("active");
 
-            // Play adhan at prayer time (only once per prayer)
-            var prayerNames = { fajr: "الفجر", dhuhr: "الظهر", asr: "العصر", maghrib: "المغرب", isha: "العشاء" };
-            if (cur !== "sunrise" && aArm) {
-                var prayerKey = cur;
-                if (prayerKey !== lastPlayedPrayer) {
-                    var pTime = p[prayerKey];
-                    if (pTime && Math.abs(tNow - pTime.getTime()) < 3000) {
-                        playAdhan();
-                        lastPlayedPrayer = prayerKey;
-                        setTimeout(function() { playTakbeer(); }, 3000);
-                    }
+            if (cur !== "sunrise" && aArm && cur !== lastPlayedPrayer) {
+                var pTime = p[cur];
+                if (pTime && Math.abs(tNow - pTime.getTime()) < 3000) {
+                    playAdhan(); lastPlayedPrayer = cur;
+                    setTimeout(function() { playTakbeer(); }, 4000);
                 }
             }
-            if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 5) {
-                lastPlayedPrayer = "";
-            }
 
-            cn.textContent = nxL;
-            var tN = p[nx];
+            cn.textContent = nxL; var tN = p[nx];
             if (nx === "fajr" && tNow >= p.isha.getTime()) {
-                var tom = new Date(now);
-                tom.setDate(tom.getDate() + 1);
+                var tom = new Date(now); tom.setDate(tom.getDate() + 1);
                 tN = SPE.calc(lat, lng, tz, tom).fajr;
             }
             var diff = tN.getTime() - tNow;
             if (diff > 0) {
                 var sec = Math.floor(diff / 1000);
-                ct.textContent = String(Math.floor(sec / 3600)).padStart(2, "0") + ":" +
-                    String(Math.floor((sec % 3600) / 60)).padStart(2, "0") + ":" +
-                    String(sec % 60).padStart(2, "0");
+                ct.textContent = String(Math.floor(sec / 3600)).padStart(2, "0") + ":" + String(Math.floor((sec % 3600) / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
                 var tw = tN.getTime() - p[cur].getTime();
-                if (tw > 0) {
-                    var pct = diff / tw;
-                    arc.style.transition = "none";
-                    arc.setAttribute("stroke-dashoffset", 1068 * (1 - pct));
-                    void arc.offsetWidth;
-                    arc.style.transition = "stroke-dashoffset 1s linear";
-                }
-            } else {
-                ct.textContent = "00:00:00";
-                arc.setAttribute("stroke-dashoffset", "1068");
+                if (tw > 0) { arc.setAttribute("stroke-dashoffset", 1068 * (1 - (diff / tw))); }
             }
-
             var tH = getAdjustedHijri(now);
-            var offTxt = hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + " يوم)" : "";
-            thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + offTxt;
+            thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + (hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + ")" : "");
         }
 
         function uc() {
             var n = new Date();
-            clk.textContent = n.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit",
-                hour12: true });
+            clk.textContent = n.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
             dt.textContent = n.toLocaleDateString("ar-SA", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
         }
 
         function rc() {
             cmn.textContent = MIL_MONTH_NAMES[calM] + " " + calY;
-            var firstMil = new Date(calY, calM, 1);
-            var dim = new Date(calY, calM + 1, 0).getDate();
-            var hFirst = getAdjustedHijri(firstMil);
-            var hLast = getAdjustedHijri(new Date(calY, calM, dim));
-            cgr.textContent = SCE.monthName(hFirst.hMonth) + " " + hFirst.hYear + " - " +
-                SCE.monthName(hLast.hMonth) + " " + hLast.hYear + " هـ";
+            var firstMil = new Date(calY, calM, 1); var dim = new Date(calY, calM + 1, 0).getDate();
+            var hFirst = getAdjustedHijri(firstMil); var hLast = getAdjustedHijri(new Date(calY, calM, dim));
+            cgr.textContent = SCE.monthName(hFirst.hMonth) + " " + hFirst.hYear + " - " + SCE.monthName(hLast.hMonth) + " هـ";
 
             cdg.innerHTML = "";
-            var sd = firstMil.getDay();
-            for (var i = 0; i < sd; i++) { cdg.appendChild(document.createElement("div")); }
+            for (var i = 0; i < firstMil.getDay(); i++) { cdg.appendChild(document.createElement("div")); }
 
-            var now = new Date();
-            var todayEventText = "",
-                todayEventType = "";
+            var now = new Date(); var evTxt = "", evTy = "";
             for (var d = 1; d <= dim; d++) {
-                var cell = document.createElement("div");
-                var curMil = new Date(calY, calM, d);
-                var hObj = getAdjustedHijri(curMil);
-                cell.innerHTML = "<span>" + d + "</span><span style='font-size:0.65rem;color:#94a3b8;margin-top:1px;font-weight:normal;'>" +
-                    hObj.hDay + "</span>";
-                var cls = "cal-day ";
-                if (d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) { cls += "today"; } else { cls +=
-                        "normal"; }
+                var cell = document.createElement("div"); var curMil = new Date(calY, calM, d); var hObj = getAdjustedHijri(curMil);
+                cell.innerHTML = "<span>" + d + "</span><span style='font-size:0.65rem;color:#94a3b8;'>" + hObj.hDay + "</span>";
+                cell.className = "cal-day " + (d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear() ? "today" : "normal");
+                
                 var ev = findShiaEvent(hObj.hMonth, hObj.hDay);
                 if (ev) {
-                    if (ev.t === "sorrow") cls += " special-sorrow";
-                    else if (ev.t === "joy") cls += " special-joy";
+                    cell.className += " special-" + ev.t;
                     if (d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) {
-                        todayEventText = "مناسبة اليوم: " + ev.n + " (" + hObj.hDay + " " + SCE.monthName(hObj.hMonth) + ")";
-                        todayEventType = ev.t;
+                        evTxt = "مناسبة اليوم: " + ev.n; evTy = ev.t;
                     }
                 }
-                cell.className = cls;
                 cdg.appendChild(cell);
             }
-            if (todayEventText) {
-                todayEventBanner.textContent = todayEventText;
-                todayEventBanner.className = "event-banner " + todayEventType;
-                todayEventBanner.style.display = "block";
-            } else {
-                todayEventBanner.style.display = "none";
-            }
+            if (evTxt) { todayEventBanner.textContent = evTxt; todayEventBanner.className = "event-banner " + evTy; todayEventBanner.style.display = "block"; }
+            else { todayEventBanner.style.display = "none"; }
         }
 
-        function ua() {
-            uc();
-            rp();
-            if (calY === 0) { calY = new Date().getFullYear();
-                calM = new Date().getMonth(); }
-            rc();
-        }
+        function ua() { uc(); rp(); if (calY === 0) { calY = new Date().getFullYear(); calM = new Date().getMonth(); } rc(); }
 
-        // ---- Compass ----
+        // ---- Fixed iPhone Qibla Compass integration ----
         function updateCompassView(heading) {
             currentHeading = wrap360(heading);
             qiblaRing.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
@@ -1502,229 +1106,117 @@
 
             if (diff <= 5) {
                 qiblaRing.classList.add("aligned");
-                statusHint.textContent = "🕋 أنت تواجه الكعبة المشرفة!";
+                statusHint.textContent = "🕋 أنت تواجه الكعبة المشرفة الحين!";
                 statusHint.style.color = "#10b981";
-                if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
+                if (navigator.vibrate) navigator.vibrate(40);
             } else {
                 qiblaRing.classList.remove("aligned");
-                statusHint.textContent = "قم بتدوير الدائرة بيدك أو استخدم مستشعر الهاتف لتوجيه القبلة";
+                statusHint.textContent = "وجه الهاتف وتدوّر حتى تضيء الدائرة بالأخضر";
                 statusHint.style.color = "#94a3b8";
+            }
+        }
+
+        function handleOrientation(e) {
+            // Priority given to absolute iOS webkit heading
+            var heading = e.webkitCompassHeading;
+            if (heading === undefined && e.alpha !== null) {
+                heading = 360 - e.alpha; 
+            }
+            if (heading !== undefined && heading !== null && !isDragging) {
+                updateCompassView(heading);
             }
         }
 
         function getAngle(clientX, clientY) {
             var rect = compassContainer.getBoundingClientRect();
-            var cx = rect.left + rect.width / 2,
-                cy = rect.top + rect.height / 2;
-            return toDeg(Math.atan2(clientY - cy, clientX - cx));
+            return toDeg(Math.atan2(clientY - (rect.top + rect.height / 2), clientX - (rect.left + rect.width / 2)));
         }
-
         function startDrag(e) {
-            isDragging = true;
-            var px = e.touches ? e.touches[0].clientX : e.clientX;
-            var py = e.touches ? e.touches[0].clientY : e.clientY;
+            isDragging = true; var px = e.touches ? e.touches[0].clientX : e.clientX; var py = e.touches ? e.touches[0].clientY : e.clientY;
             startAngle = getAngle(px, py) - currentHeading;
-            e.preventDefault();
         }
-
         function doDrag(e) {
             if (!isDragging) return;
-            var px = e.touches ? e.touches[0].clientX : e.clientX;
-            var py = e.touches ? e.touches[0].clientY : e.clientY;
-            var angle = getAngle(px, py);
-            updateCompassView(angle - startAngle);
+            var px = e.touches ? e.touches[0].clientX : e.clientX; var py = e.touches ? e.touches[0].clientY : e.clientY;
+            updateCompassView(getAngle(px, py) - startAngle);
         }
 
-        function stopDrag() { isDragging = false; }
-
-        function handleOrientation(e) {
-            var heading = e.webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : null);
-            if (heading !== null && !isDragging) {
-                updateCompassView(heading);
-            }
-        }
-
-        // Reset compass to current device heading (if available)
-        function resetCompass() {
-            if (window.DeviceOrientationEvent) {
-                // Try to get current heading from orientation
-                window.addEventListener('deviceorientation', function handler(e) {
-                    var heading = e.webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : null);
-                    if (heading !== null) {
-                        updateCompassView(heading);
-                        window.removeEventListener('deviceorientation', handler);
-                    }
-                });
-            } else {
-                // fallback: set to 0
-                updateCompassView(0);
-            }
-        }
-
-        // ---- Event bindings ----
+        // --- iPhone Compass Security Permissions Request ---
         compassIcon.onclick = function() {
             compassModal.style.display = 'flex';
             calcQibla();
-            updateCompassView(currentHeading || 0);
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission ===
-                'function') {
-                DeviceOrientationEvent.requestPermission().then(function(s) {
-                    if (s === 'granted') window.addEventListener('deviceorientation', handleOrientation);
-                });
+            updateCompassView(currentHeading);
+
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(function(response) {
+                        if (response === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation, true);
+                        } else {
+                            statusHint.textContent = "اسحب الدائرة يدويًا لعدم توفر صلاحية المستشعر";
+                        }
+                    })
+                    .catch(function() {
+                        statusHint.textContent = "اسحب الدائرة يدويًا أو اضغط إعادة ضبط لتفعيل الحساس";
+                    });
             } else {
-                window.addEventListener('deviceorientation', handleOrientation);
+                window.addEventListener('deviceorientation', handleOrientation, true);
             }
         };
 
         closeCompassBtn.onclick = function() {
             compassModal.style.display = 'none';
-            window.removeEventListener('deviceorientation', handleOrientation);
+            window.removeEventListener('deviceorientation', handleOrientation, true);
         };
 
-        resetCompassBtn.onclick = resetCompass;
+        resetCompassBtn.onclick = function() {
+            isDragging = false;
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(function(res){
+                    if(res === 'granted') { window.addEventListener('deviceorientation', handleOrientation, true); }
+                });
+            } else { updateCompassView(0); }
+        };
 
-        // Drag events
         compassContainer.addEventListener('mousedown', startDrag);
         compassContainer.addEventListener('mousemove', doDrag);
-        window.addEventListener('mouseup', stopDrag);
-        compassContainer.addEventListener('touchstart', startDrag, { passive: false });
-        compassContainer.addEventListener('touchmove', doDrag, { passive: false });
-        window.addEventListener('touchend', stopDrag);
+        window.addEventListener('mouseup', function() { isDragging = false; });
+        compassContainer.addEventListener('touchstart', startDrag, { passive: true });
+        compassContainer.addEventListener('touchmove', doDrag, { passive: true });
+        window.addEventListener('touchend', function() { isDragging = false; });
 
-        // ---- UI buttons ----
+        // ---- UI Buttons Triggers ----
         ab.onclick = function() {
-            if (aArm) {
-                aArm = false;
-                ab.innerHTML = "<span>🔔</span> <span>تفعيل التنبيهات</span>";
-                ab.style.background = "rgba(245,158,11,0.1)";
-                ab.style.borderColor = "rgba(245,158,11,0.2)";
-                ab.style.color = "#fcd34d";
-                saveAllData();
-                return;
-            }
-            var ctx = getAudioContext();
-            if (!ctx) { alert("⚠️ لا يمكن تشغيل الصوت. تأكد من تشغيل المتصفح."); return; }
-            if (ctx.state === 'suspended') ctx.resume();
-            aArm = true;
-            ab.innerHTML = "<span>✅</span> <span>التنبيهات مفعلة</span>";
-            ab.style.background = "rgba(16,185,129,0.1)";
-            ab.style.borderColor = "rgba(16,185,129,0.3)";
-            ab.style.color = "#6ee7b7";
-            saveAllData();
-            playAdhan();
+            var ctx = getAudioContext(); if (ctx && ctx.state === 'suspended') ctx.resume();
+            aArm = !aArm;
+            this.innerHTML = aArm ? "<span>✅</span> <span>التنبيهات مفعلة</span>" : "<span>🔔</span> <span>تفعيل التنبيهات</span>";
+            this.style.background = aArm ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)";
+            this.style.borderColor = aArm ? "rgba(16,185,129,0.3)" : "rgba(245,158,11,0.2)";
+            this.style.color = aArm ? "#6ee7b7" : "#fcd34d";
+            saveAllData(); if(aArm) playAdhan();
         };
 
         notifPermBtn.onclick = requestNotificationPermission;
-
-        testAudioBtn.onclick = function() {
-            var ctx = getAudioContext();
-            if (!ctx) { alert("⚠️ لا يمكن تشغيل الصوت. تأكد من تشغيل المتصفح."); return; }
-            if (ctx.state === 'suspended') ctx.resume();
-            playAdhan();
-        };
-
-        adhanSelect.onchange = function() { adhanMode = this.value;
-            saveAllData(); };
-        takbeerSelect.onchange = function() { takbeerMode = this.value;
-            saveAllData(); };
-        volumeSlider.oninput = function() { volume = parseInt(this.value) / 100;
-            saveAllData(); };
-
-        incOffset.onclick = function() { hOffset++;
-            saveAllData();
-            ua(); };
-        decOffset.onclick = function() { hOffset--;
-            saveAllData();
-            ua(); };
-        pmb.onclick = function() { calM--;
-            if (calM < 0) { calM = 11;
-                calY--; }
-            rc(); };
-        nmb.onclick = function() { calM++;
-            if (calM > 11) { calM = 0;
-                calY++; }
-            rc(); };
+        testAudioBtn.onclick = function() { var ctx = getAudioContext(); if (ctx) ctx.resume(); playAdhan(); };
+        adhanSelect.onchange = function() { adhanMode = this.value; saveAllData(); };
+        takbeerSelect.onchange = function() { takbeerMode = this.value; saveAllData(); };
+        volumeSlider.oninput = function() { volume = parseInt(this.value) / 100; saveAllData(); };
+        incOffset.onclick = function() { hOffset++; saveAllData(); ua(); };
+        decOffset.onclick = function() { hOffset--; saveAllData(); ua(); };
+        pmb.onclick = function() { calM--; if (calM < 0) { calM = 11; calY--; } rc(); };
+        nmb.onclick = function() { calM++; if (calM > 11) { calM = 0; calY++; } rc(); };
         rl.onclick = function() { triggerGPS(); };
 
-        // ---- Auto location on load with improved logic ----
+        // ---- Initializer ----
         setTimeout(function() {
-            // If we have stored location, use it but also try to update
-            if (lat !== 26.5258 || lng !== 49.9981) {
-                locDot.className = "dot active";
-                locStatusText.textContent = "محدد ✓";
-                ua();
-                // Still try to get a better fix silently
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(pos) {
-                            setLocation(pos.coords.latitude, pos.coords.longitude, "📍 GPS");
-                        },
-                        function() {},
-                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
-                    );
-                }
-            } else {
-                triggerGPS();
-            }
+            if (lat !== 26.4207 || lng !== 50.0888) {
+                locDot.className = "dot active"; locStatusText.textContent = "محدد ✓"; ua();
+            } else { triggerGPS(); }
         }, 600);
 
-        // ---- Periodic updates ----
-        setInterval(function() { uc();
-            rp(); }, 1000);
-        setInterval(function() { rc(); }, 30000);
-
-        document.addEventListener("visibilitychange", function() {
-            if (!document.hidden) { ua(); }
-        });
-
-        // ---- Service Worker for offline PWA ----
-        if ('serviceWorker' in navigator) {
-            var swCode = `
-            self.addEventListener('install', function(e) {
-              e.waitUntil(
-                caches.open('nur-v3').then(function(cache) {
-                  return cache.addAll([
-                    './',
-                    location.pathname,
-                    location.pathname + '?'
-                  ]);
-                })
-              );
-            });
-            self.addEventListener('fetch', function(e) {
-              e.respondWith(
-                caches.match(e.request).then(function(r) {
-                  return r || fetch(e.request).catch(function() {
-                    return caches.match('./');
-                  });
-                })
-              );
-            });
-          `;
-            try {
-                var swBlob = new Blob([swCode], { type: 'application/javascript' });
-                var swUrl = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swUrl, { scope: './' }).catch(function() {});
-            } catch (e) {}
-        }
-
-        // ---- Check notification permission on load ----
-        if ('Notification' in window && Notification.permission === 'granted') {
-            notificationPerm = true;
-            notifBadge.textContent = "🔔 مفعل";
-            notifBadge.style.background = "rgba(16,185,129,0.15)";
-            notifBadge.style.borderColor = "rgba(16,185,129,0.3)";
-            notifBadge.style.color = "#6ee7b7";
-        }
-
-        // ---- Initial load ----
+        setInterval(function() { uc(); rp(); }, 1000);
+        document.addEventListener("visibilitychange", function() { if (!document.hidden) { ua(); } });
         ua();
-
-        console.log("🌙 نور – تطبيق الأذان والمواقيت (محسّن)");
-        console.log("📍 الموقع:", lat, lng, locName);
-        console.log("🔊 الصوت:", aArm ? "مفعل" : "غير مفعل");
-        console.log("📨 الإشعارات:", notificationPerm ? "مفعلة" : "غير مفعلة");
-        console.log("🧭 زاوية القبلة:", qiblaDeg);
     </script>
 </body>
 </html>
