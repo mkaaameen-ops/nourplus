@@ -8,7 +8,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="نور">
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIm5vciIsCiAgInNob3J0X25hbWUiOiAibm9yIiwKICAiZGVzY3JpcHRpb24iOiAiTW9hY2l0IGFsLXNhbGF0IHdhIGFsLWFkaGFuIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZjE3MmEiLAogICJ0aGVtZV9jb2xvciI6ICIjMGYxNzJhIiwKICAiaWNvbnMiOiBbCiAgICB7ICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic+PHJlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0PSc1MTInIGZpbGw9JyMwZjE3MmEnLz48Y2lyY2xlIGN4PScyNTYnIGN5PScyNTYnIHI9JzE4MCcgZmlsbD0nbm9uZScgc3Ryb2tlPScjMmRkNGRmJyBzdHJva2Utd2lkdGg9JzI0Jy8+PHBhdGggZD0nTTI1NiAxMDYgdjMwMCBNMTU2IDIwNiBsMTAwIDEwMCBNMzU2IDIwNiBsLTEwMCAxMDAnIHN0cm9rZT0nIzJkZDRkZicgc3Ryb2tlLXdpZHRoPScyMCcgZmlsbD0nbm9uZScvPjwvc3ZnPg0K”LAogICAgInNpemVzIjogIjUxMng1MTIiLAogICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICB9CiAgXQp9">
     <style>
         /* ===== reset & base ===== */
         * {
@@ -37,8 +36,6 @@
                 padding-bottom: max(16px, env(safe-area-inset-bottom));
             }
         }
-
-        /* ===== layout ===== */
         .main-grid {
             max-width: 72rem;
             width: 100%;
@@ -58,7 +55,6 @@
                 gap: 24px;
             }
         }
-
         .panel {
             background: rgba(255, 255, 255, .05);
             backdrop-filter: blur(20px);
@@ -74,8 +70,6 @@
                 padding: 24px;
             }
         }
-
-        /* ===== prayer cards ===== */
         .prayer-card {
             display: flex;
             justify-content: space-between;
@@ -96,8 +90,6 @@
             color: #2dd4bf;
             font-weight: 700;
         }
-
-        /* ===== circle / countdown ===== */
         .circle-container {
             width: 280px;
             height: 280px;
@@ -137,8 +129,6 @@
             opacity: .7;
             transform: scale(.97);
         }
-
-        /* ===== calendar ===== */
         .cal-day {
             padding: 6px 2px;
             border-radius: 12px;
@@ -177,8 +167,6 @@
             font-size: .75rem;
             color: #94a3b8;
         }
-
-        /* ===== compass ===== */
         .compass-icon-btn {
             position: absolute;
             top: 12px;
@@ -201,7 +189,6 @@
         .compass-icon-btn:hover {
             background: rgba(20, 184, 166, .25);
         }
-
         .compass-modal-overlay {
             position: fixed;
             top: 0;
@@ -321,8 +308,6 @@
             color: #94a3b8;
             margin-top: 2px;
         }
-
-        /* ===== buttons ===== */
         .sync-btn-container {
             display: flex;
             align-items: center;
@@ -349,7 +334,6 @@
             background: rgba(20, 184, 166, 0.2);
             border-color: #2dd4bf;
         }
-
         .event-banner {
             margin-top: 12px;
             font-size: .8rem;
@@ -373,8 +357,6 @@
             color: #a7f3d0;
             display: block;
         }
-
-        /* ===== audio settings ===== */
         .audio-settings {
             margin-top: 12px;
             border-top: 1px solid rgba(255, 255, 255, .08);
@@ -430,8 +412,6 @@
             cursor: pointer;
             touch-action: manipulation;
         }
-
-        /* ===== location status ===== */
         .loc-status {
             font-size: .7rem;
             color: #94a3b8;
@@ -463,8 +443,6 @@
                 opacity: .3;
             }
         }
-
-        /* ===== notification permission ===== */
         .notif-badge {
             display: inline-block;
             background: rgba(20, 184, 166, .15);
@@ -475,8 +453,6 @@
             font-size: .6rem;
             font-weight: 600;
         }
-
-        /* ===== scroll / overflow ===== */
         .scroll-x {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -489,8 +465,6 @@
             background: rgba(45, 212, 191, .3);
             border-radius: 2px;
         }
-
-        /* ===== utility ===== */
         .flex-between {
             display: flex;
             justify-content: space-between;
@@ -521,7 +495,38 @@
             font-family: 'SF Mono', monospace;
         }
 
-        /* ===== responsive tweaks ===== */
+        /* manual location input */
+        .manual-loc {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, .03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .05);
+        }
+        .manual-loc input {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .1);
+            color: #e2e8f0;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: .7rem;
+            width: 70px;
+            font-family: 'SF Mono', monospace;
+        }
+        .manual-loc button {
+            background: rgba(20, 184, 166, .15);
+            border: 1px solid rgba(20, 184, 166, .2);
+            color: #2dd4bf;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: .7rem;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
         @media(max-width:480px) {
             .panel {
                 padding: 12px;
@@ -548,6 +553,9 @@
                 width: 36px;
                 height: 36px;
                 font-size: 1.1rem;
+            }
+            .manual-loc input {
+                width: 60px;
             }
         }
     </style>
@@ -592,6 +600,14 @@
             <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;display:flex;gap:8px;flex-wrap:wrap">
                 <button id="abtn" style="flex:1;padding:10px;border-radius:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fcd34d;font-size:.75rem;cursor:pointer;touch-action:manipulation;min-width:120px"><span id="aic">🔔</span> <span id="atx">تفعيل التنبيهات</span></button>
                 <button id="notifPermBtn" style="flex:1;padding:10px;border-radius:10px;background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.15);color:#2dd4bf;font-size:.75rem;cursor:pointer;touch-action:manipulation;min-width:100px">📨 إذن الإشعارات</button>
+            </div>
+
+            <!-- Manual location input -->
+            <div class="manual-loc">
+                <span style="font-size:.65rem;color:#94a3b8;">📍 ضبط يدوي:</span>
+                <input type="number" id="manualLat" step="any" placeholder="خط العرض" value="26.5258">
+                <input type="number" id="manualLng" step="any" placeholder="خط الطول" value="49.9981">
+                <button id="applyManualLoc">تطبيق</button>
             </div>
         </div>
 
@@ -664,13 +680,16 @@
                 <span>زاوية القبلة: <strong id="targetAngleText" style="color:#2dd4bf">--°</strong></span>
                 <span>اتجاهك: <strong id="currentAngleText" style="color:#ef4444">--°</strong></span>
             </div>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:4px;">
+                <button id="resetCompassBtn" style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;padding:6px 16px;border-radius:12px;font-size:.7rem;cursor:pointer;touch-action:manipulation">🔄 إعادة ضبط</button>
+            </div>
             <button class="compass-close-btn" id="closeCompass">تم</button>
         </div>
     </div>
 
     <script>
         // ================================================================
-        //  C O R E   E N G I N E
+        //  C O R E   E N G I N E   (improved)
         // ================================================================
 
         // ---- helpers ----
@@ -891,6 +910,10 @@
         var takbeerSelect = document.getElementById("takbeerSelect");
         var volumeSlider = document.getElementById("volumeSlider");
         var notifPermBtn = document.getElementById("notifPermBtn");
+        var resetCompassBtn = document.getElementById("resetCompassBtn");
+        var manualLat = document.getElementById("manualLat");
+        var manualLng = document.getElementById("manualLng");
+        var applyManualLoc = document.getElementById("applyManualLoc");
 
         var pc = { fajr: document.getElementById("pf"), sunrise: document.getElementById("ps"), dhuhr: document.getElementById(
                 "pd"), asr: document.getElementById("pa"), maghrib: document.getElementById("pm"), isha: document
@@ -918,9 +941,8 @@
         var currentHeading = 0;
         var isDragging = false;
         var startAngle = 0;
-        var adhanInterval = null;
-        var prayerCheckInterval = null;
         var lastPlayedPrayer = "";
+        var watchId = null;
 
         // ---- load / save ----
         function saveAllData() {
@@ -952,6 +974,8 @@
         adhanSelect.value = adhanMode;
         takbeerSelect.value = takbeerMode;
         volumeSlider.value = Math.round(volume * 100);
+        manualLat.value = lat;
+        manualLng.value = lng;
         if (aArm) {
             ab.innerHTML = "<span>✅</span> <span>التنبيهات مفعلة</span>";
             ab.style.background = "rgba(16,185,129,0.1)";
@@ -1000,9 +1024,7 @@
             var ctx = getAudioContext();
             if (!ctx) return;
             var vol = 0.25;
-            // Maqam-like pattern using frequencies: 440, 494, 554, 587, 659, 740
             var notes = [
-                // Allahu Akbar (4x) – rising then falling
                 [440, 0.35, 0],
                 [554, 0.35, 0.45],
                 [659, 0.35, 0.9],
@@ -1023,7 +1045,6 @@
                 [659, 0.35, 8.4],
                 [554, 0.35, 8.85],
                 [440, 0.35, 9.3],
-                // Ashhadu anna la ilaha illa Allah (2x)
                 [587, 0.45, 10.2],
                 [659, 0.45, 10.75],
                 [740, 0.45, 11.3],
@@ -1034,7 +1055,6 @@
                 [740, 0.45, 14.3],
                 [659, 0.45, 14.85],
                 [587, 0.45, 15.4],
-                // Ashhadu anna Muhammadan Rasul Allah (2x)
                 [659, 0.45, 16.2],
                 [740, 0.45, 16.75],
                 [831, 0.45, 17.3],
@@ -1045,7 +1065,6 @@
                 [831, 0.45, 20.3],
                 [740, 0.45, 20.85],
                 [659, 0.45, 21.4],
-                // Hayya 'ala salah (2x)
                 [880, 0.4, 22.2],
                 [831, 0.4, 22.7],
                 [740, 0.4, 23.2],
@@ -1054,7 +1073,6 @@
                 [831, 0.4, 25.0],
                 [740, 0.4, 25.5],
                 [659, 0.4, 26.0],
-                // Hayya 'ala falah (2x)
                 [880, 0.4, 26.8],
                 [831, 0.4, 27.3],
                 [740, 0.4, 27.8],
@@ -1063,14 +1081,12 @@
                 [831, 0.4, 29.6],
                 [740, 0.4, 30.1],
                 [659, 0.4, 30.6],
-                // Allahu Akbar (2x)
                 [659, 0.4, 31.4],
                 [554, 0.4, 31.85],
                 [440, 0.4, 32.3],
                 [659, 0.4, 33.0],
                 [554, 0.4, 33.45],
                 [440, 0.4, 33.9],
-                // La ilaha illa Allah
                 [554, 0.6, 34.7],
                 [440, 0.6, 35.4],
                 [330, 0.8, 36.1]
@@ -1078,7 +1094,6 @@
             notes.forEach(function(n) {
                 playTone(n[0], n[1], vol, n[2], 'sine');
             });
-            // Add a subtle reverb-like effect with a second oscillator at lower volume
             notes.forEach(function(n) {
                 playTone(n[0] * 0.99, n[1] * 0.8, vol * 0.08, n[2] + 0.03, 'sine');
             });
@@ -1131,7 +1146,6 @@
             } else {
                 playMelodicAdhan();
             }
-            // Also trigger notification if permitted
             if (notificationPerm) {
                 try {
                     var n = new Notification("🕌 وقت الصلاة", {
@@ -1233,12 +1247,14 @@
             });
         }
 
-        // ---- Location (iOS friendly) ----
+        // ---- Location (improved with watch and fallback) ----
         function setLocation(la, lo, name, accuracy) {
             lat = la;
             lng = lo;
             locName = name || "📍 موقعي";
             ld.textContent = locName;
+            manualLat.value = lat;
+            manualLng.value = lng;
             calcQibla();
             saveAllData();
             locDot.className = "dot active";
@@ -1256,22 +1272,34 @@
             locDot.className = "dot pending";
             locStatusText.textContent = "جاري التحديد...";
 
-            // iOS often needs high accuracy with a longer timeout
+            // Stop any previous watch
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+
             var options = {
                 enableHighAccuracy: true,
-                timeout: 12000,
+                timeout: 15000,
                 maximumAge: 30000
             };
 
-            // Try with high accuracy first
-            navigator.geolocation.getCurrentPosition(
+            // Use watchPosition for continuous updates (better for iOS)
+            watchId = navigator.geolocation.watchPosition(
                 function(pos) {
                     var acc = pos.coords.accuracy || 0;
                     var name = acc < 50 ? "📍 دقيق (GPS)" : "📍 تقريبي";
                     setLocation(pos.coords.latitude, pos.coords.longitude, name);
+                    // If accuracy is good, we can stop watching
+                    if (acc < 50) {
+                        if (watchId) {
+                            navigator.geolocation.clearWatch(watchId);
+                            watchId = null;
+                        }
+                    }
                 },
                 function(err) {
-                    // Fallback: try with lower accuracy
+                    // Fallback: try one shot with lower accuracy
                     var opt2 = { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 };
                     navigator.geolocation.getCurrentPosition(
                         function(pos2) {
@@ -1285,10 +1313,29 @@
                         },
                         opt2
                     );
+                    if (watchId) {
+                        navigator.geolocation.clearWatch(watchId);
+                        watchId = null;
+                    }
                 },
                 options
             );
         }
+
+        // ---- Manual location ----
+        applyManualLoc.onclick = function() {
+            var la = parseFloat(manualLat.value);
+            var lo = parseFloat(manualLng.value);
+            if (isNaN(la) || isNaN(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) {
+                alert("⚠️ إحداثيات غير صحيحة. أدخل قيماً صحيحة.");
+                return;
+            }
+            setLocation(la, lo, "📍 يدوي");
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+        };
 
         // ---- Prayer times & countdown ----
         function formatTime(d) {
@@ -1342,12 +1389,10 @@
                     if (pTime && Math.abs(tNow - pTime.getTime()) < 3000) {
                         playAdhan();
                         lastPlayedPrayer = prayerKey;
-                        // Also play takbeer after a short delay
                         setTimeout(function() { playTakbeer(); }, 3000);
                     }
                 }
             }
-            // Reset lastPlayedPrayer at midnight
             if (now.getHours() === 0 && now.getMinutes() === 0 && now.getSeconds() < 5) {
                 lastPlayedPrayer = "";
             }
@@ -1378,7 +1423,6 @@
                 arc.setAttribute("stroke-dashoffset", "1068");
             }
 
-            // Update Hijri date
             var tH = getAdjustedHijri(now);
             var offTxt = hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + " يوم)" : "";
             thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + offTxt;
@@ -1463,7 +1507,7 @@
                 if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
             } else {
                 qiblaRing.classList.remove("aligned");
-                statusHint.textContent = "قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة";
+                statusHint.textContent = "قم بتدوير الدائرة بيدك أو استخدم مستشعر الهاتف لتوجيه القبلة";
                 statusHint.style.color = "#94a3b8";
             }
         }
@@ -1500,11 +1544,28 @@
             }
         }
 
+        // Reset compass to current device heading (if available)
+        function resetCompass() {
+            if (window.DeviceOrientationEvent) {
+                // Try to get current heading from orientation
+                window.addEventListener('deviceorientation', function handler(e) {
+                    var heading = e.webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : null);
+                    if (heading !== null) {
+                        updateCompassView(heading);
+                        window.removeEventListener('deviceorientation', handler);
+                    }
+                });
+            } else {
+                // fallback: set to 0
+                updateCompassView(0);
+            }
+        }
+
         // ---- Event bindings ----
         compassIcon.onclick = function() {
             compassModal.style.display = 'flex';
             calcQibla();
-            updateCompassView(0);
+            updateCompassView(currentHeading || 0);
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission ===
                 'function') {
                 DeviceOrientationEvent.requestPermission().then(function(s) {
@@ -1519,6 +1580,8 @@
             compassModal.style.display = 'none';
             window.removeEventListener('deviceorientation', handleOrientation);
         };
+
+        resetCompassBtn.onclick = resetCompass;
 
         // Drag events
         compassContainer.addEventListener('mousedown', startDrag);
@@ -1548,7 +1611,6 @@
             ab.style.borderColor = "rgba(16,185,129,0.3)";
             ab.style.color = "#6ee7b7";
             saveAllData();
-            // Play a test
             playAdhan();
         };
 
@@ -1584,16 +1646,27 @@
             rc(); };
         rl.onclick = function() { triggerGPS(); };
 
-        // ---- Auto location on load (with iOS friendly delay) ----
+        // ---- Auto location on load with improved logic ----
         setTimeout(function() {
-            if (lat === 26.5258 && lng === 49.9981 && locName === "القطيف") {
-                triggerGPS();
-            } else {
+            // If we have stored location, use it but also try to update
+            if (lat !== 26.5258 || lng !== 49.9981) {
                 locDot.className = "dot active";
                 locStatusText.textContent = "محدد ✓";
                 ua();
+                // Still try to get a better fix silently
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(pos) {
+                            setLocation(pos.coords.latitude, pos.coords.longitude, "📍 GPS");
+                        },
+                        function() {},
+                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
+                    );
+                }
+            } else {
+                triggerGPS();
             }
-        }, 800);
+        }, 600);
 
         // ---- Periodic updates ----
         setInterval(function() { uc();
@@ -1606,11 +1679,10 @@
 
         // ---- Service Worker for offline PWA ----
         if ('serviceWorker' in navigator) {
-            // Register a service worker from a blob URL (works on iOS Safari with HTTPS)
             var swCode = `
             self.addEventListener('install', function(e) {
               e.waitUntil(
-                caches.open('nur-v2').then(function(cache) {
+                caches.open('nur-v3').then(function(cache) {
                   return cache.addAll([
                     './',
                     location.pathname,
@@ -1632,22 +1704,9 @@
             try {
                 var swBlob = new Blob([swCode], { type: 'application/javascript' });
                 var swUrl = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swUrl, { scope: './' }).then(function(reg) {
-                    console.log('✅ Service Worker registered');
-                }).catch(function(err) {
-                    console.log('⚠️ SW registration failed (fallback):', err);
-                    // Fallback: try to register from the same page using a trick
-                    try {
-                        navigator.serviceWorker.register(location.pathname + '?sw', { scope: './' });
-                    } catch (e2) {}
-                });
-            } catch (e) {
-                console.log('⚠️ SW registration skipped');
-            }
+                navigator.serviceWorker.register(swUrl, { scope: './' }).catch(function() {});
+            } catch (e) {}
         }
-
-        // ---- Initial load ----
-        ua();
 
         // ---- Check notification permission on load ----
         if ('Notification' in window && Notification.permission === 'granted') {
@@ -1658,14 +1717,14 @@
             notifBadge.style.color = "#6ee7b7";
         }
 
-        console.log("🌙 نور – تطبيق الأذان والمواقيت");
+        // ---- Initial load ----
+        ua();
+
+        console.log("🌙 نور – تطبيق الأذان والمواقيت (محسّن)");
         console.log("📍 الموقع:", lat, lng, locName);
         console.log("🔊 الصوت:", aArm ? "مفعل" : "غير مفعل");
         console.log("📨 الإشعارات:", notificationPerm ? "مفعلة" : "غير مفعلة");
-
-        // ---- Expose for debugging ----
-        window.__NUR = { lat, lng, locName, aArm, hOffset, adhanMode, takbeerMode, volume, qiblaDeg, playAdhan, playTakbeer,
-            triggerGPS };
+        console.log("🧭 زاوية القبلة:", qiblaDeg);
     </script>
 </body>
 </html>
