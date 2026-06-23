@@ -2,28 +2,31 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <title>نور – الأذان والمواقيت</title>
     <meta name="theme-color" content="#0f172a">
     
-    <script>
-        const manifest = {
-            "short_name": "نور",
-            "name": "نور – الأذان والمواقيت",
-            "start_url": window.location.href,
-            "background_color": "#0f172a",
-            "theme_color": "#0f172a",
-            "display": "standalone",
-            "orientation": "portrait"
-        };
-        const stringManifest = JSON.stringify(manifest);
-        const blob = new Blob([stringManifest], {type: 'application/json'});
-        const manifestURL = URL.createObjectURL(blob);
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = manifestURL;
-        document.head.appendChild(link);
-    </script>
+<script>
+    (function () {
+        try {
+            const manifest = {
+                short_name: "نور",
+                name: "نور – الأذان والمواقيت",
+                start_url: window.location.href,
+                scope: "./",
+                background_color: "#0f172a",
+                theme_color: "#0f172a",
+                display: "standalone",
+                orientation: "portrait"
+            };
+            const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+            const link = document.createElement("link");
+            link.rel = "manifest";
+            link.href = URL.createObjectURL(blob);
+            document.head.appendChild(link);
+        } catch (e) {}
+    })();
+</script>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -682,7 +685,7 @@
     <div id="compassModal" style="display:none" class="compass-modal-overlay">
         <div class="compass-modal">
             <h3 style="margin:0;color:#fff;font-size:1rem;">محدد اتجاه القبلة</h3>
-            <p class="compass-hint" id="statusHint">يرجى تحريك الهاتف بشكل دائري لتنشيط البوصلة الحقيقية</p>
+            <p class="compass-hint" id="statusHint">يرجى تثبيت الهاتف بشكل مسطح لتفعيل المستشعر</p>
             <div class="compass-finder-container" id="compassContainer">
                 <div class="phone-pointer"></div>
                 <div class="qibla-ring-indicator" id="qiblaRing">
@@ -694,7 +697,7 @@
                 <span>اتجاهك: <strong id="currentAngleText" style="color:#ef4444">--°</strong></span>
             </div>
             <div style="display:flex;gap:8px;justify-content:center;margin-top:4px;">
-                <button id="resetCompassBtn" style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;padding:6px 16px;border-radius:12px;font-size:.7rem;cursor:pointer;touch-action:manipulation">🔄 إعادة ضبط الحساس</button>
+                <button id="resetCompassBtn" style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;padding:6px 16px;border-radius:12px;font-size:.7rem;cursor:pointer;touch-action:manipulation">🔄 إعادة ربط المستشعر</button>
             </div>
             <button class="compass-close-btn" id="closeCompass">تم</button>
         </div>
@@ -708,51 +711,6 @@
         function toRad(d) { return d * Math.PI / 180 }
         function toDeg(r) { return r * 180 / Math.PI }
         function wrap360(x) { return ((x % 360) + 360) % 360 }
-
-        // ---- دمج برمجيات الـ Service Worker كـ Inline Data URI لتجنيب القيود ----
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                const swCode = `
-                    const CACHE_NAME = 'nur-cache-v2';
-                    const ASSETS = [window.location.pathname];
-                    
-                    self.addEventListener('install', (e) => {
-                        e.waitUntil(
-                            caches.open(CACHE_NAME).then((cache) => {
-                                return cache.addAll(ASSETS);
-                            }).then(() => self.skipWaiting())
-                        );
-                    });
-
-                    self.addEventListener('activate', (e) => {
-                        e.waitUntil(
-                            caches.keys().then((keys) => {
-                                return Promise.all(
-                                    keys.map((key) => {
-                                        if (key !== CACHE_NAME) return caches.delete(key);
-                                    })
-                                );
-                            }).then(() => self.clients.claim())
-                        );
-                    });
-
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(
-                            caches.match(e.request).then((cachedResponse) => {
-                                return cachedResponse || fetch(e.request);
-                            })
-                        );
-                    });
-                `;
-                
-                const blobSW = new Blob([swCode], { type: 'text/javascript' });
-                const swURL = URL.createObjectURL(blobSW);
-
-                navigator.serviceWorker.register(swURL)
-                .then(function(reg) { console.log('Inline Service Worker Registered Successfully'); })
-                .catch(function(err) { console.log('Service Worker Registration Failed', err); });
-            });
-        }
 
         // ---- prayer times (SPE) ----
         var SPE = (function() {
@@ -906,7 +864,7 @@
         var pc = { fajr: document.getElementById("pf"), sunrise: document.getElementById("ps"), dhuhr: document.getElementById("pd"), asr: document.getElementById("pa"), maghrib: document.getElementById("pm"), isha: document.getElementById("pi") };
         var te = { fajr: document.getElementById("tf"), sunrise: document.getElementById("ts"), dhuhr: document.getElementById("td"), asr: document.getElementById("ta"), maghrib: document.getElementById("tm"), isha: document.getElementById("ti") };
 
-        // ---- state (Default: Qatif) ----
+        // ---- state ----
         var lat = 26.5558, lng = 49.9972, locName = "القطيف";
         var aArm = false; var hOffset = 0; var calY = 0, calM = 0; var aCtx = null;
         var notificationPerm = false; var adhanMode = "melodic"; var takbeerMode = "melodic"; var volume = 0.7;
@@ -924,12 +882,12 @@
                 var saved = localStorage.getItem('nur_full_data');
                 if (saved) {
                     var d = JSON.parse(saved);
-                    if (d.lat && d.lng && d.name) { lat = d.lat; lng = d.lng; locName = d.name; }
+                    if (typeof d.lat === 'number' && typeof d.lng === 'number' && d.name) { lat = d.lat; lng = d.lng; locName = d.name; }
                     if (typeof d.sound === 'boolean') aArm = d.sound;
-                    if (typeof d.hOffset === 'number') hOffset = d.hOffset;
+                    if (typeof d.hOffset === 'number' && isFinite(d.hOffset)) hOffset = d.hOffset;
                     if (d.adhanMode) adhanMode = d.adhanMode;
                     if (d.takbeerMode) takbeerMode = d.takbeerMode;
-                    if (typeof d.volume === 'number') volume = d.volume;
+                    if (typeof d.volume === 'number' && isFinite(d.volume)) volume = Math.max(0, Math.min(1, d.volume));
                 }
             } catch (e) {}
         }
@@ -948,9 +906,9 @@
             ab.style.color = "#6ee7b7";
         }
 
-        // ==== FIXED QIBLA FORMULA (Eastern Province ≈ 244°) ====
+        // ==== FIXED QIBLA FORMULA ====
         function calcQibla() {
-            var mLat = toRad(21.4225);  // مكة
+            var mLat = toRad(21.4225); // مكة المكرمة
             var mLng = toRad(39.8262);  
             var uLat = toRad(lat);
             var uLng = toRad(lng);
@@ -965,11 +923,19 @@
 
         // ---- Audio Engine ----
         function getAudioContext() {
-            if (!aCtx) {
-                try { aCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+            try {
+                if (!aCtx) {
+                    var Ctor = window.AudioContext || window.webkitAudioContext;
+                    if (!Ctor) return null;
+                    aCtx = new Ctor();
+                }
+                if (aCtx.state === 'suspended' && aCtx.resume) {
+                    aCtx.resume().catch(function () {});
+                }
+                return aCtx;
+            } catch (e) {
+                return null;
             }
-            if (aCtx.state === 'suspended') { aCtx.resume().catch(function() {}); }
-            return aCtx;
         }
 
         function playTone(freq, duration, vol, delay, type) {
@@ -997,9 +963,9 @@
 
         function playAdhan() {
             if (adhanMode === 'simple') { playSimpleAdhan(); } else { playMelodicAdhan(); }
-            if (notificationPerm) {
+            if (notificationPerm && 'Notification' in window && Notification.permission === 'granted') {
                 try {
-                    var n = new Notification("🇲🇶 وقت الصلاة", { body: "حان وقت الصلاة – نور يذكرك", silent: true });
+                    var n = new Notification("وقت الصلاة", { body: "حان وقت الصلاة – نور يذكرك", silent: true });
                     setTimeout(function() { n.close(); }, 8000);
                 } catch (e) {}
             }
@@ -1012,20 +978,19 @@
         }
 
         function requestNotificationPermission() {
-            if (!('Notification' in window)) return;
+            if (!('Notification' in window) || !Notification.requestPermission) return;
             Notification.requestPermission().then(function(perm) {
-                if (perm === 'granted') {
-                    notificationPerm = true;
-                    notifBadge.textContent = "🔔 مفعل";
-                    notifBadge.style.background = "rgba(16,185,129,0.15)";
-                    notifBadge.style.color = "#6ee7b7";
-                    saveAllData();
-                }
-            });
+                notificationPerm = perm === 'granted';
+                notifBadge.textContent = notificationPerm ? "🔔 مفعل" : "🔔 غير مفعل";
+                notifBadge.style.background = notificationPerm ? "rgba(16,185,129,0.15)" : "rgba(20,184,166,.15)";
+                notifBadge.style.color = notificationPerm ? "#6ee7b7" : "#2dd4bf";
+                saveAllData();
+            }).catch(function () {});
         }
 
         // ---- GPS Locator Logic ----
         function setLocation(la, lo, name) {
+            if (typeof la !== 'number' || typeof lo !== 'number' || !isFinite(la) || !isFinite(lo)) return;
             lat = la; lng = lo; locName = name || "📍 موقعي";
             ld.textContent = locName; manualLat.value = lat; manualLng.value = lng;
             calcQibla(); saveAllData();
@@ -1042,7 +1007,7 @@
 
             if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
 
-            var options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
+            var options = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 };
 
             watchId = navigator.geolocation.watchPosition(
                 function(pos) {
@@ -1090,11 +1055,19 @@
         }
 
         function rp() {
-            var now = new Date(); var tz = -now.getTimezoneOffset() / 60;
-            var p = SPE.calc(lat, lng, tz, now);
+            var now = new Date();
+            var tz = -now.getTimezoneOffset() / 60;
+            var p = SPE.calc(lat, lng, tz, now) || {};
             Object.keys(te).forEach(function(k) { te[k].textContent = formatTime(p[k]); });
 
-            var cur = "isha", nx = "fajr", nxL = "الفجر"; var tNow = now.getTime();
+            if (!p.fajr || !p.sunrise || !p.dhuhr || !p.asr || !p.maghrib || !p.isha) {
+                cn.textContent = "—";
+                ct.textContent = "00:00:00";
+                return;
+            }
+
+            var cur = "isha", nx = "fajr", nxL = "الفجر";
+            var tNow = now.getTime();
             if (tNow >= p.fajr.getTime() && tNow < p.sunrise.getTime()) { cur = "fajr"; nx = "sunrise"; nxL = "الشروق"; }
             else if (tNow >= p.sunrise.getTime() && tNow < p.dhuhr.getTime()) { cur = "sunrise"; nx = "dhuhr"; nxL = "الظهر"; }
             else if (tNow >= p.dhuhr.getTime() && tNow < p.asr.getTime()) { cur = "dhuhr"; nx = "asr"; nxL = "العصر"; }
@@ -1107,23 +1080,35 @@
             if (cur !== "sunrise" && aArm && cur !== lastPlayedPrayer) {
                 var pTime = p[cur];
                 if (pTime && Math.abs(tNow - pTime.getTime()) < 3000) {
-                    playAdhan(); lastPlayedPrayer = cur;
+                    playAdhan();
+                    lastPlayedPrayer = cur;
                     setTimeout(function() { playTakbeer(); }, 4000);
                 }
             }
 
-            cn.textContent = nxL; var tN = p[nx];
+            cn.textContent = nxL;
+            var tN = p[nx];
             if (nx === "fajr" && tNow >= p.isha.getTime()) {
-                var tom = new Date(now); tom.setDate(tom.getDate() + 1);
-                tN = SPE.calc(lat, lng, tz, tom).fajr;
+                var tom = new Date(now);
+                tom.setDate(tom.getDate() + 1);
+                var nextDay = SPE.calc(lat, lng, tz, tom) || {};
+                tN = nextDay.fajr || null;
             }
-            var diff = tN.getTime() - tNow;
-            if (diff > 0) {
-                var sec = Math.floor(diff / 1000);
-                ct.textContent = String(Math.floor(sec / 3600)).padStart(2, "0") + ":" + String(Math.floor((sec % 3600) / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
-                var tw = tN.getTime() - p[cur].getTime();
-                if (tw > 0) { arc.setAttribute("stroke-dashoffset", 1068 * (1 - (diff / tw))); }
+
+            if (tN && tN.getTime) {
+                var diff = tN.getTime() - tNow;
+                if (diff > 0) {
+                    var sec = Math.floor(diff / 1000);
+                    ct.textContent = String(Math.floor(sec / 3600)).padStart(2, "0") + ":" + String(Math.floor((sec % 3600) / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+                    var curTime = p[cur] && p[cur].getTime ? p[cur].getTime() : tNow;
+                    var tw = tN.getTime() - curTime;
+                    if (tw > 0) {
+                        var progress = Math.max(0, Math.min(1, 1 - (diff / tw)));
+                        arc.setAttribute("stroke-dashoffset", 1068 * progress);
+                    }
+                }
             }
+
             var tH = getAdjustedHijri(now);
             thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + (hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + ")" : "");
         }
@@ -1134,6 +1119,7 @@
             dt.textContent = n.toLocaleDateString("ar-SA", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
         }
 
+        // ---- UI Calendar ----
         function rc() {
             cmn.textContent = MIL_MONTH_NAMES[calM] + " " + calY;
             var firstMil = new Date(calY, calM, 1); var dim = new Date(calY, calM + 1, 0).getDate();
@@ -1164,7 +1150,7 @@
 
         function ua() { uc(); rp(); if (calY === 0) { calY = new Date().getFullYear(); calM = new Date().getMonth(); } rc(); }
 
-        // ---- Compass Alignment ----
+        // ---- AUTOMATIC COMPASS LOGIC ----
         function updateCompassView(heading) {
             currentHeading = wrap360(heading);
             qiblaRing.style.transform = 'rotate(' + (qiblaDeg - currentHeading) + 'deg)';
@@ -1176,20 +1162,32 @@
 
             if (diff <= 5) {
                 qiblaRing.classList.add("aligned");
-                statusHint.textContent = "🕋 أنت تواجه الكعبة المشرفة الحين!";
+                statusHint.textContent = "🕋 أنت تواجه الكعبة المشرفة الآن!";
                 statusHint.style.color = "#10b981";
-                if (navigator.vibrate) navigator.vibrate(40);
+                try { if (navigator.vibrate) navigator.vibrate(40); } catch (e) {}
             } else {
                 qiblaRing.classList.remove("aligned");
-                statusHint.textContent = "وجه الهاتف وتدوّر حتى تضيء الدائرة بالأخضر";
+                statusHint.textContent = "وجه الهاتف ودوّر حتى تضيء الدائرة بالأخضر";
                 statusHint.style.color = "#94a3b8";
             }
         }
 
         function handleOrientation(e) {
-            var heading = e.webkitCompassHeading;
-            if (heading === undefined && e.alpha !== null) { heading = 360 - e.alpha; }
-            if (heading !== undefined && heading !== null && !isDragging) { updateCompassView(heading); }
+            if (isDragging) return; // عدم المقاطعة عند السحب اليدوي البحت
+
+            var heading = null;
+            // دعم كامل لـ iOS (webkitCompassHeading)
+            if (typeof e.webkitCompassHeading === 'number') {
+                heading = e.webkitCompassHeading;
+            } 
+            // دعم كامل لـ Android (معيار Absolute Orientation)
+            else if (e.alpha !== null && e.alpha !== undefined) {
+                heading = 360 - e.alpha; 
+            }
+
+            if (heading !== null) {
+                updateCompassView(heading);
+            }
         }
 
         function getAngle(clientX, clientY) {
@@ -1197,13 +1195,29 @@
             return toDeg(Math.atan2(clientY - (rect.top + rect.height / 2), clientX - (rect.left + rect.width / 2)));
         }
         function startDrag(e) {
-            isDragging = true; var px = e.touches ? e.touches[0].clientX : e.clientX; var py = e.touches ? e.touches[0].clientY : e.clientY;
+            isDragging = true; 
+            var px = e.touches ? e.touches[0].clientX : e.clientX; 
+            var py = e.touches ? e.touches[0].clientY : e.clientY;
             startAngle = getAngle(px, py) - currentHeading;
         }
         function doDrag(e) {
             if (!isDragging) return;
-            var px = e.touches ? e.touches[0].clientX : e.clientX; var py = e.touches ? e.touches[0].clientY : e.clientY;
+            var px = e.touches ? e.touches[0].clientX : e.clientX; 
+            var py = e.touches ? e.touches[0].clientY : e.clientY;
             updateCompassView(getAngle(px, py) - startAngle);
+        }
+
+        function addCompassListener() {
+            // إزالة الأحداث القديمة لتجنب التكرار
+            window.removeEventListener('deviceorientation', handleOrientation, true);
+            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+
+            // الاستماع للحدث المطلق الخاص بأندرويد وحدث آيفون الافتراضي
+            if ('ondeviceorientationabsolute' in window) {
+                window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation, true);
+            }
         }
 
         compassIcon.onclick = function() {
@@ -1211,36 +1225,53 @@
             calcQibla();
             updateCompassView(currentHeading);
 
+            // تفعيل فوري وطلب الصلاحيات المتقدمة لـ iOS
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(function(response) {
-                        if (response === 'granted') { window.addEventListener('deviceorientation', handleOrientation, true); }
-                        else { statusHint.textContent = "اسحب الدائرة يدويًا لعدم توفر صلاحية المستشعر"; }
+                        if (response === 'granted') { 
+                            addCompassListener(); 
+                        } else { 
+                            statusHint.textContent = "اسحب الدائرة يدويًا لعدم توفر صلاحية الحساس"; 
+                        }
                     })
-                    .catch(function() { statusHint.textContent = "اسحب الدائرة يدويًا أو اضغط إعادة ضبط لتفعيل الحساس"; });
-            } else { window.addEventListener('deviceorientation', handleOrientation, true); }
+                    .catch(function() { 
+                        statusHint.textContent = "اسحب الدائرة يدويًا أو اضغط إعادة ربط لتفعيل الحساس"; 
+                    });
+            } else {
+                addCompassListener();
+            }
         };
 
         closeCompassBtn.onclick = function() {
             compassModal.style.display = 'none';
             window.removeEventListener('deviceorientation', handleOrientation, true);
+            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
         };
 
         resetCompassBtn.onclick = function() {
             isDragging = false;
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission().then(function(res){
-                    if(res === 'granted') { window.addEventListener('deviceorientation', handleOrientation, true); }
-                });
-            } else { updateCompassView(0); }
+                    if(res === 'granted') { addCompassListener(); }
+                }).catch(function(){ updateCompassView(0); });
+            } else {
+                addCompassListener();
+                updateCompassView(0);
+            }
         };
 
+        // أحداث اللمس والسحب (مع استرجاع التحكم للمستشعر التلقائي عند انتهاء اللمس)
         compassContainer.addEventListener('mousedown', startDrag);
         compassContainer.addEventListener('mousemove', doDrag);
         window.addEventListener('mouseup', function() { isDragging = false; });
+        
         compassContainer.addEventListener('touchstart', startDrag, { passive: true });
         compassContainer.addEventListener('touchmove', doDrag, { passive: true });
-        window.addEventListener('touchend', function() { isDragging = false; });
+        window.addEventListener('touchend', function() { 
+            // بمجرد رفع الإصبع، نتيح لـ المستشعر التحكم التلقائي مجدداً فوراً
+            setTimeout(function() { isDragging = false; }, 100);
+        });
 
         // ---- UI Buttons Triggers ----
         ab.onclick = function() {
@@ -1272,6 +1303,7 @@
         }, 600);
 
         setInterval(function() { uc(); rp(); }, 1000);
+        window.addEventListener('resize', function () { rc(); });
         document.addEventListener("visibilitychange", function() { if (!document.hidden) { ua(); } });
         ua();
     </script>
