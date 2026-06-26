@@ -87,7 +87,9 @@
             min-height: 44px;
             border: 1px solid transparent;
             transition: all 0.2s;
+            cursor: pointer;
         }
+        .cal-day:active { transform: scale(0.92); }
         .cal-day.today {
             background: linear-gradient(135deg, #14b8a6, #10b981);
             color: #0f172a;
@@ -99,6 +101,11 @@
         .cal-day.normal { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .02); color: #e2e8f0 }
         .cal-day.special-sorrow { border: 1px solid rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.12); color: #fca5a5; }
         .cal-day.special-joy { border: 1px solid rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.12); color: #a7f3d0; }
+        .cal-day.special-lunar {
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+        }
         
         .small-text { font-size: .75rem; color: #94a3b8 }
         
@@ -203,8 +210,101 @@
         }
         .event-banner.sorrow { border-right-color: #ef4444; background: rgba(239, 68, 68, 0.06); color: #fca5a5; display: block; }
         .event-banner.joy { border-right-color: #10b981; background: rgba(16, 185, 129, 0.06); color: #a7f3d0; display: block; }
+        .event-banner.lunar { border-right-color: #3b82f6; background: rgba(59, 130, 246, 0.06); color: #93c5fd; display: block; }
 
-        /* ===== رأس المسبحة ===== */
+        /* ===== نافذة تفاصيل اليوم ===== */
+        .day-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, .92); backdrop-filter: blur(12px);
+            z-index: 300; display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .day-modal-overlay.open { display: flex; }
+        .day-modal {
+            background: rgba(30, 41, 59, .85);
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 32px;
+            padding: 28px 24px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .7);
+            position: relative;
+            text-align: center;
+        }
+        .day-modal .close-day-btn {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #94a3b8;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .day-modal .close-day-btn:hover { background: rgba(255,255,255,0.15); }
+        .day-modal .day-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .day-modal .day-sub {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 14px;
+        }
+        .day-modal .day-hijri {
+            font-size: 1.1rem;
+            color: #2dd4bf;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: rgba(20,184,166,0.08);
+            border-radius: 12px;
+        }
+        .day-modal .day-event {
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .day-modal .day-event.sorrow {
+            background: rgba(239,68,68,0.15);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #fca5a5;
+        }
+        .day-modal .day-event.joy {
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.3);
+            color: #a7f3d0;
+        }
+        .day-modal .day-event.lunar {
+            background: rgba(59,130,246,0.15);
+            border: 1px solid rgba(59,130,246,0.3);
+            color: #93c5fd;
+        }
+        .day-modal .day-event.none {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #94a3b8;
+            font-weight: 400;
+        }
+        .day-modal .day-event .event-icon { font-size: 1.6rem; margin-left: 8px; }
+        .day-modal .day-event .event-sign {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* ===== المسبحة الرقمية ===== */
         :root {
             --bg-deep:    #060608;
             --gold:       #C9A84C;
@@ -435,6 +535,7 @@
     </div>
 </div>
 
+<!-- نافذة البوصلة -->
 <div id="compassModal" style="display:none" class="compass-modal-overlay">
     <div class="compass-modal">
         <h3 style="margin:0;color:#fff;font-size:1.1rem;">محدد اتجاه القبلة التفاعلي</h3>
@@ -452,6 +553,17 @@
             <span>اتجاهك الحالي: <strong id="currentAngleText" style="color:#ef4444">--°</strong></span>
         </div>
         <button class="compass-close-btn" id="closeCompass">تم</button>
+    </div>
+</div>
+
+<!-- نافذة تفاصيل اليوم -->
+<div id="dayModal" class="day-modal-overlay">
+    <div class="day-modal">
+        <button class="close-day-btn" id="closeDayModal">✕</button>
+        <div class="day-title" id="dayTitle">--</div>
+        <div class="day-sub" id="daySub">--</div>
+        <div class="day-hijri" id="dayHijri">--</div>
+        <div class="day-event" id="dayEvent">--</div>
     </div>
 </div>
 
@@ -510,12 +622,22 @@
 </div>
 
 <script>
-// (كود الجافا سكريبت كما هو دون تغيير - لأنه لا يعتمد على الإنترنت)
 function toRad(d){return d*Math.PI/180}
 function toDeg(r){return r*180/Math.PI}
 
 var SPE=(function(){function w(x){return x-360*Math.floor(x/360)}return{calc:function(la,lo,tz,D){var y=D.getFullYear(),m=D.getMonth()+1,dd=D.getDate();if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=2-A+Math.floor(A/4);var jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+dd+B-1524.5;var D2=jd-2451545;var g=w(357.529+0.98560028*D2),q=w(280.459+0.98564736*D2);var L=w(q+1.915*Math.sin(toRad(g))+0.020*Math.sin(toRad(2*g)));var e=23.439-0.00000036*D2;var RA=toDeg(Math.atan2(Math.cos(toRad(e))*Math.sin(toRad(L)),Math.cos(toRad(L))))/15;if(RA<0)RA+=24;var dec=toDeg(Math.asin(Math.sin(toRad(e))*Math.sin(toRad(L))));var EqT=q/15-RA;var mid=12+tz-lo/15-EqT;if(mid<0)mid+=24;if(mid>24)mid-=24;function aD(a){var num=-Math.sin(toRad(a))-Math.sin(toRad(la))*Math.sin(toRad(dec));var den=Math.cos(toRad(la))*Math.cos(toRad(dec));var cosH=num/den;if(cosH>1||cosH<-1)return null;return toDeg(Math.acos(cosH))/15}function asrD(){var len=1+Math.tan(toRad(Math.abs(la-dec)));var num=Math.sin(Math.atan(1/len))-Math.sin(toRad(la))*Math.sin(toRad(dec));var den=Math.cos(toRad(la))*Math.cos(toRad(dec));var cosH=num/den;if(cosH>1||cosH<-1)return null;return toDeg(Math.acos(cosH))/15}var fH=aD(16),sH=aD(0.833),aH=asrD(),mH=aD(4),iH=aD(14);var T={fajr:mid-fH,sunrise:mid-sH,dhuhr:mid,asr:mid+aH,maghrib:mid+mH,isha:mid+iH};var res={};Object.keys(T).forEach(function(k){var base=new Date(D.getTime());base.setHours(0,0,0,0);res[k]=new Date(base.getTime()+T[k]*3600000)});return res}}})();
 var SCE=(function(){var M=["محرّم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوّال","ذو القعدة","ذو الحجة"];function g2j(y,m,d){if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=Math.floor(A/4),C=2-A+B;return C+d+Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))-1524.5}function j2h(jd){var z=Math.floor(jd+0.5),c=Math.floor((z-1948439.5)/10631),rem=(z-1948439.5)-c*10631;var yc=Math.floor((rem*30+11)/10631),yr=rem-Math.floor((yc*10631+14)/30);var y=c*30+yc+1,m=Math.floor((yr*11+330)/325),d=Math.floor(yr-Math.floor((m*325-320)/11)+0.5);if(d===0){d=30;m--}if(m===0){m=12;y--}return{hYear:y,hMonth:m,hDay:d}}return{hijri:function(d){return j2h(g2j(d.getFullYear(),d.getMonth()+1,d.getDate()))},monthName:function(i){return M[i-1]||""},daysInMonth:function(y,m){if(m===12)return((y*11+14)%30)<11?30:29;return m%2===1?30:29},h2g:function(y,m,d){var c=Math.floor((y-1)/30),yc=(y-1)%30;var jd=1948439.5+c*10631+Math.floor((yc*10631+14)/30)+Math.floor((m*325-320)/11)+d;var j=Math.floor(jd+0.5),w=Math.floor((j-1867216.25)/36524.25),x=Math.floor(w/4),b=j+1+w-x,c2=b+1524;var dy=Math.floor((c2-122.1)/365.25),e=Math.floor(365.25*dy),g=Math.floor((c2-e)/30.6001);var day=c2-e-Math.floor(30.6001*g),month=g<14?g-1:g-13,year=month>2?dy-4716:dy-4715;return new Date(year,month-1,day)}}})();
+
+// ===== منازل القمر وأبراج القمر =====
+const LUNAR_MANSIONS = [
+    "الشرطان", "البطين", "الثريا", "الدبران", "الهقعة", "الهنعة",
+    "الذراع", "النثرة", "الطرف", "الجبهة", "الزبرة", "الصرفة",
+    "العواء", "السماك", "الغفر", "الزبانا", "الإكليل", "القلب",
+    "الشولة", "النعائم", "البلدة", "سعد الذابح", "سعد بلع",
+    "سعد السعود", "سعد الأخبية", "الفرغ المقدم", "الفرغ المؤخر", "الحوت"
+];
+const ZODIAC_SIGNS = ["الحمل", "الثور", "الجوزاء", "السرطان", "الأسد", "السنبلة", "الميزان", "العقرب", "القوس", "الجدي", "الدلو", "الحوت"];
+const LUNAR_MANSION_TO_SIGN = [0,0,0, 1,1,1, 2,2,2, 3,3,3, 4,4,4, 5,5,5, 6,6,6, 7,7, 8, 9, 10, 11, 11];
 
 var shiaEvents=[
   {m:1,d:1,t:"sorrow",n:"رأس السنة الهجرية"},
@@ -572,6 +694,70 @@ var shiaEvents=[
 
 var MIL_MONTH_NAMES = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 
+// ===== دالة البحث المعدلة (منازل + أبراج) =====
+function findShiaEvent(hMonth, hDay) {
+    var found = shiaEvents.find(function(e) { return e.m === hMonth && e.d === hDay; });
+    if (found) return found;
+    if (hDay >= 1 && hDay <= 28) {
+        var signIndex = LUNAR_MANSION_TO_SIGN[hDay - 1];
+        return {
+            t: "lunar",
+            n: "منزلة " + LUNAR_MANSIONS[hDay - 1],
+            sign: ZODIAC_SIGNS[signIndex]
+        };
+    }
+    return null;
+}
+
+// ===== نافذة تفاصيل اليوم =====
+var dayModal = document.getElementById('dayModal');
+var closeDayBtn = document.getElementById('closeDayModal');
+
+function showDayModal(day, month, year, hObj, ev) {
+    var title = document.getElementById('dayTitle');
+    var sub = document.getElementById('daySub');
+    var hijri = document.getElementById('dayHijri');
+    var eventEl = document.getElementById('dayEvent');
+    
+    var dateObj = new Date(year, month, day);
+    var weekday = dateObj.toLocaleDateString('ar-SA', { weekday: 'long' });
+    title.textContent = weekday + '، ' + day + ' ' + MIL_MONTH_NAMES[month] + ' ' + year;
+    sub.textContent = 'التاريخ الميلادي';
+    
+    var hMonthName = SCE.monthName(hObj.hMonth);
+    hijri.textContent = hObj.hDay + ' ' + hMonthName + ' ' + hObj.hYear + ' هـ';
+    
+    if (ev) {
+        var icon = '';
+        var cls = '';
+        var detail = '';
+        if (ev.t === 'sorrow') {
+            icon = '🕋';
+            cls = 'sorrow';
+            detail = 'مناسبة حزينة';
+        } else if (ev.t === 'joy') {
+            icon = '🎉';
+            cls = 'joy';
+            detail = 'مناسبة مفرحة';
+        } else if (ev.t === 'lunar') {
+            icon = '🌙';
+            cls = 'lunar';
+            detail = 'برج ' + ev.sign;
+        }
+        eventEl.className = 'day-event ' + cls;
+        eventEl.innerHTML = '<span class="event-icon">' + icon + '</span> ' + ev.n + '<div class="event-sign">' + detail + '</div>';
+    } else {
+        eventEl.className = 'day-event none';
+        eventEl.innerHTML = '📅 لا توجد مناسبات خاصة في هذا اليوم';
+    }
+    
+    dayModal.classList.add('open');
+}
+
+closeDayBtn.onclick = function() { dayModal.classList.remove('open'); };
+dayModal.onclick = function(e) { if (e.target === dayModal) dayModal.classList.remove('open'); };
+
+// ===== بداية الكود الرئيسي =====
 (function(){
 var ld=document.getElementById("ld"),clk=document.getElementById("clk"),dt=document.getElementById("dt"),cn=document.getElementById("cn"),ct=document.getElementById("ct"),arc=document.getElementById("arc"),ab=document.getElementById("abtn"),cmn=document.getElementById("cmn"),cgr=document.getElementById("cgr"),cdg=document.getElementById("cdg"),thj=document.getElementById("thj"),pmb=document.getElementById("pmb"),nmb=document.getElementById("nmb"),rl=document.getElementById("rl");
 var incOffset=document.getElementById("incOffset"), decOffset=document.getElementById("decOffset");
@@ -730,10 +916,7 @@ function getAdjustedHijri(dateObj) {
   return SCE.hijri(targetDate);
 }
 
-function findShiaEvent(hMonth, hDay) {
-  return shiaEvents.find(function(e) { return e.m === hMonth && e.d === hDay; }) || null;
-}
-
+// ===== دالة rc المعدلة مع إضافة حدث الضغط على اليوم =====
 function rc(){
   cmn.textContent = MIL_MONTH_NAMES[calM] + " " + calY;
   var firstMilDate = new Date(calY, calM, 1);
@@ -756,14 +939,31 @@ function rc(){
     if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) { cls += "today"; } else { cls += "normal"; }
     var ev = findShiaEvent(hObj.hMonth, hObj.hDay);
     if(ev) {
-      if(ev.t === "sorrow") cls += " special-sorrow";
-      else if(ev.t === "joy") cls += " special-joy";
-      if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) {
-        todayEventText = "مناسبة اليوم: " + ev.n + " (" + hObj.hDay + " " + SCE.monthName(hObj.hMonth) + ")";
-        todayEventType = ev.t;
-      }
+        if(ev.t === "sorrow") cls += " special-sorrow";
+        else if(ev.t === "joy") cls += " special-joy";
+        else if(ev.t === "lunar") {
+            cls += " special-lunar";
+            cell.innerHTML += "<span style='font-size:0.55rem;color:#60a5fa;margin-top:1px;'>" + ev.sign + "</span>";
+        }
+        if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) {
+            if(ev.t === "lunar") {
+                todayEventText = "🌙 منزلة " + ev.n.replace("منزلة ", "") + " (برج " + ev.sign + ")";
+                todayEventType = "lunar";
+            } else {
+                todayEventText = "مناسبة اليوم: " + ev.n + " (" + hObj.hDay + " " + SCE.monthName(hObj.hMonth) + ")";
+                todayEventType = ev.t;
+            }
+        }
     }
     cell.className = cls;
+    
+    // ===== إضافة حدث الضغط =====
+    cell.onclick = (function(day, month, year, hijriObj, eventObj) {
+        return function() {
+            showDayModal(day, month, year, hijriObj, eventObj);
+        };
+    })(d, calM, calY, hObj, ev);
+    
     cdg.appendChild(cell);
   }
   if(todayEventText) { todayEventBanner.textContent = todayEventText; todayEventBanner.className = "event-banner " + todayEventType; } else { todayEventBanner.style.display = "none"; }
@@ -829,7 +1029,7 @@ ua();
 })();
 
 /* ================================================================
-   المسبحة الرقمية (بدون تغيير في الجافا سكريبت)
+   المسبحة الرقمية (الكود الكامل)
 ================================================================ */
 (function(){
 function toArabicNums(n) { return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
