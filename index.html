@@ -8,12 +8,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="نور">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         * { -webkit-tap-highlight-color: transparent; outline: 0; box-sizing: border-box; }
         body {
-            font-family: 'Tajawal', system-ui, sans-serif;
+            font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
             direction: rtl;
             margin: 0;
             background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a);
@@ -206,7 +204,7 @@
         .event-banner.sorrow { border-right-color: #ef4444; background: rgba(239, 68, 68, 0.06); color: #fca5a5; display: block; }
         .event-banner.joy { border-right-color: #10b981; background: rgba(16, 185, 129, 0.06); color: #a7f3d0; display: block; }
 
-        /* ===== تعديل رأس المسبحة ===== */
+        /* ===== رأس المسبحة ===== */
         :root {
             --bg-deep:    #060608;
             --gold:       #C9A84C;
@@ -249,7 +247,7 @@
             justify-content: space-between;
             padding: 12px 16px 8px;
             gap: 8px;
-            flex-wrap: wrap; /* يسمح بانتقال العناصر لصف جديد */
+            flex-wrap: wrap;
         }
 
         .tasbih-close-btn { 
@@ -267,7 +265,7 @@
             transition: all 0.2s;
             flex-shrink: 0;
             white-space: nowrap;
-            order: 1; /* يظهر أولاً (يمين) */
+            order: 1;
         }
         .tasbih-close-btn:hover {
             background: rgba(201,168,76,0.15);
@@ -278,11 +276,11 @@
             text-align: left; 
             direction: ltr; 
             flex-shrink: 0;
-            order: 2; /* يظهر ثانياً (يسار) */
-            margin-right: auto; /* يدفع المجموع لليسار مع بقاء زر العودة في أقصى اليمين */
+            order: 2;
+            margin-right: auto;
         }
         #session-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; }
-        #total-display { font-family: 'Scheherazade New', serif; font-size: 16px; color: var(--gold-dim); }
+        #total-display { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 16px; color: var(--gold-dim); }
 
         #dhikr-selector-btn {
             display: flex; 
@@ -293,25 +291,24 @@
             border-radius: 50px; 
             padding: 7px 14px;
             color: var(--gold-light);
-            font-family: 'Tajawal', sans-serif; 
+            font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
             font-size: 13px; 
             font-weight: 500;
             cursor: pointer; 
             transition: background 0.2s;
             flex-shrink: 1; 
             min-width: 0;
-            flex-basis: 100%; /* يأخذ العرض الكامل للصف الجديد */
-            order: 3; /* يظهر في الصف الثالث */
-            margin-top: 4px; /* تباعد بسيط عن الصف الأول */
-            justify-content: center; /* توسيط النص */
+            flex-basis: 100%;
+            order: 3;
+            margin-top: 4px;
+            justify-content: center;
         }
         #dhikr-selector-btn:active { background: rgba(201,168,76,0.22); }
         #dhikr-selector-btn .arrow { font-size: 9px; opacity: 0.7; }
 
-        /* باقي ستايلات المسبحة كما هي */
         #dhikr-area { position: relative; z-index: 10; text-align: center; padding: 4px 20px 0; }
         #dhikr-text {
-            font-family: 'Scheherazade New', serif;
+            font-family: 'Geeza Pro', 'Times New Roman', serif;
             font-size: clamp(22px, 6vw, 30px);
             color: var(--text-main); letter-spacing: 0.03em;
             text-shadow: 0 0 30px rgba(201,168,76,0.2); line-height: 1.4;
@@ -319,22 +316,22 @@
         #dhikr-phase-label { font-size: 11px; color: var(--gold-dim); margin-top: 1px; min-height: 14px; }
         #counter-wrap { position: relative; z-index: 10; text-align: center; padding: 6px 0 2px; }
         #counter-num {
-            font-family: 'Scheherazade New', serif;
+            font-family: 'Geeza Pro', 'Times New Roman', serif;
             font-size: clamp(52px, 15vw, 72px); font-weight: 700;
             color: var(--text-main); line-height: 1;
             text-shadow: 0 2px 20px rgba(201,168,76,0.15);
         }
-        #counter-of { font-family: 'Scheherazade New', serif; font-size: 15px; color: var(--text-muted); }
+        #counter-of { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 15px; color: var(--text-muted); }
         #round-num { font-size: 11px; color: var(--gold-dim); margin-top: 2px; }
         #canvas-wrap { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
         #tasbih-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-        #swipe-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 10px; color: rgba(201,168,76,0.3); font-family: 'Tajawal', sans-serif; pointer-events: none; letter-spacing: 0.05em; transition: opacity 0.5s; }
+        #swipe-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 10px; color: rgba(201,168,76,0.3); font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; pointer-events: none; letter-spacing: 0.05em; transition: opacity 0.5s; }
         .ripple { position: absolute; border-radius: 50%; background: rgba(201,168,76,0.15); transform: scale(0); animation: ripple-anim 0.55s ease-out forwards; pointer-events: none; }
         @keyframes ripple-anim { to { transform: scale(5); opacity: 0; } }
         #tasbih-controls { position: relative; z-index: 10; display: flex; align-items: center; gap: 10px; padding: 10px 16px 14px; }
         #btn-undo { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
         #btn-undo:active { background: rgba(255,255,255,0.12); }
-        #btn-count { flex: 1; height: 56px; border-radius: 28px; border: none; background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #A87C30 100%); color: #1A1408; font-family: 'Scheherazade New', serif; font-size: 20px; font-weight: 700; cursor: pointer; letter-spacing: 0.05em; box-shadow: 0 4px 24px rgba(201,168,76,0.35), 0 1px 3px rgba(0,0,0,0.4); transition: transform 0.1s, box-shadow 0.1s; touch-action: none; }
+        #btn-count { flex: 1; height: 56px; border-radius: 28px; border: none; background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #A87C30 100%); color: #1A1408; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 20px; font-weight: 700; cursor: pointer; letter-spacing: 0.05em; box-shadow: 0 4px 24px rgba(201,168,76,0.35), 0 1px 3px rgba(0,0,0,0.4); transition: transform 0.1s, box-shadow 0.1s; touch-action: none; }
         #btn-count:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(201,168,76,0.25); }
         #btn-reset { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(200,50,50,0.25); background: rgba(200,50,50,0.08); color: #C85050; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
         #btn-reset:active { background: rgba(200,50,50,0.18); }
@@ -342,22 +339,22 @@
         #dhikr-panel-overlay.open { display: flex; }
         #dhikr-panel { width: 100%; max-width: 500px; background: linear-gradient(180deg, #1E1C26 0%, #141319 100%); border-radius: 24px 24px 0 0; border-top: 1px solid rgba(201,168,76,0.2); padding: 0 0 calc(16px + var(--safe-bot)); overflow-y: auto; max-height: 85vh; }
         #dhikr-panel-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 14px auto 18px; }
-        #dhikr-panel h2 { font-family: 'Scheherazade New', serif; font-size: 18px; color: var(--gold-light); text-align: center; margin-bottom: 14px; }
+        #dhikr-panel h2 { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 18px; color: var(--gold-light); text-align: center; margin-bottom: 14px; }
         .dhikr-option { display: flex; align-items: center; gap: 14px; padding: 13px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
         .dhikr-option:active { background: rgba(255,255,255,0.05); }
         .dhikr-option.active { background: rgba(201,168,76,0.08); }
         .dhikr-color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
-        .dhikr-option-text { flex: 1; font-family: 'Scheherazade New', serif; font-size: 17px; color: var(--text-main); text-align: right;}
-        .dhikr-option-count { font-family: 'Scheherazade New', serif; font-size: 14px; color: var(--text-muted); }
+        .dhikr-option-text { flex: 1; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 17px; color: var(--text-main); text-align: right;}
+        .dhikr-option-count { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 14px; color: var(--text-muted); }
         #custom-dhikr-wrap { margin: 14px 20px 0; display: flex; gap: 8px; flex-wrap: wrap; }
-        #custom-dhikr-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 10px 14px; font-family: 'Scheherazade New', serif; font-size: 16px; color: var(--text-main); text-align: right; direction: rtl; outline: none; min-width: 120px; }
+        #custom-dhikr-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 10px 14px; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 16px; color: var(--text-main); text-align: right; direction: rtl; outline: none; min-width: 120px; }
         #custom-dhikr-input::placeholder { color: var(--text-muted); }
         #custom-dhikr-input:focus { border-color: rgba(201,168,76,0.5); }
-        #custom-dhikr-count { width: 70px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 10px; font-family: 'Scheherazade New', serif; font-size: 15px; color: var(--text-main); text-align: center; outline: none; }
+        #custom-dhikr-count { width: 70px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 10px; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 15px; color: var(--text-main); text-align: center; outline: none; }
         #custom-dhikr-count:focus { border-color: rgba(201,168,76,0.5); }
-        #btn-custom-apply { background: rgba(201,168,76,0.18); border: 1px solid rgba(201,168,76,0.35); border-radius: 12px; padding: 10px 14px; color: var(--gold-light); font-family: 'Tajawal', sans-serif; font-size: 13px; cursor: pointer; }
+        #btn-custom-apply { background: rgba(201,168,76,0.18); border: 1px solid rgba(201,168,76,0.35); border-radius: 12px; padding: 10px 14px; color: var(--gold-light); font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 13px; cursor: pointer; }
         #btn-custom-apply:active { background: rgba(201,168,76,0.3); }
-        #tasbih-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 18px; padding: 16px 28px; font-family: 'Scheherazade New', serif; font-size: 20px; color: var(--gold-light); text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
+        #tasbih-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 18px; padding: 16px 28px; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 20px; color: var(--gold-light); text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
         #tasbih-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     </style>
 </head>
@@ -458,17 +455,15 @@
     </div>
 </div>
 
-<!-- شاشة واجهة المسبحة الرقمية التفاعلية -->
+<!-- شاشة المسبحة -->
 <div id="tasbihModal" class="tasbih-modal-overlay">
     <div id="tasbih-app">
       <div id="tasbih-header">
         <button class="tasbih-close-btn" id="closeTasbih">الرئيسية ↩</button>
-        
         <div id="session-info">
           <div id="session-label">المجموع</div>
           <div id="total-display">٠</div>
         </div>
-        
         <button id="dhikr-selector-btn">
           <span id="current-dhikr-name">سبحان الله</span>
           <span class="arrow">▼</span>
@@ -515,6 +510,7 @@
 </div>
 
 <script>
+// (كود الجافا سكريبت كما هو دون تغيير - لأنه لا يعتمد على الإنترنت)
 function toRad(d){return d*Math.PI/180}
 function toDeg(r){return r*180/Math.PI}
 
@@ -833,7 +829,7 @@ ua();
 })();
 
 /* ================================================================
-   تكامل نظام المسبحة الرقمية بالكامل (الفيزياء، الصوت، التحكم)
+   المسبحة الرقمية (بدون تغيير في الجافا سكريبت)
 ================================================================ */
 (function(){
 function toArabicNums(n) { return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
