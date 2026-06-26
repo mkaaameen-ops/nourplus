@@ -310,10 +310,10 @@
         #tasbih-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 18px; padding: 16px 28px; font-family: 'Scheherazade New', serif; font-size: 20px; color: var(--gold-light); text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
         #tasbih-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         
-        /* تعديل تصميم زر إغلاق المسبحة للعودة للصفحة الرئيسية */
+        /* تعديل زر إغلاق المسبحة مع مراعاة الساعة */
         .tasbih-close-btn { 
             position: absolute; 
-            top: 12px; 
+            top: calc(12px + env(safe-area-inset-top, 0px));  /* ← التعديل المهم */
             left: 16px; 
             background: rgba(255,255,255,0.08); 
             border: 1px solid rgba(255,255,255,0.15); 
@@ -339,7 +339,6 @@
 <div class="main-grid">
     <div style="grid-column:span 6" class="panel">
         <div class="compass-icon-btn" id="compassIcon" style="right: 12px;" title="البوصلة">🧭</div>
-        <!-- إضافة أيقونة المسبحة في الأعلى بجانب البوصلة -->
         <div class="compass-icon-btn" id="tasbihIcon" style="right: 56px;" title="المسبحة الرقمية">📿</div>
         
         <div style="text-align:center;margin-bottom:16px">
@@ -436,7 +435,6 @@
 <!-- شاشة واجهة المسبحة الرقمية التفاعلية -->
 <div id="tasbihModal" class="tasbih-modal-overlay">
     <div id="tasbih-app">
-      <!-- تم تعديل هذا الزر ليكون أوضح للخروج إلى الصفحة الرئيسية -->
       <button class="tasbih-close-btn" id="closeTasbih">الرئيسية ↩</button>
       <div id="tasbih-header">
         <button id="dhikr-selector-btn">
