@@ -309,7 +309,30 @@
         #btn-custom-apply:active { background: rgba(201,168,76,0.3); }
         #tasbih-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 18px; padding: 16px 28px; font-family: 'Scheherazade New', serif; font-size: 20px; color: var(--gold-light); text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
         #tasbih-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        .tasbih-close-btn { position: absolute; top: 12px; left: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 15; }
+        
+        /* تعديل تصميم زر إغلاق المسبحة للعودة للصفحة الرئيسية */
+        .tasbih-close-btn { 
+            position: absolute; 
+            top: 12px; 
+            left: 16px; 
+            background: rgba(255,255,255,0.08); 
+            border: 1px solid rgba(255,255,255,0.15); 
+            color: var(--gold-light); 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            z-index: 15; 
+            display: flex; 
+            align-items: center; 
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .tasbih-close-btn:hover {
+            background: rgba(201,168,76,0.15);
+            border-color: rgba(201,168,76,0.3);
+        }
     </style>
 </head>
 <body>
@@ -413,7 +436,8 @@
 <!-- شاشة واجهة المسبحة الرقمية التفاعلية -->
 <div id="tasbihModal" class="tasbih-modal-overlay">
     <div id="tasbih-app">
-      <button class="tasbih-close-btn" id="closeTasbih">✕</button>
+      <!-- تم تعديل هذا الزر ليكون أوضح للخروج إلى الصفحة الرئيسية -->
+      <button class="tasbih-close-btn" id="closeTasbih">الرئيسية ↩</button>
       <div id="tasbih-header">
         <button id="dhikr-selector-btn">
           <span id="current-dhikr-name">سبحان الله</span>
