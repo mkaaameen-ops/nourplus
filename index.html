@@ -206,7 +206,7 @@
         .event-banner.sorrow { border-right-color: #ef4444; background: rgba(239, 68, 68, 0.06); color: #fca5a5; display: block; }
         .event-banner.joy { border-right-color: #10b981; background: rgba(16, 185, 129, 0.06); color: #a7f3d0; display: block; }
 
-        /* تجميع ستايلات المسبحة الرقمية المدمجة */
+        /* ===== تعديل رأس المسبحة ===== */
         :root {
             --bg-deep:    #060608;
             --gold:       #C9A84C;
@@ -240,42 +240,18 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
             pointer-events: none; z-index: 0; opacity: 0.4;
         }
-        /* ===== التعديل المهم هنا ===== */
+
         #tasbih-header {
             position: relative; 
             z-index: 10;
             display: flex; 
             align-items: center; 
-            justify-content: space-between; /* توزيع متساوٍ */
+            justify-content: space-between;
             padding: 12px 16px 8px;
             gap: 8px;
-            flex-wrap: wrap; /* للشاشات الصغيرة جداً */
+            flex-wrap: wrap; /* يسمح بانتقال العناصر لصف جديد */
         }
-        /* ============================ */
-        
-        #dhikr-selector-btn {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(201,168,76,0.12);
-            border: 1px solid rgba(201,168,76,0.25);
-            border-radius: 50px; padding: 7px 14px;
-            color: var(--gold-light);
-            font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: 500;
-            cursor: pointer; transition: background 0.2s;
-            flex-shrink: 1; /* يسمح بالانكماش قليلاً */
-            min-width: 0;
-        }
-        #dhikr-selector-btn:active { background: rgba(201,168,76,0.22); }
-        #dhikr-selector-btn .arrow { font-size: 9px; opacity: 0.7; }
-        
-        #session-info { 
-            text-align: left; 
-            direction: ltr; 
-            flex-shrink: 0; /* لا يتقلص */
-        }
-        #session-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; }
-        #total-display { font-family: 'Scheherazade New', serif; font-size: 16px; color: var(--gold-dim); }
-        
-        /* تعديل زر العودة ليصبح عنصراً مرناً داخل الهيدر */
+
         .tasbih-close-btn { 
             background: rgba(255,255,255,0.08); 
             border: 1px solid rgba(255,255,255,0.15); 
@@ -289,15 +265,50 @@
             align-items: center; 
             gap: 4px;
             transition: all 0.2s;
-            flex-shrink: 0; /* لا يتقلص */
+            flex-shrink: 0;
             white-space: nowrap;
+            order: 1; /* يظهر أولاً (يمين) */
         }
         .tasbih-close-btn:hover {
             background: rgba(201,168,76,0.15);
             border-color: rgba(201,168,76,0.3);
         }
-        /* انتهى التعديل */
 
+        #session-info { 
+            text-align: left; 
+            direction: ltr; 
+            flex-shrink: 0;
+            order: 2; /* يظهر ثانياً (يسار) */
+            margin-right: auto; /* يدفع المجموع لليسار مع بقاء زر العودة في أقصى اليمين */
+        }
+        #session-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; }
+        #total-display { font-family: 'Scheherazade New', serif; font-size: 16px; color: var(--gold-dim); }
+
+        #dhikr-selector-btn {
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 50px; 
+            padding: 7px 14px;
+            color: var(--gold-light);
+            font-family: 'Tajawal', sans-serif; 
+            font-size: 13px; 
+            font-weight: 500;
+            cursor: pointer; 
+            transition: background 0.2s;
+            flex-shrink: 1; 
+            min-width: 0;
+            flex-basis: 100%; /* يأخذ العرض الكامل للصف الجديد */
+            order: 3; /* يظهر في الصف الثالث */
+            margin-top: 4px; /* تباعد بسيط عن الصف الأول */
+            justify-content: center; /* توسيط النص */
+        }
+        #dhikr-selector-btn:active { background: rgba(201,168,76,0.22); }
+        #dhikr-selector-btn .arrow { font-size: 9px; opacity: 0.7; }
+
+        /* باقي ستايلات المسبحة كما هي */
         #dhikr-area { position: relative; z-index: 10; text-align: center; padding: 4px 20px 0; }
         #dhikr-text {
             font-family: 'Scheherazade New', serif;
@@ -348,8 +359,6 @@
         #btn-custom-apply:active { background: rgba(201,168,76,0.3); }
         #tasbih-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 18px; padding: 16px 28px; font-family: 'Scheherazade New', serif; font-size: 20px; color: var(--gold-light); text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
         #tasbih-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        
-        /* لم يعد هناك حاجة لستايل position:absolute للزر القديم */
     </style>
 </head>
 <body>
@@ -452,21 +461,19 @@
 <!-- شاشة واجهة المسبحة الرقمية التفاعلية -->
 <div id="tasbihModal" class="tasbih-modal-overlay">
     <div id="tasbih-app">
-      <!-- تم نقل الزر إلى داخل الهيدر -->
       <div id="tasbih-header">
         <button class="tasbih-close-btn" id="closeTasbih">الرئيسية ↩</button>
-        
-        <button id="dhikr-selector-btn">
-          <span id="current-dhikr-name">سبحان الله</span>
-          <span class="arrow">▼</span>
-        </button>
         
         <div id="session-info">
           <div id="session-label">المجموع</div>
           <div id="total-display">٠</div>
         </div>
+        
+        <button id="dhikr-selector-btn">
+          <span id="current-dhikr-name">سبحان الله</span>
+          <span class="arrow">▼</span>
+        </button>
       </div>
-      <!-- انتهى التعديل -->
     
       <div id="dhikr-area">
         <div id="dhikr-text">سُبْحَانَ اللهِ</div>
