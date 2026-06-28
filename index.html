@@ -1,1529 +1,1427 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-    <title>نور</title>
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="نور">
-    <style>
-        * { -webkit-tap-highlight-color: transparent; outline: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-            direction: rtl;
-            margin: 0;
-            background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a);
-            color: #e2e8f0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px
-        }
-        @supports(padding:max(0px)) {
-            body {
-                padding-top: max(16px, env(safe-area-inset-top));
-                padding-left: max(12px, env(safe-area-inset-left));
-                padding-right: max(12px, env(safe-area-inset-right));
-                padding-bottom: max(16px, env(safe-area-inset-bottom))
-            }
-        }
-        .main-grid {
-            max-width: 72rem;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px
-        }
-        @media(min-width:768px) { .main-grid { grid-template-columns: 1fr 1fr; gap: 24px } }
-        @media(min-width:1024px) { .main-grid { grid-template-columns: repeat(12, 1fr); gap: 24px } }
-        .panel {
-            background: rgba(255, 255, 255, .05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, .1);
-            border-radius: 24px;
-            padding: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .5);
-            position: relative
-        }
-        @media(min-width:640px) { .panel { padding: 24px } }
-        .prayer-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, .05);
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, .05);
-            transition: all .2s
-        }
-        @media(min-width:640px) { .prayer-card { padding: 14px } }
-        .prayer-card.active {
-            background: rgba(20, 184, 166, .2);
-            border-color: rgba(45, 212, 191, .6);
-            box-shadow: 0 0 20px rgba(20, 184, 166, .2);
-            transform: scale(1.01)
-        }
-        .prayer-card.active span:first-child { color: #2dd4bf; font-weight: 700 }
-        .circle-container { width: 340px; height: 340px; position: relative }
-        @media(min-width:640px) { .circle-container { width: 378px; height: 378px } }
-        .prayer-time { font-family: monospace; font-size: 1.1rem }
-        .digital-clock { font-family: monospace; font-weight: 900; color: #5eead4; text-shadow: 0 0 12px rgba(45, 212, 191, .15) }
-        .countdown-timer { font-family: monospace; font-weight: 700; color: #6ee7b7 }
-        .gradient-text { background: linear-gradient(to right, #2dd4bf, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent }
-        button:active { opacity: .7; transform: scale(.97) }
-        
-        .cal-day {
-            padding: 6px 2px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            font-weight: 600;
-            min-height: 44px;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .cal-day:active { transform: scale(0.92); }
-        .cal-day.today {
-            background: linear-gradient(135deg, #14b8a6, #10b981);
-            color: #0f172a;
-            font-weight: 800;
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
-            border: none
-        }
-        .cal-day.normal { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .02); color: #e2e8f0 }
-        .cal-day.special-sorrow { border: 1px solid rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.12); color: #fca5a5; }
-        .cal-day.special-joy { border: 1px solid rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.12); color: #a7f3d0; }
-        .cal-day.special-lunar {
-            border: 1px solid rgba(59, 130, 246, 0.5);
-            background: rgba(59, 130, 246, 0.12);
-            color: #93c5fd;
-        }
-        
-        .small-text { font-size: .75rem; color: #94a3b8 }
-        
-        .compass-icon-btn {
-            position: absolute;
-            top: 12px;
-            background: rgba(20, 184, 166, .15);
-            border: 1px solid rgba(20, 184, 166, .3);
-            color: #2dd4bf;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            z-index: 5;
-            transition: all .2s
-        }
-        .compass-icon-btn:hover { background: rgba(20, 184, 166, .25) }
-        
-        .compass-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, .92); backdrop-filter: blur(12px);
-            z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column
-        }
-        .compass-modal {
-            background: rgba(30, 41, 59, .75); border: 1px solid rgba(255, 255, 255, .1);
-            border-radius: 32px; padding: 24px; text-align: center; max-width: 360px; width: 92%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .5);
-            position: relative;
-        }
-        .compass-finder-container {
-            width: 240px; height: 240px; margin: 20px auto; position: relative; border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.3) 100%);
-            border: 3px dashed rgba(255, 255, 255, 0.15);
-            display: flex; align-items: center; justify-content: center;
-            cursor: grab; touch-action: none;
-        }
-        .compass-finder-container:active { cursor: grabbing; }
-        .qibla-ring-indicator {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 2px solid rgba(20, 184, 166, 0.2); transition: all 0.15s ease-out;
-        }
-        .qibla-ring-indicator.aligned {
-            border: 4px solid #10b981;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
-        }
-        .kaaba-icon {
-            position: absolute; width: 44px; height: 44px;
-            background: #1e293b; border: 2px solid #ef4444; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-            bottom: calc(50% - 22px); left: calc(50% - 22px);
-            transform-origin: center center; z-index: 10;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            transition: all 0.15s ease-out;
-        }
-        .qibla-ring-indicator.aligned .kaaba-icon {
-            border-color: #10b981;
-            background-color: #10b981;
-        }
-        .phone-pointer {
-            position: absolute; top: 8px; width: 4px; height: 26px;
-            background: #5eead4; border-radius: 2px; z-index: 15;
-            box-shadow: 0 0 8px #2dd4bf;
-        }
-        .compass-close-btn { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .15); color: white; padding: 10px 32px; border-radius: 24px; margin-top: 16px; font-size: .9rem; cursor: pointer; font-weight: 600; }
-        .compass-close-btn:hover { background: rgba(255,255,255,0.2); }
-        .qibla-info { color: #93c5fd; font-size: .85rem; margin: 8px 0; display: flex; justify-content: center; gap: 16px; font-family: monospace }
-        .compass-hint { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
-        
-        .sync-btn-container { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
-        .offset-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #e2e8f0;
-            border-radius: 6px;
-            width: 28px;
-            height: 28px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .offset-btn:hover { background: rgba(20, 184, 166, 0.2); border-color: #2dd4bf; }
-        
-        .event-banner {
-            margin-top: 12px;
-            font-size: 0.85rem;
-            padding: 10px 14px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.03);
-            border-right: 4px solid #94a3b8;
-            color: #cbd5e1;
-            display: none;
-            font-weight: 500;
-        }
-        .event-banner.sorrow { border-right-color: #ef4444; background: rgba(239, 68, 68, 0.06); color: #fca5a5; display: block; }
-        .event-banner.joy { border-right-color: #10b981; background: rgba(16, 185, 129, 0.06); color: #a7f3d0; display: block; }
-        .event-banner.lunar { border-right-color: #3b82f6; background: rgba(59, 130, 246, 0.06); color: #93c5fd; display: block; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نور">
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<title>نور</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg1:#0f172a;--bg2:#1e1b4b;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.12);
+  --gold:#f59e0b;--gold2:#fbbf24;
+  --green:#10b981;--red:#ef4444;--blue:#60a5fa;
+  --text:#f1f5f9;--muted:#94a3b8;
+  --font:-apple-system,'Geeza Pro',BlinkMacSystemFont,sans-serif;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+}
+html,body{height:100%;overflow:hidden;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%);font-family:var(--font);color:var(--text)}
+body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
 
-        .day-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, .92); backdrop-filter: blur(12px);
-            z-index: 300; display: none; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .day-modal-overlay.open { display: flex; }
-        .day-modal {
-            background: rgba(30, 41, 59, .85);
-            border: 1px solid rgba(255, 255, 255, .1);
-            border-radius: 32px;
-            padding: 28px 24px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .7);
-            position: relative;
-            text-align: center;
-        }
-        .day-modal .close-day-btn {
-            position: absolute;
-            top: 12px;
-            left: 16px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: #94a3b8;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .day-modal .close-day-btn:hover { background: rgba(255,255,255,0.15); }
-        .day-modal .day-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-        .day-modal .day-sub {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-bottom: 14px;
-        }
-        .day-modal .day-hijri {
-            font-size: 1.1rem;
-            color: #2dd4bf;
-            font-weight: 600;
-            margin-bottom: 12px;
-            padding: 8px;
-            background: rgba(20,184,166,0.08);
-            border-radius: 12px;
-        }
-        .day-modal .day-event {
-            padding: 14px 16px;
-            border-radius: 16px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-        .day-modal .day-event.sorrow {
-            background: rgba(239,68,68,0.15);
-            border: 1px solid rgba(239,68,68,0.3);
-            color: #fca5a5;
-        }
-        .day-modal .day-event.joy {
-            background: rgba(16,185,129,0.15);
-            border: 1px solid rgba(16,185,129,0.3);
-            color: #a7f3d0;
-        }
-        .day-modal .day-event.lunar {
-            background: rgba(59,130,246,0.15);
-            border: 1px solid rgba(59,130,246,0.3);
-            color: #93c5fd;
-        }
-        .day-modal .day-event.none {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: #94a3b8;
-            font-weight: 400;
-        }
-        .day-modal .day-event .event-icon { font-size: 1.6rem; margin-left: 8px; }
-        .day-modal .day-event .event-sign {
-            font-size: 0.85rem;
-            opacity: 0.8;
-            margin-top: 4px;
-        }
+/* SCREENS */
+.screen{position:fixed;inset:0;padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l);overflow-y:auto;overflow-x:hidden;display:none;flex-direction:column}
+.screen.active{display:flex}
 
-        /* ===== المسبحة الرقمية ===== */
-        :root {
-            --bg-deep:    #060608;
-            --gold:       #C9A84C;
-            --gold-light: #E8C97A;
-            --gold-dim:   #7A6030;
-            --text-main:  #EDE8DC;
-            --text-muted: #7A7570;
-            --safe-top:   env(safe-area-inset-top, 0px);
-            --safe-bot:   env(safe-area-inset-bottom, 0px);
-        }
-        .tasbih-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(6, 6, 8, 0.95); backdrop-filter: blur(15px);
-            z-index: 200; display: none; align-items: center; justify-content: center;
-        }
-        #tasbih-app {
-            position: relative;
-            width: 100%; max-width: 500px;
-            height: 100vh; height: 100dvh;
-            background: linear-gradient(175deg, #1A1820 0%, #0E0D12 40%, var(--bg-deep) 100%);
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            padding-top: var(--safe-top);
-            padding-bottom: var(--safe-bot);
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-        }
-        #tasbih-app::before {
-            content: '';
-            position: absolute; inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: 0; opacity: 0.4;
-        }
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;flex-shrink:0}
+.app-title{font-size:22px;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+.topbar-actions{display:flex;gap:8px}
+.icon-btn{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s,opacity .15s;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.icon-btn:active{transform:scale(0.9);opacity:.7}
 
-        #tasbih-header {
-            position: relative; 
-            z-index: 10;
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between;
-            padding: 12px 16px 8px;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+/* PANELS */
+.panel{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:16px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 60%);pointer-events:none}
 
-        .tasbih-close-btn { 
-            background: rgba(255,255,255,0.08); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            color: var(--gold-light); 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 4px;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            white-space: nowrap;
-            order: 1;
-        }
-        .tasbih-close-btn:hover {
-            background: rgba(201,168,76,0.15);
-            border-color: rgba(201,168,76,0.3);
-        }
+/* CLOCK */
+.clock-panel{text-align:center;padding:20px 16px}
+.digital-clock{font-size:52px;font-weight:200;letter-spacing:4px;font-variant-numeric:tabular-nums;color:var(--text);line-height:1}
+.clock-date{color:var(--muted);font-size:13px;margin-top:6px}
+.clock-hijri{color:var(--gold);font-size:14px;margin-top:4px}
 
-        #session-info { 
-            text-align: left; 
-            direction: ltr; 
-            flex-shrink: 0;
-            order: 2;
-            margin-right: auto;
-        }
-        #session-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; }
-        #total-display { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 16px; color: var(--gold-dim); }
+/* NEXT PRAYER ARC */
+.arc-wrap{display:flex;align-items:center;gap:16px;margin-top:12px;justify-content:center}
+.arc-svg{flex-shrink:0}
+.arc-info{text-align:right}
+.arc-label{color:var(--muted);font-size:12px}
+.arc-name{font-size:18px;font-weight:600;color:var(--gold)}
+.arc-remain{font-size:24px;font-weight:300;color:var(--text);font-variant-numeric:tabular-nums}
 
-        #dhikr-selector-btn {
-            display: flex; 
-            align-items: center; 
-            gap: 6px;
-            background: rgba(201,168,76,0.12);
-            border: 1px solid rgba(201,168,76,0.25);
-            border-radius: 50px; 
-            padding: 7px 14px;
-            color: var(--gold-light);
-            font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-            font-size: 13px; 
-            font-weight: 500;
-            cursor: pointer; 
-            transition: background 0.2s;
-            flex-shrink: 1; 
-            min-width: 0;
-            flex-basis: 100%;
-            order: 3;
-            margin-top: 4px;
-            justify-content: center;
-        }
-        #dhikr-selector-btn:active { background: rgba(201,168,76,0.22); }
-        #dhikr-selector-btn .arrow { font-size: 9px; opacity: 0.7; }
+/* PRAYERS GRID */
+.prayers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px}
+@media(min-width:600px){.prayers-grid{grid-template-columns:repeat(6,1fr)}}
+.prayer-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:10px 6px;text-align:center;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .15s;cursor:default}
+.prayer-card.active-prayer{border-color:var(--gold);background:rgba(245,158,11,0.12);box-shadow:0 0 20px rgba(245,158,11,0.2)}
+.prayer-card:active{transform:scale(0.95)}
+.prayer-name{font-size:13px;color:var(--muted);margin-bottom:4px}
+.prayer-time{font-size:16px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
 
-        #dhikr-area { position: relative; z-index: 10; text-align: center; padding: 4px 20px 0; }
-        #dhikr-text {
-            font-family: 'Geeza Pro', 'Times New Roman', serif;
-            font-size: clamp(22px, 6vw, 30px);
-            color: var(--text-main); letter-spacing: 0.03em;
-            text-shadow: 0 0 30px rgba(201,168,76,0.2); line-height: 1.4;
-        }
-        #dhikr-phase-label { font-size: 11px; color: var(--gold-dim); margin-top: 1px; min-height: 14px; }
-        #counter-wrap { position: relative; z-index: 10; text-align: center; padding: 6px 0 2px; }
-        #counter-num {
-            font-family: 'Geeza Pro', 'Times New Roman', serif;
-            font-size: clamp(52px, 15vw, 72px); font-weight: 700;
-            color: var(--text-main); line-height: 1;
-            text-shadow: 0 2px 20px rgba(201,168,76,0.15);
-        }
-        #counter-of { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 15px; color: var(--text-muted); }
-        #round-num { font-size: 11px; color: var(--gold-dim); margin-top: 2px; }
-        #canvas-wrap { position: relative; flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
-        #tasbih-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-        #swipe-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 10px; color: rgba(201,168,76,0.3); font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; pointer-events: none; letter-spacing: 0.05em; transition: opacity 0.5s; }
-        .ripple { position: absolute; border-radius: 50%; background: rgba(201,168,76,0.15); transform: scale(0); animation: ripple-anim 0.55s ease-out forwards; pointer-events: none; }
-        @keyframes ripple-anim { to { transform: scale(5); opacity: 0; } }
-        #tasbih-controls { position: relative; z-index: 10; display: flex; align-items: center; gap: 10px; padding: 10px 16px 14px; }
-        #btn-undo { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-        #btn-undo:active { background: rgba(255,255,255,0.12); }
-        #btn-count { flex: 1; height: 56px; border-radius: 28px; border: none; background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #A87C30 100%); color: #1A1408; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 20px; font-weight: 700; cursor: pointer; letter-spacing: 0.05em; box-shadow: 0 4px 24px rgba(201,168,76,0.35), 0 1px 3px rgba(0,0,0,0.4); transition: transform 0.1s, box-shadow 0.1s; touch-action: none; }
-        #btn-count:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(201,168,76,0.25); }
-        #btn-reset { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(200,50,50,0.25); background: rgba(200,50,50,0.08); color: #C85050; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-        #btn-reset:active { background: rgba(200,50,50,0.18); }
-        #dhikr-panel-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 50; display: none; align-items: flex-end; justify-content: center; }
-        #dhikr-panel-overlay.open { display: flex; }
-        #dhikr-panel { width: 100%; max-width: 500px; background: linear-gradient(180deg, #1E1C26 0%, #141319 100%); border-radius: 24px 24px 0 0; border-top: 1px solid rgba(201,168,76,0.2); padding: 0 0 calc(16px + var(--safe-bot)); overflow-y: auto; max-height: 85vh; }
-        #dhikr-panel-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 14px auto 18px; }
-        #dhikr-panel h2 { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 18px; color: var(--gold-light); text-align: center; margin-bottom: 14px; }
-        .dhikr-option { display: flex; align-items: center; gap: 14px; padding: 13px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
-        .dhikr-option:active { background: rgba(255,255,255,0.05); }
-        .dhikr-option.active { background: rgba(201,168,76,0.08); }
-        .dhikr-color-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
-        .dhikr-option-text { flex: 1; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 17px; color: var(--text-main); text-align: right;}
-        .dhikr-option-count { font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 14px; color: var(--text-muted); }
-        #custom-dhikr-wrap { margin: 14px 20px 0; display: flex; gap: 8px; flex-wrap: wrap; }
-        #custom-dhikr-input { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 10px 14px; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 16px; color: var(--text-main); text-align: right; direction: rtl; outline: none; min-width: 120px; }
-        #custom-dhikr-input::placeholder { color: var(--text-muted); }
-        #custom-dhikr-input:focus { border-color: rgba(201,168,76,0.5); }
-        #custom-dhikr-count { width: 70px; background: rgba(255,255,255,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: 12px; padding: 10px; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 15px; color: var(--text-main); text-align: center; outline: none; }
-        #custom-dhikr-count:focus { border-color: rgba(201,168,76,0.5); }
-        #btn-custom-apply { background: rgba(201,168,76,0.18); border: 1px solid rgba(201,168,76,0.35); border-radius: 12px; padding: 10px 14px; color: var(--gold-light); font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 13px; cursor: pointer; }
-        #btn-custom-apply:active { background: rgba(201,168,76,0.3); }
-        #tasbih-toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 18px; padding: 16px 28px; font-family: 'Geeza Pro', 'Times New Roman', serif; font-size: 20px; color: var(--gold-light); text-align: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; white-space: nowrap; }
-        #tasbih-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    </style>
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 16px;flex:1}
+@media(min-width:600px){.main-grid{grid-template-columns:1fr 1fr}}
+
+/* SECTION LABELS */
+.sec-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav-btn{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cal-nav-btn:active{opacity:.6}
+.cal-title{font-size:15px;font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-dow{font-size:10px;color:var(--muted);text-align:center;padding:4px 0}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;transition:transform .1s;font-size:13px;position:relative}
+.cal-day:active{transform:scale(0.9)}
+.cal-day.empty{pointer-events:none}
+.cal-day.today{background:rgba(245,158,11,0.2);border:1px solid var(--gold)}
+.cal-day .gday{font-weight:600;line-height:1}
+.cal-day .hday{font-size:9px;color:var(--muted);line-height:1;margin-top:1px}
+.cal-day .sign{font-size:8px;line-height:1;margin-top:1px}
+.cal-day.ev-sorrow .gday{color:var(--red)}
+.cal-day.ev-joy .gday{color:var(--green)}
+.cal-day.ev-moon .gday{color:var(--blue)}
+
+/* TASBIH SCREEN - powered by new engine */
+#tasbihScreen{background:linear-gradient(175deg,#1A1820 0%,#0E0D12 40%,#060608 100%);padding:0}
+#tasbihScreen::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
+#tsb-header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;gap:8px;flex-wrap:wrap;padding-top:calc(12px + var(--safe-top))}
+.back-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#E8C97A;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .2s;flex-shrink:0;white-space:nowrap;order:1}
+.back-btn:active{background:rgba(201,168,76,0.15)}
+#tsb-session{text-align:left;direction:ltr;flex-shrink:0;order:2;margin-right:auto}
+#tsb-session-label{font-size:10px;color:#7A7570;letter-spacing:.08em}
+#tsb-total{font-family:'Geeza Pro','Times New Roman',serif;font-size:16px;color:#7A6030}
+#tsb-dhikr-btn{display:flex;align-items:center;gap:6px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:50px;padding:7px 14px;color:#E8C97A;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:background .2s;flex-shrink:1;min-width:0;flex-basis:100%;order:3;margin-top:4px;justify-content:center}
+#tsb-dhikr-btn:active{background:rgba(201,168,76,0.22)}
+#tsb-dhikr-arrow{font-size:9px;opacity:.7}
+#tsb-dhikr-area{position:relative;z-index:10;text-align:center;padding:4px 20px 0}
+#tsb-dhikr-text{font-family:'Geeza Pro','Times New Roman',serif;font-size:clamp(22px,6vw,30px);color:#EDE8DC;letter-spacing:.03em;text-shadow:0 0 30px rgba(201,168,76,.2);line-height:1.4}
+#tsb-phase-label{font-size:11px;color:#7A6030;margin-top:1px;min-height:14px}
+#tsb-counter-wrap{position:relative;z-index:10;text-align:center;padding:6px 0 2px}
+#tsb-count-num{font-family:'Geeza Pro','Times New Roman',serif;font-size:clamp(52px,15vw,72px);font-weight:700;color:#EDE8DC;line-height:1;text-shadow:0 2px 20px rgba(201,168,76,.15)}
+#tsb-count-of{font-family:'Geeza Pro','Times New Roman',serif;font-size:15px;color:#7A7570}
+#tsb-round{font-size:11px;color:#7A6030;margin-top:2px}
+#tsb-canvas-wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5}
+#tsb-canvas{display:block;width:100%;height:100%;touch-action:none}
+#tsb-swipe-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(201,168,76,.3);font-family:var(--font);pointer-events:none;letter-spacing:.05em;transition:opacity .5s}
+.tsb-ripple{position:absolute;border-radius:50%;background:rgba(201,168,76,.15);transform:scale(0);animation:tsb-ripple .55s ease-out forwards;pointer-events:none}
+@keyframes tsb-ripple{to{transform:scale(5);opacity:0}}
+#tsb-controls{position:relative;z-index:10;display:flex;align-items:center;gap:10px;padding:10px 16px;padding-bottom:calc(14px + var(--safe-bot))}
+#tsb-btn-undo{flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#7A7570;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+#tsb-btn-undo:active{background:rgba(255,255,255,.12)}
+#tsb-btn-count{flex:1;height:56px;border-radius:28px;border:none;background:linear-gradient(135deg,#C9A84C 0%,#E8C97A 50%,#A87C30 100%);color:#1A1408;font-family:'Geeza Pro','Times New Roman',serif;font-size:20px;font-weight:700;cursor:pointer;letter-spacing:.05em;box-shadow:0 4px 24px rgba(201,168,76,.35),0 1px 3px rgba(0,0,0,.4);transition:transform .1s,box-shadow .1s;touch-action:none}
+#tsb-btn-count:active{transform:scale(.97);box-shadow:0 2px 12px rgba(201,168,76,.25)}
+#tsb-btn-reset{flex:0 0 auto;width:48px;height:48px;border-radius:50%;border:1px solid rgba(200,50,50,.25);background:rgba(200,50,50,.08);color:#C85050;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+#tsb-btn-reset:active{background:rgba(200,50,50,.18)}
+#tsb-panel-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:50;display:none;align-items:flex-end;justify-content:center}
+#tsb-panel-overlay.open{display:flex}
+#tsb-panel{width:100%;max-width:500px;background:linear-gradient(180deg,#1E1C26 0%,#141319 100%);border-radius:24px 24px 0 0;border-top:1px solid rgba(201,168,76,.2);padding:0 0 calc(16px + var(--safe-bot));overflow-y:auto;max-height:85vh}
+#tsb-panel-handle{width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:14px auto 18px}
+#tsb-panel h2{font-family:'Geeza Pro','Times New Roman',serif;font-size:18px;color:#E8C97A;text-align:center;margin-bottom:14px}
+.tsb-dhikr-opt{display:flex;align-items:center;gap:14px;padding:13px 20px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+.tsb-dhikr-opt:active{background:rgba(255,255,255,.05)}
+.tsb-dhikr-opt.tsb-active{background:rgba(201,168,76,.08)}
+.tsb-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
+.tsb-opt-text{flex:1;font-family:'Geeza Pro','Times New Roman',serif;font-size:17px;color:#EDE8DC;text-align:right}
+.tsb-opt-count{font-family:'Geeza Pro','Times New Roman',serif;font-size:14px;color:#7A7570}
+#tsb-custom-wrap{margin:14px 20px 0;display:flex;gap:8px;flex-wrap:wrap}
+#tsb-custom-input{flex:1;min-width:120px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:10px 14px;font-family:'Geeza Pro','Times New Roman',serif;font-size:16px;color:#EDE8DC;text-align:right;direction:rtl;outline:none}
+#tsb-custom-input::placeholder{color:#7A7570}
+#tsb-custom-input:focus{border-color:rgba(201,168,76,.5)}
+#tsb-custom-count{width:70px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:10px;font-family:'Geeza Pro','Times New Roman',serif;font-size:15px;color:#EDE8DC;text-align:center;outline:none}
+#tsb-custom-count:focus{border-color:rgba(201,168,76,.5)}
+#tsb-custom-apply{background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.35);border-radius:12px;padding:10px 14px;color:#E8C97A;font-family:var(--font);font-size:13px;cursor:pointer}
+#tsb-custom-apply:active{background:rgba(201,168,76,.3)}
+#tsb-toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);backdrop-filter:blur(12px);border-radius:18px;padding:16px 28px;font-family:'Geeza Pro','Times New Roman',serif;font-size:20px;color:#E8C97A;text-align:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;white-space:nowrap}
+#tsb-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* COMPASS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:linear-gradient(135deg,#1e2a3a,#1e1b4b);border:1px solid var(--glass-border);border-radius:24px;padding:24px;width:100%;max-width:340px;text-align:center}
+.modal-title{font-size:18px;font-weight:700;color:var(--gold);margin-bottom:16px}
+.modal-close{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);padding:8px 20px;border-radius:20px;font-size:14px;cursor:pointer;margin-top:16px}
+.compass-ring{width:220px;height:220px;border-radius:50%;border:2px solid var(--glass-border);position:relative;margin:0 auto;cursor:grab;user-select:none;touch-action:none;transition:border-color .3s}
+.compass-ring.on-qibla{border-color:var(--green);box-shadow:0 0 30px rgba(16,185,129,0.4)}
+.compass-inner{width:100%;height:100%;border-radius:50%;position:relative;transition:transform .1s linear}
+.compass-n{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:13px;color:var(--red);font-weight:700}
+.compass-s{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:13px;color:var(--muted)}
+.compass-e{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted)}
+.compass-w{position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted)}
+.qibla-arrow{position:absolute;top:50%;left:50%;width:4px;height:80px;transform-origin:bottom center;background:linear-gradient(to top,transparent,var(--gold));border-radius:2px;margin-left:-2px;margin-top:-80px}
+.needle-n{position:absolute;top:50%;left:50%;width:4px;height:50px;transform-origin:bottom center;background:linear-gradient(to top,transparent,var(--red));border-radius:2px;margin-left:-2px;margin-top:-50px}
+.needle-s{position:absolute;top:50%;left:50%;width:4px;height:50px;transform-origin:top center;background:linear-gradient(to bottom,transparent,var(--text));border-radius:2px;margin-left:-2px}
+.compass-status{font-size:14px;color:var(--muted);margin-top:12px;min-height:22px}
+.compass-status.found{color:var(--green);font-weight:600}
+
+/* DAY MODAL */
+.day-modal .modal-box{text-align:right}
+.day-modal-date{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.day-modal-hijri{color:var(--gold);font-size:15px;margin-bottom:12px}
+.day-modal-event{font-size:15px;color:var(--text);padding:10px;border-radius:10px;background:var(--glass)}
+.day-modal-event.sorrow{border-right:3px solid var(--red)}
+.day-modal-event.joy{border-right:3px solid var(--green)}
+.day-modal-event.moon{border-right:3px solid var(--blue)}
+
+/* LOCATION STATUS */
+.loc-status{font-size:12px;color:var(--muted);text-align:center;padding:4px 0}
+
+/* SCROLL */
+.scroll-content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:20px}
+.scroll-content::-webkit-scrollbar{display:none}
+
+/* ALERT TOGGLE */
+.alert-row{display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.toggle-wrap{display:flex;align-items:center;gap:8px}
+.toggle{width:44px;height:26px;background:var(--glass);border:1px solid var(--glass-border);border-radius:13px;position:relative;cursor:pointer;transition:.3s}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle.on::after{right:calc(100% - 22px)}
+
+/* SPINNER */
+.spinner{width:20px;height:20px;border:2px solid var(--glass-border);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
-<div class="main-grid">
-    <div style="grid-column:span 6" class="panel">
-        <div class="compass-icon-btn" id="compassIcon" style="right: 12px;" title="البوصلة">🧭</div>
-        <div class="compass-icon-btn" id="tasbihIcon" style="right: 56px;" title="المسبحة الرقمية">📿</div>
-        
-        <div style="text-align:center;margin-bottom:16px">
-            <h1 class="gradient-text" style="font-size:2rem;font-weight:800">نُور</h1>
-            <div style="display:flex;justify-content:center;align-items:center;gap:8px;direction:ltr;margin-top:4px">
-                <button id="rl" style="font-size:.65rem;background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.2);color:#2dd4bf;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:bold;">تزامن الموقع 📍</button>
-                <span id="ld" style="font-size:.75rem;color:#94a3b8;max-width:180px;overflow:hidden;white-space:nowrap">القطيف</span>
-            </div>
-            <div style="margin:8px 0"><div id="clk" class="digital-clock" style="font-size:2.5rem"></div></div>
-            <div id="dt" class="small-text"></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-            <div id="pf" class="prayer-card"><span>🌙 الفجر</span><span class="prayer-time" id="tf">--:--</span></div>
-            <div id="ps" class="prayer-card" style="opacity:.4"><span>☀️ الشروق</span><span class="prayer-time" id="ts">--:--</span></div>
-            <div id="pd" class="prayer-card"><span>🌞 الظهر</span><span class="prayer-time" id="td">--:--</span></div>
-            <div id="pa" class="prayer-card"><span>⛅ العصر</span><span class="prayer-time" id="ta">--:--</span></div>
-            <div id="pm" class="prayer-card"><span>🌅 المغرب</span><span class="prayer-time" id="tm">--:--</span></div>
-            <div id="pi" class="prayer-card"><span>🌙 العشاء</span><span class="prayer-time" id="ti">--:--</span></div>
-        </div>
-        <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px">
-            <button id="abtn" style="width:100%;padding:12px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d;font-size:.8rem;letter-spacing:.05em"><span id="aic">🔔</span> <span id="atx">تفعيل التنبيهات الصوتية</span></button>
-        </div>
-    </div>
-    
-    <div style="grid-column:span 6;display:flex;flex-direction:column;gap:16px">
-        <div class="panel" style="display:flex;align-items:center;justify-content:center;min-height:360px">
-            <div class="circle-container">
-                <svg width="100%" height="100%" viewBox="0 0 378 378">
-                    <circle cx="189" cy="189" r="170" stroke="rgba(255,255,255,.03)" stroke-width="12" fill="transparent"/>
-                    <circle id="arc" cx="189" cy="189" r="170" stroke="url(#g)" stroke-width="10" stroke-linecap="round" fill="transparent" stroke-dasharray="1068" stroke-dashoffset="0" transform="rotate(-90 189 189)"/>
-                    <defs>
-                        <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#10b981"/></linearGradient>
-                    </defs>
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-                    <span style="font-size:.7rem;color:#2dd4bf;font-weight:600;letter-spacing:.1em">الصلاة القادمة</span>
-                    <h2 id="cn" style="font-size:1.8rem;color:#fff;margin:6px 0">--</h2>
-                    <div id="ct" class="countdown-timer" style="font-size:2.2rem">00:00:00</div>
-                    <span style="font-size:.65rem;color:#94a3b8;margin-top:4px">الوقت المتبقي</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px;margin-bottom:12px">
-                <button id="pmb" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;padding:4px 12px;border-radius:8px">&gt;</button>
-                <div style="text-align:center">
-                    <h3 id="cmn" style="font-size:1.2rem;color:#2dd4bf;font-weight:700">--</h3>
-                    <p id="cgr" style="font-size:.7rem;color:#94a3b8;margin-top:2px"></p>
-                </div>
-                <button id="nmb" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;padding:4px 12px;border-radius:8px">&lt;</button>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:.8rem;color:#94a3b8;margin-bottom:8px">
-                <div>ح</div><div>ن</div><div>ث</div><div>ر</div><div>خ</div><div>ج</div><div>س</div>
-            </div>
-            <div id="cdg" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center"></div>
-            
-            <div id="todayEventBanner" class="event-banner"></div>
 
-            <div style="margin-top:12px;background:rgba(20,184,166,.05);border:1px solid rgba(20,184,166,.1);border-radius:12px;padding:12px">
-                <div class="sync-btn-container">
-                    <div style="font-size:.8rem;color:#2dd4bf;display:flex;align-items:center;gap:6px"><span>📅</span> التاريخ الهجري الشرعي اليوم:</div>
-                    <div style="display:flex;gap:4px">
-                        <button class="offset-btn" id="decOffset" title="تأخير يوم">-</button>
-                        <button class="offset-btn" id="incOffset" title="تقديم يوم">+</button>
-                    </div>
-                </div>
-                <p id="thj" style="font-size:.95rem;color:#fff;margin-top:6px;margin-bottom:0;font-weight:600">--</p>
+<!-- MAIN SCREEN -->
+<div class="screen active" id="mainScreen">
+  <div class="topbar">
+    <div class="app-title">نور</div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="alertBtn" title="التنبيهات">🔔</button>
+      <button class="icon-btn" id="compassBtn" title="القبلة">🧭</button>
+      <button class="icon-btn" id="tasbihNavBtn" title="المسبحة">📿</button>
+    </div>
+  </div>
+
+  <div class="scroll-content">
+    <!-- CLOCK -->
+    <div class="panel clock-panel" style="margin:0 16px 12px">
+      <div class="digital-clock" id="clockDisplay">--:--:--</div>
+      <div class="clock-date" id="clockDate">--</div>
+      <div class="clock-hijri" id="clockHijri">-- -- --</div>
+      <div class="arc-wrap">
+        <svg class="arc-svg" id="arcSVG" width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
+          <circle id="arcPath" cx="40" cy="40" r="34" fill="none" stroke="var(--gold)" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+            transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s linear"/>
+        </svg>
+        <div class="arc-info">
+          <div class="arc-label">الصلاة القادمة</div>
+          <div class="arc-name" id="nextPrayerName">--</div>
+          <div class="arc-remain" id="nextPrayerRemain">--:--:--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOC STATUS -->
+    <div class="loc-status" id="locStatus">جاري تحديد الموقع...</div>
+
+    <!-- PRAYERS -->
+    <div class="prayers-grid" id="prayersGrid" style="margin-bottom:12px">
+      <div class="prayer-card"><div class="prayer-name">الفجر</div><div class="prayer-time">--:--</div></div>
+      <div class="prayer-card"><div class="prayer-name">الشروق</div><div class="prayer-time">--:--</div></div>
+      <div class="prayer-card"><div class="prayer-name">الظهر</div><div class="prayer-time">--:--</div></div>
+      <div class="prayer-card"><div class="prayer-name">العصر</div><div class="prayer-time">--:--</div></div>
+      <div class="prayer-card"><div class="prayer-name">المغرب</div><div class="prayer-time">--:--</div></div>
+      <div class="prayer-card"><div class="prayer-name">العشاء</div><div class="prayer-time">--:--</div></div>
+    </div>
+
+    <!-- MAIN PANELS -->
+    <div class="main-grid">
+      <!-- CALENDAR -->
+      <div class="panel">
+        <div class="sec-label">التقويم</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="calPrev">&#8250;</button>
+          <div class="cal-title" id="calTitle">--</div>
+          <button class="cal-nav-btn" id="calNext">&#8249;</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <!-- SETTINGS PANEL -->
+      <div class="panel">
+        <div class="sec-label">الإعدادات</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="alert-row">
+            <span>تنبيهات الصلاة</span>
+            <div class="toggle-wrap">
+              <div class="toggle" id="alertToggle"></div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- نافذة البوصلة -->
-<div id="compassModal" style="display:none" class="compass-modal-overlay">
-    <div class="compass-modal">
-        <h3 style="margin:0;color:#fff;font-size:1.1rem;">محدد اتجاه القبلة التفاعلي</h3>
-        <p class="compass-hint" id="statusHint">قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة</p>
-        
-        <div class="compass-finder-container" id="compassContainer">
-            <div class="phone-pointer"></div>
-            <div class="qibla-ring-indicator" id="qiblaRing">
-                <div class="kaaba-icon" id="kaabaIcon">🕋</div>
-            </div>
-        </div>
-        
-        <div class="qibla-info">
-            <span>زاوية القبلة: <strong id="targetAngleText" style="color:#2dd4bf">--°</strong></span>
-            <span>اتجاهك الحالي: <strong id="currentAngleText" style="color:#ef4444">--°</strong></span>
-        </div>
-        <button class="compass-close-btn" id="closeCompass">تم</button>
-    </div>
-</div>
-
-<!-- نافذة تفاصيل اليوم -->
-<div id="dayModal" class="day-modal-overlay">
-    <div class="day-modal">
-        <button class="close-day-btn" id="closeDayModal">✕</button>
-        <div class="day-title" id="dayTitle">--</div>
-        <div class="day-sub" id="daySub">--</div>
-        <div class="day-hijri" id="dayHijri">--</div>
-        <div class="day-event" id="dayEvent">--</div>
-    </div>
-</div>
-
-<!-- شاشة المسبحة -->
-<div id="tasbihModal" class="tasbih-modal-overlay">
-    <div id="tasbih-app">
-      <div id="tasbih-header">
-        <button class="tasbih-close-btn" id="closeTasbih">الرئيسية ↩</button>
-        <div id="session-info">
-          <div id="session-label">المجموع</div>
-          <div id="total-display">٠</div>
-        </div>
-        <button id="dhikr-selector-btn">
-          <span id="current-dhikr-name">سبحان الله</span>
-          <span class="arrow">▼</span>
-        </button>
-      </div>
-    
-      <div id="dhikr-area">
-        <div id="dhikr-text">سُبْحَانَ اللهِ</div>
-        <div id="dhikr-phase-label"></div>
-      </div>
-    
-      <div id="counter-wrap">
-        <div id="counter-num">٠</div>
-        <div id="counter-of">من <span id="counter-target">٣٣</span></div>
-        <div id="round-num">الجولة ١</div>
-      </div>
-    
-      <div id="canvas-wrap">
-        <canvas id="tasbih-canvas"></canvas>
-        <div id="swipe-hint">↓ اسحب للأسفل للتسبيح</div>
-      </div>
-    
-      <div id="tasbih-controls">
-        <button id="btn-undo">↩</button>
-        <button id="btn-count">سبّح</button>
-        <button id="btn-reset">✕</button>
-      </div>
-    
-      <div id="dhikr-panel-overlay">
-        <div id="dhikr-panel">
-          <div id="dhikr-panel-handle"></div>
-          <h2>اختر الذكر</h2>
-          <div id="dhikr-list"></div>
-          <div id="custom-dhikr-wrap">
-            <input type="text" id="custom-dhikr-input" placeholder="ذكر حر..." maxlength="60">
-            <input type="number" id="custom-dhikr-count" placeholder="عدد" min="1" max="999" value="33">
-            <button id="btn-custom-apply">تطبيق</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">المدينة الحالية</div>
+          <div style="font-size:13px;color:var(--gold);font-weight:600" id="locText">--</div>
+          <button class="icon-btn" id="cityPickerBtn" style="width:auto;padding:0 16px;border-radius:12px;height:38px;font-size:13px">
+            🌍 اختر مدينتك
+          </button>
+          <button class="icon-btn" id="refreshLoc" style="width:auto;padding:0 16px;border-radius:12px;height:38px;font-size:13px;background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3)">
+            📍 تحديد تلقائي (GPS)
+          </button>
+          <div style="font-size:12px;color:var(--muted)">ضبط التاريخ الهجري</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="cal-nav-btn" id="hoffMinus">-</button>
+            <span id="hoffDisplay" style="font-size:14px;color:var(--gold)">0</span>
+            <button class="cal-nav-btn" id="hoffPlus">+</button>
+            <span style="font-size:12px;color:var(--muted)">يوم</span>
           </div>
         </div>
       </div>
-    
-      <div id="tasbih-toast"></div>
     </div>
+  </div>
+</div>
+
+<!-- CITY PICKER MODAL -->
+<div class="modal-overlay" id="cityModal">
+  <div class="modal-box" style="max-width:380px;max-height:85vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+    <div style="padding:20px 20px 12px;border-bottom:1px solid var(--glass-border)">
+      <div class="modal-title" style="margin-bottom:12px">🌍 اختر مدينتك</div>
+      <input id="citySearch" placeholder="ابحث عن مدينة..." style="width:100%;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:15px;font-family:var(--font);outline:none;text-align:right;direction:rtl">
+    </div>
+    <div id="cityList" style="overflow-y:auto;flex:1;padding:8px 0"></div>
+    <div style="padding:12px 20px;border-top:1px solid var(--glass-border)">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">أو أدخل الإحداثيات يدوياً</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="manualLat" placeholder="خط العرض  24.68" type="number" step="0.001" style="flex:1;min-width:100px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;text-align:center">
+        <input id="manualLng" placeholder="خط الطول  46.72" type="number" step="0.001" style="flex:1;min-width:100px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;text-align:center">
+        <button id="manualApply" style="background:var(--gold);border:none;color:#000;padding:8px 14px;border-radius:10px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;white-space:nowrap">تطبيق</button>
+      </div>
+    </div>
+    <button class="modal-close" id="cityClose" style="margin:0 20px 16px;width:calc(100% - 40px)">إغلاق</button>
+  </div>
+</div>
+
+<!-- TASBIH SCREEN -->
+<div class="screen" id="tasbihScreen">
+  <div id="tsb-header">
+    <button class="back-btn" id="backBtn">↩ الرئيسية</button>
+    <div id="tsb-session">
+      <div id="tsb-session-label">المجموع</div>
+      <div id="tsb-total">٠</div>
+    </div>
+    <button id="tsb-dhikr-btn">
+      <span id="tsb-current-name">سبحان الله</span>
+      <span id="tsb-dhikr-arrow">▼</span>
+    </button>
+  </div>
+  <div id="tsb-dhikr-area">
+    <div id="tsb-dhikr-text">سُبْحَانَ اللهِ</div>
+    <div id="tsb-phase-label"></div>
+  </div>
+  <div id="tsb-counter-wrap">
+    <div id="tsb-count-num">٠</div>
+    <div id="tsb-count-of">من <span id="tsb-target">٣٣</span></div>
+    <div id="tsb-round">الجولة ١</div>
+  </div>
+  <div id="tsb-canvas-wrap">
+    <canvas id="tsb-canvas"></canvas>
+    <div id="tsb-swipe-hint">↓ اسحب للأسفل للتسبيح</div>
+  </div>
+  <div id="tsb-controls">
+    <button id="tsb-btn-undo">↩</button>
+    <button id="tsb-btn-count">سبّح</button>
+    <button id="tsb-btn-reset">✕</button>
+  </div>
+  <div id="tsb-panel-overlay">
+    <div id="tsb-panel">
+      <div id="tsb-panel-handle"></div>
+      <h2>اختر الذكر</h2>
+      <div id="tsb-dhikr-list"></div>
+      <div id="tsb-custom-wrap">
+        <input type="text" id="tsb-custom-input" placeholder="ذكر حر..." maxlength="60">
+        <input type="number" id="tsb-custom-count" placeholder="عدد" min="1" max="999" value="33">
+        <button id="tsb-custom-apply">تطبيق</button>
+      </div>
+    </div>
+  </div>
+  <div id="tsb-toast"></div>
+</div>
+
+<!-- COMPASS MODAL -->
+<div class="modal-overlay" id="compassModal">
+  <div class="modal-box">
+    <div class="modal-title">🧭 اتجاه القبلة</div>
+    <div class="compass-ring" id="compassRing">
+      <div class="compass-inner" id="compassInner">
+        <div class="compass-n">N</div>
+        <div class="compass-s">S</div>
+        <div class="compass-e">E</div>
+        <div class="compass-w">W</div>
+        <div class="qibla-arrow" id="qiblaArrow"></div>
+        <div class="needle-n" id="needleN"></div>
+        <div class="needle-s" id="needleS"></div>
+      </div>
+    </div>
+    <div class="compass-status" id="compassStatus">حرّك الجهاز أو اسحب الدائرة</div>
+    <button class="modal-close" id="compassClose">إغلاق</button>
+  </div>
+</div>
+
+<!-- DAY MODAL -->
+<div class="modal-overlay day-modal" id="dayModal">
+  <div class="modal-box" style="text-align:right">
+    <div class="modal-title" style="text-align:center">تفاصيل اليوم</div>
+    <div class="day-modal-date" id="dmDate"></div>
+    <div class="day-modal-hijri" id="dmHijri"></div>
+    <div class="day-modal-event" id="dmEvent"></div>
+    <button class="modal-close" id="dayClose" style="width:100%;margin-top:12px">إغلاق</button>
+  </div>
 </div>
 
 <script>
+// ─── ARABIC NUMERALS ───────────────────────────────────────────────────
+const toAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+
+// ─── STORAGE ────────────────────────────────────────────────────────────
+const ST = {
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch{return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+let userLat = ST.get('lat', null);
+let userLng = ST.get('lng', null);
+let cityName = ST.get('city', 'غير محدد');
+let alertsOn = ST.get('alerts', false);
+let hOffset  = ST.get('hOffset', 0);
+
+// ─── SCE: SHIA CALENDAR ENGINE ─────────────────────────────────────────
+const SCE = (() => {
+  const MONTHS = ['محرم','صفر','ربيع الأول','ربيع الثاني','جمادى الأولى','جمادى الثانية','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+  function jd(y,m,d){
+    if(m<3){y--;m+=12}
+    const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+    return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5;
+  }
+  function hijri(date){
+    const J=jd(date.getFullYear(),date.getMonth()+1,date.getDate())+hOffset;
+    const Z=Math.floor(J+0.5);
+    const A=Math.floor((Z-1867216.25)/36524.25);
+    const AA=Z+1+A-Math.floor(A/4);
+    const B=AA+1524;
+    const C=Math.floor((B-122.1)/365.25);
+    const D=Math.floor(365.25*C);
+    const E=Math.floor((B-D)/30.6001);
+    const gd=B-D-Math.floor(30.6001*E);
+    const gm=E<14?E-1:E-13;
+    const gy=gm>2?C-4716:C-4715;
+    const gJ=jd(gy,gm,gd);
+    let hY=Math.floor((gJ-1948440+10632)/10631);
+    const N=Math.ceil((gJ-29+Math.floor((11*hY+3)/30))/29.5);
+    let hM=N<1?1:N>12?12:N;
+    const hD=Math.ceil(gJ-(29.5001*hM-29)+Math.floor((11*hY+3)/30))-Math.floor(hY/100)*0+Math.floor(Math.floor(hY/100)/4)+Math.floor((hY-1)/30)*0;
+    // Simplified Kuwaiti algorithm
+    const K=Math.floor((11*hY+3)/30);
+    const JH=Math.floor((11*hY+3)/30)+354*hY+30*hM-Math.floor((hM-1)/2)+hD+1948440-385;
+    // Use direct calculation
+    const L=Z-1948440+10632;
+    const N2=Math.floor((L-1)/10631);
+    const L2=L-10631*N2+354;
+    const J2=Math.floor((10985-L2)/5316)*Math.floor((50*L2)/17719)+Math.floor(L2/5670)*Math.floor((43*L2)/15238);
+    const L3=L2-Math.floor((30-J2)/15)*Math.floor((17719*J2)/50)-Math.floor(J2/16)*Math.floor((15238*J2)/43)+29;
+    const M2=Math.floor((24*L3)/709);
+    const D2=L3-Math.floor((709*M2)/24);
+    const Y2=30*N2+J2-1;
+    return{hYear:Y2,hMonth:M2,hDay:D2};
+  }
+  function monthName(i){return MONTHS[(i-1+12)%12]}
+  function daysInMonth(y,m){return(m%12===0)?Math.floor((11*(y+1)+3)/30)-Math.floor((11*y+3)/30)===1?30:29:m%2===1?30:29}
+  function h2g(y,m,d){
+    const J=Math.floor((11*y+3)/30)+354*y+30*m-Math.floor((m-1)/2)+d+1948440-385;
+    const Z=Math.floor(J+0.5);
+    const A=Math.floor((Z-1867216.25)/36524.25);
+    const B=Z+1+A-Math.floor(A/4)+1524;
+    const C=Math.floor((B-122.1)/365.25);
+    const D=Math.floor(365.25*C);
+    const E=Math.floor((B-D)/30.6001);
+    const dd=B-D-Math.floor(30.6001*E);
+    const mm=E<14?E-1:E-13;
+    const yy=mm>2?C-4716:C-4715;
+    return new Date(yy,mm-1,dd);
+  }
+  return{hijri,monthName,daysInMonth,h2g,monthNames:MONTHS};
+})();
+
+// ─── SHIA EVENTS ───────────────────────────────────────────────────────
+const shiaEvents=[
+  {m:1,d:1,t:'sorrow',n:'رأس السنة الهجرية - استشهاد الإمام علي بن أبي طالب (ذكرى)'},
+  {m:1,d:10,t:'sorrow',n:'يوم عاشوراء - استشهاد الإمام الحسين ﷺ'},
+  {m:2,d:20,t:'sorrow',n:'الأربعين - زيارة الأربعين'},
+  {m:2,d:28,t:'sorrow',n:'وفاة النبي محمد ﷺ واستشهاد الإمام الحسن ﷺ'},
+  {m:2,d:30,t:'sorrow',n:'استشهاد الإمام علي بن أبي طالب ﷺ'},
+  {m:3,d:8,t:'sorrow',n:'استشهاد السيدة فاطمة الزهراء ﷺ'},
+  {m:3,d:17,t:'joy',n:'مولد النبي محمد ﷺ ومولد الإمام الصادق ﷺ'},
+  {m:6,d:3,t:'sorrow',n:'استشهاد الإمام علي الهادي ﷺ'},
+  {m:7,d:13,t:'joy',n:'مولد الإمام علي بن أبي طالب ﷺ'},
+  {m:8,d:15,t:'joy',n:'مولد الإمام المهدي ﷺ'},
+  {m:9,d:1,t:'joy',n:'دخول شهر رمضان المبارك'},
+  {m:9,d:19,t:'sorrow',n:'ضرب الإمام علي ﷺ'},
+  {m:9,d:21,t:'sorrow',n:'استشهاد الإمام علي ﷺ'},
+  {m:10,d:1,t:'joy',n:'عيد الفطر المبارك'},
+  {m:10,d:25,t:'sorrow',n:'استشهاد الإمام الجواد ﷺ'},
+  {m:12,d:10,t:'joy',n:'عيد الأضحى المبارك'},
+  {m:12,d:18,t:'joy',n:'عيد الغدير الأغر'},
+];
+
+const LUNAR_MANSIONS=['الشرطين','البطين','الثريا','الدبران','الهقعة','الهنعة','الذراع','النثرة','الطرف','الجبهة','الزبرة','الصرفة','العوّاء','السماك','الغفر','الزبانى','الإكليل','القلب','الشولة','النعائم','البلدة','سعد الذابح','سعد بلع','سعد السعود','سعد الأخبية','فرغ الدلو المقدم','فرغ الدلو المؤخر','بطن الحوت'];
+const ZODIAC_SIGNS=['الحمل','الحمل','الثور','الثور','الجوزاء','الجوزاء','السرطان','السرطان','الأسد','الأسد','السنبلة','السنبلة','الميزان','الميزان','العقرب','العقرب','القوس','القوس','الجدي','الجدي','الدلو','الدلو','الحوت','الحوت','الحمل','الحمل','الحوت','الحوت'];
+
+function findShiaEvent(hm,hd){
+  const ev=shiaEvents.find(e=>e.m===hm&&e.d===hd);
+  if(ev)return ev;
+  if(hd>=1&&hd<=28){
+    const idx=hd-1;
+    return{t:'moon',n:`منزلة: ${LUNAR_MANSIONS[idx]} • برج: ${ZODIAC_SIGNS[idx]}`};
+  }
+  return null;
+}
+
+// ─── SPE: SOLAR PRAYER ENGINE (معادلة الملف المرجعي) ──────────────────
 function toRad(d){return d*Math.PI/180}
 function toDeg(r){return r*180/Math.PI}
 
-var SPE=(function(){function w(x){return x-360*Math.floor(x/360)}return{calc:function(la,lo,tz,D){var y=D.getFullYear(),m=D.getMonth()+1,dd=D.getDate();if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=2-A+Math.floor(A/4);var jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+dd+B-1524.5;var D2=jd-2451545;var g=w(357.529+0.98560028*D2),q=w(280.459+0.98564736*D2);var L=w(q+1.915*Math.sin(toRad(g))+0.020*Math.sin(toRad(2*g)));var e=23.439-0.00000036*D2;var RA=toDeg(Math.atan2(Math.cos(toRad(e))*Math.sin(toRad(L)),Math.cos(toRad(L))))/15;if(RA<0)RA+=24;var dec=toDeg(Math.asin(Math.sin(toRad(e))*Math.sin(toRad(L))));var EqT=q/15-RA;var mid=12+tz-lo/15-EqT;if(mid<0)mid+=24;if(mid>24)mid-=24;function aD(a){var num=-Math.sin(toRad(a))-Math.sin(toRad(la))*Math.sin(toRad(dec));var den=Math.cos(toRad(la))*Math.cos(toRad(dec));var cosH=num/den;if(cosH>1||cosH<-1)return null;return toDeg(Math.acos(cosH))/15}function asrD(){var len=1+Math.tan(toRad(Math.abs(la-dec)));var num=Math.sin(Math.atan(1/len))-Math.sin(toRad(la))*Math.sin(toRad(dec));var den=Math.cos(toRad(la))*Math.cos(toRad(dec));var cosH=num/den;if(cosH>1||cosH<-1)return null;return toDeg(Math.acos(cosH))/15}var fH=aD(16),sH=aD(0.833),aH=asrD(),mH=aD(4),iH=aD(14);var T={fajr:mid-fH,sunrise:mid-sH,dhuhr:mid,asr:mid+aH,maghrib:mid+mH,isha:mid+iH};var res={};Object.keys(T).forEach(function(k){var base=new Date(D.getTime());base.setHours(0,0,0,0);res[k]=new Date(base.getTime()+T[k]*3600000)});return res}}})();
-var SCE=(function(){var M=["محرّم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوّال","ذو القعدة","ذو الحجة"];function g2j(y,m,d){if(m<=2){y--;m+=12}var A=Math.floor(y/100),B=Math.floor(A/4),C=2-A+B;return C+d+Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))-1524.5}function j2h(jd){var z=Math.floor(jd+0.5),c=Math.floor((z-1948439.5)/10631),rem=(z-1948439.5)-c*10631;var yc=Math.floor((rem*30+11)/10631),yr=rem-Math.floor((yc*10631+14)/30);var y=c*30+yc+1,m=Math.floor((yr*11+330)/325),d=Math.floor(yr-Math.floor((m*325-320)/11)+0.5);if(d===0){d=30;m--}if(m===0){m=12;y--}return{hYear:y,hMonth:m,hDay:d}}return{hijri:function(d){return j2h(g2j(d.getFullYear(),d.getMonth()+1,d.getDate()))},monthName:function(i){return M[i-1]||""},daysInMonth:function(y,m){if(m===12)return((y*11+14)%30)<11?30:29;return m%2===1?30:29},h2g:function(y,m,d){var c=Math.floor((y-1)/30),yc=(y-1)%30;var jd=1948439.5+c*10631+Math.floor((yc*10631+14)/30)+Math.floor((m*325-320)/11)+d;var j=Math.floor(jd+0.5),w=Math.floor((j-1867216.25)/36524.25),x=Math.floor(w/4),b=j+1+w-x,c2=b+1524;var dy=Math.floor((c2-122.1)/365.25),e=Math.floor(365.25*dy),g=Math.floor((c2-e)/30.6001);var day=c2-e-Math.floor(30.6001*g),month=g<14?g-1:g-13,year=month>2?dy-4716:dy-4715;return new Date(year,month-1,day)}}})();
-
-// ===== منازل القمر وأبراج القمر =====
-const LUNAR_MANSIONS = [
-    "الشرطان", "البطين", "الثريا", "الدبران", "الهقعة", "الهنعة",
-    "الذراع", "النثرة", "الطرف", "الجبهة", "الزبرة", "الصرفة",
-    "العواء", "السماك", "الغفر", "الزبانا", "الإكليل", "القلب",
-    "الشولة", "النعائم", "البلدة", "سعد الذابح", "سعد بلع",
-    "سعد السعود", "سعد الأخبية", "الفرغ المقدم", "الفرغ المؤخر", "الحوت"
-];
-const ZODIAC_SIGNS = ["الحمل", "الثور", "الجوزاء", "السرطان", "الأسد", "السنبلة", "الميزان", "العقرب", "القوس", "الجدي", "الدلو", "الحوت"];
-const LUNAR_MANSION_TO_SIGN = [0,0,0, 1,1,1, 2,2,2, 3,3,3, 4,4,4, 5,5,5, 6,6,6, 7,7, 8, 9, 10, 11, 11];
-
-var shiaEvents=[
-  {m:1,d:1,t:"sorrow",n:"رأس السنة الهجرية"},
-  {m:1,d:2,t:"sorrow",n:"ورود القافلة الحسينية كربلاء"},
-  {m:1,d:7,t:"sorrow",n:"منع الماء عن معسكر الحسين (ع)"},
-  {m:1,d:9,t:"sorrow",n:"تأسوعاء الإمام الحسين (ع)"},
-  {m:1,d:10,t:"sorrow",n:"عاشوراء - شهادة الإمام الحسين (ع)"},
-  {m:1,d:12,t:"sorrow",n:"دفن الأجساد الطاهرة بكربلاء"},
-  {m:1,d:25,t:"sorrow",n:"شهادة الإمام علي بن الحسين السجاد (ع)"},
-  {m:2,d:1,t:"sorrow",n:"دخول سبايا آل محمد إلى الشام"},
-  {m:2,d:7,t:"sorrow",n:"شهادة الإمام الحسن المجتبى (ع)"},
-  {m:2,d:20,t:"sorrow",n:"أربعينية الإمام الحسين (ع)"},
-  {m:2,d:28,t:"sorrow",n:"شهادة الرسول الأعظم محمد (ص)"},
-  {m:2,d:29,t:"sorrow",n:"شهادة الإمام علي بن موسى الرضا (ع)"},
-  {m:3,d:1,t:"joy",n:"هجرة النبي (ص) ومبيت الإمام علي بالفراش"},
-  {m:3,d:8,t:"sorrow",n:"شهادة الإمام الحسن العسكري (ع)"},
-  {m:3,d:9,t:"joy",n:"تتويج الإمام المهدي (عج) / فرحة الزهراء"},
-  {m:3,d:17,t:"joy",n:"المولد النبوي الشريف / مولد الإمام الصادق (ع)"},
-  {m:4,d:8,t:"joy",n:"مولد الإمام الحسن العسكري (ع)"},
-  {m:4,d:10,t:"sorrow",n:"وفاة السيدة فاطمة المعصومة (ع)"},
-  {m:5,d:5,t:"joy",n:"مولد بطلة كربلاء السيدة زينب (ع)"},
-  {m:5,d:13,t:"sorrow",n:"شهادة الصديقة الزهراء (ع) - الرواية الثانية"},
-  {m:6,d:3,t:"sorrow",n:"شهادة الصديقة فاطمة الزهراء (ع) - الرواية الثالثة"},
-  {m:6,d:20,t:"joy",n:"مولد السيدة فاطمة الزهراء (ع)"},
-  {m:7,d:1,t:"joy",n:"مولد الإمام محمد الباقر (ع)"},
-  {m:7,d:3,t:"sorrow",n:"شهادة الإمام علي الهادي (ع)"},
-  {m:7,d:10,t:"joy",n:"مولد الإمام محمد الجواد (ع)"},
-  {m:7,d:13,t:"joy",n:"مولد أمير المؤمنين الإمام علي بن أبي طالب (ع)"},
-  {m:7,d:25,t:"sorrow",n:"شهادة الإمام موسى بن جعفر الكاظم (ع)"},
-  {m:7,d:27,t:"joy",n:"المبعث النبوي الشريف"},
-  {m:8,d:3,t:"joy",n:"مولد الإمام الحسين (ع)"},
-  {m:8,d:4,t:"joy",n:"مولد أبو الفضل العباس (ع)"},
-  {m:8,d:5,t:"joy",n:"مولد الإمام علي بن الحسين السجاد (ع)"},
-  {m:8,d:11,t:"joy",n:"مولد شبيه المصطفى علي الأكبر (ع)"},
-  {m:8,d:15,t:"joy",n:"مولد منقذ البشرية الإمام المهدي المنتظر (عج)"},
-  {m:9,d:1,t:"joy",n:"بدء شهر رمضان المبارك"},
-  {m:9,d:15,t:"joy",n:"مولد سبط النبي الإمام الحسن المجتبى (ع)"},
-  {m:9,d:19,t:"sorrow",n:"ضربة أمير المؤمنين (ع) في محرابه"},
-  {m:9,d:21,t:"sorrow",n:"شهادة أمير المؤمنين الإمام علي (ع)"},
-  {m:9,d:23,t:"joy",n:"ليلة القدر المباركة الثالثة"},
-  {m:10,d:1,t:"joy",n:"عيد الفطر المبارك"},
-  {m:10,d:25,t:"sorrow",n:"شهادة الإمام جعفر بن محمد الصادق (ع)"},
-  {m:11,d:1,t:"joy",n:"مولد السيدة فاطمة المعصومة (ع)"},
-  {m:11,d:11,t:"joy",n:"مولد غريب طوس الإمام علي بن موسى الرضا (ع)"},
-  {m:11,d:29,t:"sorrow",n:"شهادة الإمام محمد بن علي الجواد (ع)"},
-  {m:12,d:1,t:"joy",n:"زواج أمير المؤمنين من السيدة الزهراء (ع)"},
-  {m:12,d:7,t:"sorrow",n:"شهادة الإمام محمد بن علي الباقر (ع)"},
-  {m:12,d:9,t:"sorrow",n:"يوم عرفة المبارك"},
-  {m:12,d:10,t:"joy",n:"عيد الأضحى المبارك"},
-  {m:12,d:15,t:"joy",n:"مولد الإمام علي بن محمد الهادي (ع)"},
-  {m:12,d:18,t:"joy",n:"عيد الغدير الأغر - تنصيب الولاية"},
-  {m:12,d:24,t:"joy",n:"يوم مباهلة النبي وتصدق أمير المؤمنين بالخاتم"}
-];
-
-var MIL_MONTH_NAMES = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
-
-// ===== دالة البحث المعدلة (منازل + أبراج) =====
-function findShiaEvent(hMonth, hDay) {
-    var found = shiaEvents.find(function(e) { return e.m === hMonth && e.d === hDay; });
-    if (found) return found;
-    if (hDay >= 1 && hDay <= 28) {
-        var signIndex = LUNAR_MANSION_TO_SIGN[hDay - 1];
-        return {
-            t: "lunar",
-            n: "منزلة " + LUNAR_MANSIONS[hDay - 1],
-            sign: ZODIAC_SIGNS[signIndex]
-        };
+const SPE=(function(){
+  function w(x){return x-360*Math.floor(x/360)}
+  return{calc:function(la,lo,tz,D){
+    var y=D.getFullYear(),m=D.getMonth()+1,dd=D.getDate();
+    if(m<=2){y--;m+=12}
+    var A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+    var jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+dd+B-1524.5;
+    var D2=jd-2451545;
+    var g=w(357.529+0.98560028*D2),q=w(280.459+0.98564736*D2);
+    var L=w(q+1.915*Math.sin(toRad(g))+0.020*Math.sin(toRad(2*g)));
+    var e=23.439-0.00000036*D2;
+    var RA=toDeg(Math.atan2(Math.cos(toRad(e))*Math.sin(toRad(L)),Math.cos(toRad(L))))/15;
+    if(RA<0)RA+=24;
+    var dec=toDeg(Math.asin(Math.sin(toRad(e))*Math.sin(toRad(L))));
+    var EqT=q/15-RA;
+    var mid=12+tz-lo/15-EqT;
+    if(mid<0)mid+=24; if(mid>24)mid-=24;
+    function aD(a){
+      var num=-Math.sin(toRad(a))-Math.sin(toRad(la))*Math.sin(toRad(dec));
+      var den=Math.cos(toRad(la))*Math.cos(toRad(dec));
+      var cosH=num/den;
+      if(cosH>1||cosH<-1)return null;
+      return toDeg(Math.acos(cosH))/15
     }
-    return null;
+    function asrD(){
+      var len=1+Math.tan(toRad(Math.abs(la-dec)));
+      var num=Math.sin(Math.atan(1/len))-Math.sin(toRad(la))*Math.sin(toRad(dec));
+      var den=Math.cos(toRad(la))*Math.cos(toRad(dec));
+      var cosH=num/den;
+      if(cosH>1||cosH<-1)return null;
+      return toDeg(Math.acos(cosH))/15
+    }
+    var fH=aD(16),sH=aD(0.833),aH=asrD(),mH=aD(4),iH=aD(14);
+    var T={fajr:mid-fH, sunrise:mid-sH, dhuhr:mid, asr:mid+aH, maghrib:mid+mH, isha:mid+iH};
+    var res={};
+    Object.keys(T).forEach(function(k){
+      if(T[k]==null){res[k]=null;return;}
+      var base=new Date(D.getTime());
+      base.setHours(0,0,0,0);
+      res[k]=new Date(base.getTime()+T[k]*3600000);
+    });
+    return res
+  }}
+})();
+
+// مساعد: تحويل Date إلى نص HH:MM
+function fmtPrayerTime(d){
+  if(!d||isNaN(d.getTime()))return '--:--';
+  return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
 }
 
-// ===== نافذة تفاصيل اليوم =====
-var dayModal = document.getElementById('dayModal');
-var closeDayBtn = document.getElementById('closeDayModal');
+// ─── AUDIO ENGINE ──────────────────────────────────────────────────────
+let audioCtx=null;
+function getAudioCtx(){
+  if(!audioCtx||audioCtx.state==='closed'){
+    try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}
+  }
+  if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+  return audioCtx;
+}
+function playBeadSound(){
+  const ctx=getAudioCtx();if(!ctx)return;
+  const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++){
+    const t=i/ctx.sampleRate;
+    d[i]=Math.sin(2*Math.PI*800*t)*Math.exp(-30*t)*0.4+
+         Math.sin(2*Math.PI*1200*t)*Math.exp(-40*t)*0.2+
+         (Math.random()-0.5)*Math.exp(-50*t)*0.1;
+  }
+  const src=ctx.createBufferSource();
+  src.buffer=buf;
+  const g=ctx.createGain();g.gain.value=0.7;
+  src.connect(g);g.connect(ctx.destination);
+  src.start();
+}
+function playAdhanAlert(name){
+  const ctx=getAudioCtx();if(!ctx||name==='الشروق')return;
+  const dur=1.5;
+  const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+  const d=buf.getChannelData(0);
+  const freqs=[440,550,495,440,392];
+  freqs.forEach((f,i)=>{
+    const start=Math.floor(i*(ctx.sampleRate*dur/freqs.length));
+    const end=Math.floor((i+1)*(ctx.sampleRate*dur/freqs.length));
+    for(let j=start;j<end;j++){
+      const t=(j-start)/ctx.sampleRate;
+      d[j]=Math.sin(2*Math.PI*f*t)*Math.exp(-2*t)*0.3;
+    }
+  });
+  const src=ctx.createBufferSource();
+  src.buffer=buf;
+  const g=ctx.createGain();g.gain.value=alertsOn?0.8:0;
+  src.connect(g);g.connect(ctx.destination);
+  src.start();
+}
+function playTestSound(){
+  const ctx=getAudioCtx();if(!ctx)return;
+  const osc=ctx.createOscillator();
+  const g=ctx.createGain();
+  osc.connect(g);g.connect(ctx.destination);
+  osc.frequency.value=660;g.gain.value=0.3;
+  osc.start();g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+  osc.stop(ctx.currentTime+0.4);
+}
 
-function showDayModal(day, month, year, hObj, ev) {
-    var title = document.getElementById('dayTitle');
-    var sub = document.getElementById('daySub');
-    var hijri = document.getElementById('dayHijri');
-    var eventEl = document.getElementById('dayEvent');
-    
-    var dateObj = new Date(year, month, day);
-    var weekday = dateObj.toLocaleDateString('ar-SA', { weekday: 'long' });
-    title.textContent = weekday + '، ' + day + ' ' + MIL_MONTH_NAMES[month] + ' ' + year;
-    sub.textContent = 'التاريخ الميلادي';
-    
-    var hMonthName = SCE.monthName(hObj.hMonth);
-    hijri.textContent = hObj.hDay + ' ' + hMonthName + ' ' + hObj.hYear + ' هـ';
-    
-    if (ev) {
-        var icon = '';
-        var cls = '';
-        var detail = '';
-        if (ev.t === 'sorrow') {
-            icon = '🕋';
-            cls = 'sorrow';
-            detail = 'مناسبة حزينة';
-        } else if (ev.t === 'joy') {
-            icon = '🎉';
-            cls = 'joy';
-            detail = 'مناسبة مفرحة';
-        } else if (ev.t === 'lunar') {
-            icon = '🌙';
-            cls = 'lunar';
-            detail = 'برج ' + ev.sign;
+// ─── STATE ─────────────────────────────────────────────────────────────
+let prayerTimes=null;
+let currentPrayer='';
+let lastPrayerDate='';
+const PRAYER_NAMES=['الفجر','الشروق','الظهر','العصر','المغرب','العشاء'];
+const PRAYER_KEYS=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+
+// ─── CLOCK & PRAYER UPDATE ─────────────────────────────────────────────
+function updateClock(){
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clockDisplay').textContent=`${hh}:${mm}:${ss}`;
+  const h=SCE.hijri(now);
+  document.getElementById('clockHijri').textContent=`${toAr(h.hDay)} ${SCE.monthName(h.hMonth)} ${toAr(h.hYear)} هـ`;
+  const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('clockDate').textContent=`${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  updatePrayerHighlight(now);
+  updateArc(now);
+}
+
+function timeToMins(t){
+  if(!t||t==='--:--')return -1;
+  const[h,m]=t.split(':').map(Number);
+  return h*60+m;
+}
+
+function updatePrayerHighlight(now){
+  if(!prayerTimes)return;
+  const nowMs=now.getTime();
+  const keys=PRAYER_KEYS;
+  const names=PRAYER_NAMES;
+
+  // حساب الصلاة الحالية
+  let active=-1;
+  // ترتيب الصلوات الزمني
+  const order=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+  for(let i=order.length-1;i>=0;i--){
+    const pt=prayerTimes[order[i]];
+    if(pt && pt.getTime()<=nowMs){active=i;break;}
+  }
+
+  const cards=document.querySelectorAll('.prayer-card');
+  cards.forEach((c,i)=>{
+    c.classList.toggle('active-prayer',i===active);
+    const pt=c.querySelector('.prayer-time');
+    if(pt) pt.textContent=fmtPrayerTime(prayerTimes[keys[i]]);
+    const pn=c.querySelector('.prayer-name');
+    if(pn) pn.textContent=names[i];
+  });
+
+  // تنبيه تغيير الصلاة (تجاهل الشروق)
+  const name=active>=0?names[active]:'';
+  if(name && name!==currentPrayer && name!=='الشروق' && alertsOn){playAdhanAlert(name);}
+  currentPrayer=name;
+}
+
+function updateArc(now){
+  if(!prayerTimes)return;
+  const nowMs=now.getTime();
+  const order=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+
+  // الصلاة القادمة
+  let nextKey=null, nextMs=-1, prevMs=-1;
+  for(let i=0;i<order.length;i++){
+    const pt=prayerTimes[order[i]];
+    if(pt && pt.getTime()>nowMs){
+      nextKey=order[i];
+      nextMs=pt.getTime();
+      // الصلاة السابقة
+      const prevPt=i>0?prayerTimes[order[i-1]]:null;
+      prevMs=prevPt?prevPt.getTime():prayerTimes['fajr'].getTime()-86400000;
+      break;
+    }
+  }
+
+  // إذا انتهت كل صلوات اليوم → فجر الغد
+  if(!nextKey){
+    const tz=-new Date().getTimezoneOffset()/60;
+    const tom=new Date(); tom.setDate(tom.getDate()+1);
+    const tomP=SPE.calc(userLat||26.5258, userLng||49.9981, tz, tom);
+    nextMs=tomP.fajr.getTime();
+    nextKey='fajr';
+    prevMs=prayerTimes['isha'].getTime();
+  }
+
+  const nextName=PRAYER_NAMES[PRAYER_KEYS.indexOf(nextKey)];
+  const remain=Math.max(0,nextMs-nowMs);
+  const h=Math.floor(remain/3600000);
+  const m=Math.floor((remain%3600000)/60000);
+  const s=Math.floor((remain%60000)/1000);
+  document.getElementById('nextPrayerName').textContent=nextName||'--';
+  document.getElementById('nextPrayerRemain').textContent=
+    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  // قوس SVG
+  const span=nextMs-prevMs;
+  const elapsed=nowMs-prevMs;
+  const pct=span>0?Math.max(0,Math.min(1,elapsed/span)):0;
+  const circ=2*Math.PI*34;
+  document.getElementById('arcPath').style.strokeDashoffset=circ*(1-pct);
+}
+
+// ─── CITIES DATABASE ───────────────────────────────────────────────────
+const CITIES=[
+  // السعودية
+  {n:'مكة المكرمة',c:'🇸🇦',lat:21.3891,lng:39.8579},
+  {n:'المدينة المنورة',c:'🇸🇦',lat:24.5247,lng:39.5692},
+  {n:'الرياض',c:'🇸🇦',lat:24.6877,lng:46.7219},
+  {n:'جدة',c:'🇸🇦',lat:21.5433,lng:39.1728},
+  {n:'الدمام',c:'🇸🇦',lat:26.4344,lng:50.1033},
+  {n:'القطيف',c:'🇸🇦',lat:26.5590,lng:50.0093},
+  {n:'الأحساء',c:'🇸🇦',lat:25.3848,lng:49.5876},
+  {n:'النجف',c:'🇮🇶',lat:32.0006,lng:44.3356},
+  // العراق
+  {n:'كربلاء',c:'🇮🇶',lat:32.6158,lng:44.0243},
+  {n:'بغداد',c:'🇮🇶',lat:33.3406,lng:44.4009},
+  {n:'البصرة',c:'🇮🇶',lat:30.5085,lng:47.7804},
+  {n:'سامراء',c:'🇮🇶',lat:34.1981,lng:43.8736},
+  // إيران
+  {n:'طهران',c:'🇮🇷',lat:35.6892,lng:51.3890},
+  {n:'مشهد',c:'🇮🇷',lat:36.2972,lng:59.6057},
+  {n:'قم',c:'🇮🇷',lat:34.6416,lng:50.8746},
+  {n:'أصفهان',c:'🇮🇷',lat:32.6546,lng:51.6680},
+  // الكويت
+  {n:'الكويت',c:'🇰🇼',lat:29.3759,lng:47.9774},
+  // الإمارات
+  {n:'دبي',c:'🇦🇪',lat:25.2048,lng:55.2708},
+  {n:'أبوظبي',c:'🇦🇪',lat:24.4539,lng:54.3773},
+  // البحرين
+  {n:'المنامة',c:'🇧🇭',lat:26.2154,lng:50.5832},
+  // قطر
+  {n:'الدوحة',c:'🇶🇦',lat:25.2854,lng:51.5310},
+  // لبنان
+  {n:'بيروت',c:'🇱🇧',lat:33.8938,lng:35.5018},
+  // سوريا
+  {n:'دمشق',c:'🇸🇾',lat:33.5138,lng:36.2765},
+  // مصر
+  {n:'القاهرة',c:'🇪🇬',lat:30.0444,lng:31.2357},
+  // الأردن
+  {n:'عمّان',c:'🇯🇴',lat:31.9539,lng:35.9106},
+  // اليمن
+  {n:'صنعاء',c:'🇾🇪',lat:15.3694,lng:44.1910},
+  // المغرب
+  {n:'الرباط',c:'🇲🇦',lat:33.9716,lng:-6.8498},
+  // تركيا
+  {n:'إسطنبول',c:'🇹🇷',lat:41.0082,lng:28.9784},
+  // باكستان
+  {n:'كراتشي',c:'🇵🇰',lat:24.8607,lng:67.0011},
+  // الهند
+  {n:'مومباي',c:'🇮🇳',lat:19.0760,lng:72.8777},
+  // المملكة المتحدة
+  {n:'لندن',c:'🇬🇧',lat:51.5074,lng:-0.1278},
+  // ألمانيا
+  {n:'برلين',c:'🇩🇪',lat:52.5200,lng:13.4050},
+  // الولايات المتحدة
+  {n:'نيويورك',c:'🇺🇸',lat:40.7128,lng:-74.0060},
+  {n:'لوس أنجلوس',c:'🇺🇸',lat:34.0522,lng:-118.2437},
+  // كندا
+  {n:'تورنتو',c:'🇨🇦',lat:43.6532,lng:-79.3832},
+  // أستراليا
+  {n:'سيدني',c:'🇦🇺',lat:-33.8688,lng:151.2093},
+];
+
+// ─── LOCATION & PRAYERS ────────────────────────────────────────────────
+function calcPrayers(la, lng){
+  const tz = -new Date().getTimezoneOffset()/60;
+  prayerTimes = SPE.calc(la, lng, tz, new Date());
+  updateClock();
+}
+
+function setCity(name,lat,lng){
+  userLat=lat; userLng=lng; cityName=name;
+  ST.set('lat',lat); ST.set('lng',lng); ST.set('city',name);
+  calcPrayers(lat,lng);
+  document.getElementById('locText').textContent=name;
+  document.getElementById('locStatus').textContent=`📍 ${name}`;
+}
+
+// ─── CITY PICKER ───────────────────────────────────────────────────────
+function buildCityList(filter){
+  const list=document.getElementById('cityList');
+  list.innerHTML='';
+  const filtered=filter
+    ? CITIES.filter(c=>c.n.includes(filter))
+    : CITIES;
+  filtered.forEach(city=>{
+    const div=document.createElement('div');
+    div.style.cssText='padding:12px 20px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .1s';
+    div.innerHTML=`<span style="font-size:20px">${city.c}</span><span style="font-size:16px;color:var(--text);font-family:var(--font)">${city.n}</span>`;
+    div.addEventListener('click',()=>{
+      setCity(city.n,city.lat,city.lng);
+      document.getElementById('cityModal').classList.remove('open');
+    });
+    div.addEventListener('touchstart',()=>div.style.background='rgba(255,255,255,0.06)',{passive:true});
+    div.addEventListener('touchend',()=>div.style.background='',{passive:true});
+    list.appendChild(div);
+  });
+  if(!filtered.length){
+    list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:14px">لا توجد نتائج</div>';
+  }
+}
+
+function openCityPicker(){
+  buildCityList('');
+  document.getElementById('citySearch').value='';
+  document.getElementById('cityModal').classList.add('open');
+}
+
+// ─── LOCATION & PRAYERS (iOS-proven logic from reference) ──────────────
+var locName = cityName; // alias
+
+function sv(la, lo, lb){
+  userLat = la; userLng = lo; cityName = lb; locName = lb;
+  ST.set('lat', la); ST.set('lng', lo); ST.set('city', lb);
+  calcPrayers(la, lo);
+  document.getElementById('locText').textContent = lb;
+  document.getElementById('locStatus').textContent = `📍 ${lb}`;
+  // تحديث البوصلة إذا كانت مفتوحة
+  qiblaDir = calcQibla(la, lo);
+}
+
+function triggerGPS(){
+  const locSt = document.getElementById('locStatus');
+  if (!navigator.geolocation) {
+    locSt.textContent = '⚠️ GPS غير مدعوم في هذا المتصفح';
+    useFallback(); return;
+  }
+  // تحقق من بروتوكول file:// — iOS يحظر GPS في هذه الحالة
+  if (window.location.protocol === 'file:') {
+    locSt.innerHTML = '<span style="font-size:11px;color:var(--red)">⚠️ افتح الملف عبر Safari مباشرة (ليس من مدير الملفات)</span>';
+    useFallback(); return;
+  }
+  locSt.innerHTML = '<span class="spinner"></span> 📡 جاري الاتصال بالـ GPS...';
+
+  var optHigh = { enableHighAccuracy: true,  timeout: 5000,  maximumAge: 0 };
+  var optLow  = { enableHighAccuracy: false, timeout: 6000,  maximumAge: 60000 };
+
+  // المحاولة الأولى — GPS دقيق
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var name = reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+      sv(pos.coords.latitude, pos.coords.longitude, '📍 ' + name);
+    },
+    function(err1){
+      // المحاولة الثانية — شبكة (سريعة وتعمل على iOS حتى بدون GPS)
+      navigator.geolocation.getCurrentPosition(
+        function(pos2){
+          var name = reverseGeocode(pos2.coords.latitude, pos2.coords.longitude);
+          sv(pos2.coords.latitude, pos2.coords.longitude, '📍 ' + name);
+        },
+        function(err2){
+          if (err2.code === 1) {
+            // رفض الإذن
+            locSt.innerHTML = '<span style="font-size:11px;color:var(--red)">❌ الإعدادات ← الخصوصية ← خدمات الموقع ← Safari ← اسمح</span>';
+          } else {
+            locSt.textContent = '⚠️ لم يتم التعرف على الموقع';
+          }
+          // استخدام محفوظ أو افتراضي
+          if (userLat && userLng) {
+            calcPrayers(userLat, userLng);
+            locSt.textContent = `📍 ${cityName} (محفوظ)`;
+          } else {
+            useFallback();
+          }
+        },
+        optLow
+      );
+    },
+    optHigh
+  );
+}
+
+function useFallback(){
+  if (!userLat) {
+    userLat = 26.5258; userLng = 49.9981; cityName = 'القطيف (افتراضي)'; locName = cityName;
+  }
+  calcPrayers(userLat, userLng);
+  document.getElementById('locText').textContent = cityName;
+  document.getElementById('locStatus').textContent = `📍 ${cityName}`;
+}
+
+function reverseGeocode(lat, lng){
+  // أقرب مدينة من قاعدة البيانات
+  let best = CITIES[0], bestD = Infinity;
+  CITIES.forEach(c => {
+    const d = Math.hypot(c.lat - lat, c.lng - lng);
+    if (d < bestD){ bestD = d; best = c; }
+  });
+  const name = bestD < 2 ? best.n : `${lat.toFixed(3)}°، ${lng.toFixed(3)}°`;
+  ST.set('city', name);
+  cityName = name; locName = name;
+  document.getElementById('locText').textContent = name;
+  return name;
+}
+
+function getLocation(){ triggerGPS(); }
+function tryGPS(){ triggerGPS(); }
+
+// ─── CALENDAR ──────────────────────────────────────────────────────────
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+const DOW_AR=['أح','اث','ثل','أر','خم','جم','سب'];
+
+function buildCalendar(){
+  const today=new Date();
+  const first=new Date(calYear,calMonth,1);
+  const daysInM=new Date(calYear,calMonth+1,0).getDate();
+  const startDow=first.getDay();
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('calTitle').textContent=`${months[calMonth]} ${calYear}`;
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  DOW_AR.forEach(d=>{const c=document.createElement('div');c.className='cal-dow';c.textContent=d;grid.appendChild(c);});
+  for(let i=0;i<startDow;i++){const c=document.createElement('div');c.className='cal-day empty';grid.appendChild(c);}
+  for(let d=1;d<=daysInM;d++){
+    const date=new Date(calYear,calMonth,d);
+    const hd=SCE.hijri(date);
+    const ev=findShiaEvent(hd.hMonth,hd.hDay);
+    const c=document.createElement('div');
+    c.className='cal-day';
+    if(d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear())c.classList.add('today');
+    if(ev){c.classList.add(ev.t==='sorrow'?'ev-sorrow':ev.t==='joy'?'ev-joy':'ev-moon');}
+    c.innerHTML=`<span class="gday">${d}</span><span class="hday">${toAr(hd.hDay)}</span>${ev&&ev.t==='moon'?`<span class="sign">⭐</span>`:''}`;
+    c.addEventListener('click',()=>openDayModal(date,hd,ev));
+    grid.appendChild(c);
+  }
+}
+
+function openDayModal(date,hd,ev){
+  const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('dmDate').textContent=`${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  document.getElementById('dmHijri').textContent=`${toAr(hd.hDay)} ${SCE.monthName(hd.hMonth)} ${toAr(hd.hYear)} هـ`;
+  const eDiv=document.getElementById('dmEvent');
+  if(ev){
+    eDiv.textContent=ev.n;
+    eDiv.className=`day-modal-event ${ev.t}`;
+  } else {
+    eDiv.textContent='لا توجد مناسبة مسجّلة';
+    eDiv.className='day-modal-event';
+  }
+  document.getElementById('dayModal').classList.add('open');
+}
+
+// ─── COMPASS ───────────────────────────────────────────────────────────
+const KAABA={lat:21.4225,lng:39.8262};
+let compassAngle=0, qiblaDir=0, dragging=false, lastAngle=0;
+
+function calcQibla(lat,lng){
+  const dLng=(KAABA.lng-lng)*Math.PI/180;
+  const φ1=lat*Math.PI/180, φ2=KAABA.lat*Math.PI/180;
+  const y=Math.sin(dLng)*Math.cos(φ2);
+  const x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(dLng);
+  return((Math.atan2(y,x)*180/Math.PI)+360)%360;
+}
+
+function updateCompassUI(){
+  const inner=document.getElementById('compassInner');
+  const qArrow=document.getElementById('qiblaArrow');
+  const needleN=document.getElementById('needleN');
+  const needleS=document.getElementById('needleS');
+  inner.style.transform=`rotate(${-compassAngle}deg)`;
+  qArrow.style.transform=`translateX(-50%) rotate(${qiblaDir-compassAngle}deg)`;
+  needleN.style.transform=`translateX(-50%) rotate(${-compassAngle}deg)`;
+  needleS.style.transform=`translateX(-50%) rotate(${180-compassAngle}deg)`;
+  const diff=Math.abs(((compassAngle-qiblaDir)+360)%360);
+  const onQ=diff<5||diff>355;
+  const ring=document.getElementById('compassRing');
+  const status=document.getElementById('compassStatus');
+  ring.classList.toggle('on-qibla',onQ);
+  if(onQ){
+    status.textContent='✅ أنت تواجه الكعبة';
+    status.className='compass-status found';
+    if(navigator.vibrate)navigator.vibrate([100,50,100]);
+  } else {
+    status.textContent=`اتجاه القبلة: ${Math.round(qiblaDir)}°`;
+    status.className='compass-status';
+  }
+}
+
+function setupCompassDrag(){
+  const ring=document.getElementById('compassRing');
+  function getAngle(e,el){
+    const r=el.getBoundingClientRect();
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    const p=e.touches?e.touches[0]:e;
+    return Math.atan2(p.clientY-cy,p.clientX-cx)*180/Math.PI;
+  }
+  ring.addEventListener('mousedown',e=>{dragging=true;lastAngle=getAngle(e,ring);});
+  ring.addEventListener('touchstart',e=>{dragging=true;lastAngle=getAngle(e,ring);},{passive:true});
+  window.addEventListener('mousemove',e=>{if(!dragging)return;const a=getAngle(e,ring);compassAngle+=(a-lastAngle);lastAngle=a;updateCompassUI();});
+  window.addEventListener('touchmove',e=>{if(!dragging)return;const a=getAngle(e,ring);compassAngle+=(a-lastAngle);lastAngle=a;updateCompassUI();},{passive:true});
+  window.addEventListener('mouseup',()=>dragging=false);
+  window.addEventListener('touchend',()=>dragging=false);
+}
+
+function setupDeviceOrientation(){
+  if(!window.DeviceOrientationEvent) return;
+
+  function handleOrientation(e){
+    // webkitCompassHeading = iOS الاتجاه الحقيقي (أدق)
+    // 360 - alpha = تحويل alpha لاتجاه بوصلة
+    var heading = e.webkitCompassHeading != null
+      ? e.webkitCompassHeading
+      : (e.alpha != null ? (360 - e.alpha) : null);
+    if (heading == null || dragging) return;
+    compassAngle = heading;
+    updateCompassUI();
+  }
+
+  // iOS 13+ يتطلب طلب إذن صريح
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    document.getElementById('compassBtn').addEventListener('click', async function(){
+      try {
+        var perm = await DeviceOrientationEvent.requestPermission();
+        if (perm === 'granted') {
+          window.addEventListener('deviceorientation', handleOrientation);
         }
-        eventEl.className = 'day-event ' + cls;
-        eventEl.innerHTML = '<span class="event-icon">' + icon + '</span> ' + ev.n + '<div class="event-sign">' + detail + '</div>';
-    } else {
-        eventEl.className = 'day-event none';
-        eventEl.innerHTML = '📅 لا توجد مناسبات خاصة في هذا اليوم';
-    }
-    
-    dayModal.classList.add('open');
+      } catch(e) {
+        // المستخدم رفض أو خطأ — الوضع اليدوي يبقى يعمل
+      }
+    }, { once: true });
+  } else {
+    // Android وiOS القديم
+    window.addEventListener('deviceorientation', handleOrientation);
+  }
 }
 
-closeDayBtn.onclick = function() { dayModal.classList.remove('open'); };
-dayModal.onclick = function(e) { if (e.target === dayModal) dayModal.classList.remove('open'); };
+// ─── TASBIH ENGINE (Advanced) ──────────────────────────────────────────
+(function(){
+  const toAr2=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+  const TSB_DHIKR=[
+    {id:'subhan',name:'سبحان الله',text:'سُبْحَانَ اللهِ',target:33,color:'#C9813A',phases:null},
+    {id:'alhamd',name:'الحمد لله',text:'الْحَمْدُ للهِ',target:33,color:'#3ABAAB',phases:null},
+    {id:'akbar',name:'الله أكبر',text:'اللهُ أَكْبَرُ',target:34,color:'#9B3A3A',phases:null},
+    {id:'zahraa',name:'تسبيح الزهراء ع',text:'اللهُ أَكْبَرُ',target:34,color:'#7B5EA7',
+      phases:[
+        {text:'اللهُ أَكْبَرُ',label:'التكبير (٣٤)',target:34},
+        {text:'الْحَمْدُ للهِ',label:'التحميد (٣٣)',target:33},
+        {text:'سُبْحَانَ اللهِ',label:'التسبيح (٣٣)',target:33}
+      ]},
+    {id:'tahleel',name:'لا إله إلا الله',text:'لَا إِلَهَ إِلَّا اللهُ',target:100,color:'#3A6FB5',phases:null}
+  ];
+  let tsbState={dhikrIndex:0,phaseIndex:0,count:0,round:1,totalAll:0,customDhikr:null};
+  function curD(){return tsbState.customDhikr||TSB_DHIKR[tsbState.dhikrIndex];}
+  function curPh(){const d=curD();if(d.phases)return d.phases[tsbState.phaseIndex];return{text:d.text,label:'',target:d.target};}
 
-// ===== إدارة حفظ البيانات =====
-function saveAllData() {
-  var data = { 
-    lat: lat, 
-    lng: lng, 
-    name: locName, 
-    sound: aArm, 
-    hOffset: hOffset 
+  // DOM refs
+  const elDT=document.getElementById('tsb-dhikr-text');
+  const elPL=document.getElementById('tsb-phase-label');
+  const elCN=document.getElementById('tsb-count-num');
+  const elCT=document.getElementById('tsb-target');
+  const elRD=document.getElementById('tsb-round');
+  const elTO=document.getElementById('tsb-total');
+  const elCurName=document.getElementById('tsb-current-name');
+  const elToast=document.getElementById('tsb-toast');
+  const elPanel=document.getElementById('tsb-panel-overlay');
+  const elDList=document.getElementById('tsb-dhikr-list');
+  const btnCount=document.getElementById('tsb-btn-count');
+  const btnUndo=document.getElementById('tsb-btn-undo');
+  const btnReset=document.getElementById('tsb-btn-reset');
+  const btnOpen=document.getElementById('tsb-dhikr-btn');
+  const swHint=document.getElementById('tsb-swipe-hint');
+
+  function tsbUpdateUI(){
+    const ph=curPh(),d=curD();
+    elDT.textContent=ph.text;
+    elPL.textContent=ph.label||'';
+    elCN.textContent=toAr2(tsbState.count);
+    elCT.textContent=toAr2(ph.target);
+    elRD.textContent=`الجولة ${toAr2(tsbState.round)}`;
+    elTO.textContent=toAr2(tsbState.totalAll);
+    elCurName.textContent=d.name||d.text;
+  }
+
+  let toastTmr=null;
+  function showTsbToast(msg){
+    elToast.textContent=msg;elToast.classList.add('show');
+    if(toastTmr)clearTimeout(toastTmr);
+    toastTmr=setTimeout(()=>elToast.classList.remove('show'),2200);
+  }
+
+  // Audio
+  let tsbAudioCtx=null;
+  function ensureTsbAudio(){
+    if(!tsbAudioCtx||tsbAudioCtx.state==='closed')tsbAudioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(tsbAudioCtx.state==='suspended')tsbAudioCtx.resume();
+  }
+  function playImpact(vel){
+    ensureTsbAudio();const ctx=tsbAudioCtx,t=ctx.currentTime;
+    const intens=Math.min(1,Math.max(0.15,vel/900));
+    const osc=ctx.createOscillator(),g=ctx.createGain();
+    osc.type='triangle';osc.frequency.setValueAtTime(130,t);osc.frequency.exponentialRampToValueAtTime(55,t+0.045);
+    g.gain.setValueAtTime(0.32*intens,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.055);
+    osc.connect(g);g.connect(ctx.destination);osc.start(t);osc.stop(t+0.06);
+    const bLen=Math.floor(ctx.sampleRate*0.018),buf=ctx.createBuffer(1,bLen,ctx.sampleRate);
+    const dat=buf.getChannelData(0);for(let i=0;i<bLen;i++)dat[i]=Math.random()*2-1;
+    const nSrc=ctx.createBufferSource(),bpf=ctx.createBiquadFilter(),nG=ctx.createGain();
+    bpf.type='bandpass';bpf.frequency.value=700;bpf.Q.value=1.1;
+    nSrc.buffer=buf;nG.gain.setValueAtTime(0.18*intens,t);nG.gain.exponentialRampToValueAtTime(0.0001,t+0.018);
+    nSrc.connect(bpf);bpf.connect(nG);nG.connect(ctx.destination);nSrc.start(t);
+    const ring=ctx.createOscillator(),rG=ctx.createGain();
+    ring.type='sine';ring.frequency.value=420;
+    rG.gain.setValueAtTime(0.06*intens,t+0.005);rG.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
+    ring.connect(rG);rG.connect(ctx.destination);ring.start(t+0.002);ring.stop(t+0.13);
+  }
+
+  // Canvas & Physics
+  const canvas=document.getElementById('tsb-canvas');
+  const ctx2=canvas.getContext('2d');
+  let TW=0,TH=0,TDPR=window.devicePixelRatio||1;
+  const BEAD_N=18,GRAV=980,DAMP_=0.68,SPR=700,REST=1.05,COL_D=0.38,FALL_R=0.24;
+  let tBeads=[],tBeadR=0,tStrX=0,tTopY=0,tStackY=0,tFalling=null;
+  let tDrag={active:false,startY:0,lastY:0,lastTime:0,swipeVy:0,triggered:false};
+  const SW_THRESH=38;
+
+  function tBeadColor(){return curD().color;}
+
+  function tInitBeads(){
+    tBeadR=Math.min(TW*0.075,28);const diam=tBeadR*2;
+    tStrX=TW/2;tTopY=TH*0.04;tStackY=tTopY+TH*FALL_R;tFalling=null;
+    tDrag.active=false;tDrag.triggered=false;tBeads=[];
+    for(let i=0;i<BEAD_N;i++)tBeads.push({x:tStrX,y:tStackY+i*diam*REST,vy:0,r:tBeadR});
+  }
+
+  function tPhysics(dt){
+    if(dt>0.05)dt=0.05;
+    const diam=tBeadR*2,rest=diam*REST;
+    if(tFalling){
+      tFalling.vy+=GRAV*dt;tFalling.y+=tFalling.vy*dt;
+      const top=tBeads[0];
+      if(tFalling.y+tFalling.r>=top.y-top.r){
+        const imp=tFalling.vy;playImpact(Math.abs(imp));
+        if(navigator.vibrate)navigator.vibrate(12);
+        const tr=imp*(1-COL_D);top.vy+=tr*0.55;tFalling=null;
+        tBeads.pop();tBeads.unshift({x:tStrX,y:top.y-diam,vy:tr*0.45,r:tBeadR});
+      }
+    }
+    for(let i=0;i<tBeads.length;i++){
+      const b=tBeads[i];b.x=tStrX;
+      let sf=i===0?-SPR*(b.y-tStackY):-SPR*(b.y-tBeads[i-1].y-rest);
+      b.vy+=sf*dt;b.vy+=GRAV*0.035*dt;b.vy*=Math.pow(DAMP_,dt*60);b.y+=b.vy*dt;
+    }
+    for(let it=0;it<4;it++){
+      for(let i=1;i<tBeads.length;i++){
+        const a=tBeads[i-1],b=tBeads[i],gap=b.y-a.y;
+        if(gap<diam){const p=(diam-gap)*0.5;a.y-=p;b.y+=p;}
+      }
+    }
+    const fl=TH-tBeadR-8;for(const b of tBeads){if(b.y>fl){b.y=fl;b.vy=0;}}
+  }
+
+  function hx(h){const n=parseInt(h.replace('#',''),16);return[(n>>16)&255,(n>>8)&255,n&255];}
+
+  function drawSphere(x,y,r,hex){
+    const[R,G,B]=hx(hex);
+    ctx2.save();
+    ctx2.shadowColor='rgba(0,0,0,0.6)';ctx2.shadowBlur=r*0.9;ctx2.shadowOffsetY=r*0.28;
+    const gx=x-r*0.28,gy=y-r*0.32;
+    const grad=ctx2.createRadialGradient(gx,gy,r*0.04,x,y,r*1.08);
+    grad.addColorStop(0,`rgb(${Math.min(R+105,255)},${Math.min(G+95,255)},${Math.min(B+75,255)})`);
+    grad.addColorStop(0.32,`rgb(${R},${G},${B})`);
+    grad.addColorStop(0.72,`rgb(${Math.max(R-55,0)},${Math.max(G-50,0)},${Math.max(B-45,0)})`);
+    grad.addColorStop(1,`rgb(${Math.max(R-85,0)},${Math.max(G-75,0)},${Math.max(B-65,0)})`);
+    ctx2.beginPath();ctx2.arc(x,y,r,0,Math.PI*2);ctx2.fillStyle=grad;ctx2.fill();ctx2.restore();
+    const sp=ctx2.createRadialGradient(x-r*0.29,y-r*0.36,0,x-r*0.26,y-r*0.30,r*0.40);
+    sp.addColorStop(0,'rgba(255,255,255,0.78)');sp.addColorStop(0.42,'rgba(255,255,255,0.16)');sp.addColorStop(1,'rgba(255,255,255,0)');
+    ctx2.beginPath();ctx2.arc(x,y,r,0,Math.PI*2);ctx2.fillStyle=sp;ctx2.fill();
+  }
+
+  function drawThread(x,y1,y2){
+    const tg=ctx2.createLinearGradient(x-2,0,x+2,0);
+    tg.addColorStop(0,'rgba(175,155,115,0.22)');tg.addColorStop(0.5,'rgba(210,188,140,0.62)');tg.addColorStop(1,'rgba(175,155,115,0.22)');
+    ctx2.beginPath();ctx2.moveTo(x,y1);ctx2.lineTo(x,y2);ctx2.strokeStyle=tg;ctx2.lineWidth=2.4;ctx2.stroke();
+  }
+
+  function drawShahid(x,y){
+    ctx2.save();
+    const mH=tBeadR*2.2,mW=tBeadR*0.72;
+    const mg=ctx2.createLinearGradient(x-mW,y,x+mW,y);
+    mg.addColorStop(0,'#7A5A1A');mg.addColorStop(0.3,'#C9A84C');mg.addColorStop(0.7,'#E8C97A');mg.addColorStop(1,'#7A5A1A');
+    ctx2.shadowColor='rgba(0,0,0,0.5)';ctx2.shadowBlur=8;
+    ctx2.beginPath();if(ctx2.roundRect)ctx2.roundRect(x-mW/2,y-mH/2,mW,mH,4);else ctx2.rect(x-mW/2,y-mH/2,mW,mH);
+    ctx2.fillStyle=mg;ctx2.fill();
+    ctx2.beginPath();ctx2.arc(x,y-mH/2,mW/2,Math.PI,0);ctx2.fillStyle='#E8C97A';ctx2.fill();
+    ctx2.beginPath();ctx2.rect(x-mW/2-2,y-2,mW+4,4);ctx2.fillStyle='#E8C97A';ctx2.fill();
+    ctx2.shadowBlur=0;
+    const tTop=y+mH/2,tLen=tBeadR*3.4,now=Date.now()*0.0018;
+    for(let i=0;i<10;i++){
+      const f=i/9,sx=x+(f-0.5)*mW*2.2,wave=Math.sin(now+f*2.6)*3.2;
+      ctx2.beginPath();ctx2.moveTo(sx,tTop);ctx2.quadraticCurveTo(sx+wave,tTop+tLen*0.48,sx+wave*1.5,tTop+tLen);
+      ctx2.strokeStyle=`rgba(201,168,76,${0.28+0.5*Math.sin(f*Math.PI)})`;ctx2.lineWidth=1.1;ctx2.stroke();
+    }
+    ctx2.restore();
+  }
+
+  function tRender(){
+    ctx2.clearRect(0,0,canvas.width,canvas.height);
+    const col=tBeadColor();
+    const fy=tBeads[0]?tBeads[0].y-tBeadR:tStackY;
+    drawThread(tStrX,tTopY,fy);
+    if(tBeads.length)drawThread(tStrX,fy,tBeads[tBeads.length-1].y+tBeadR);
+    drawShahid(tStrX,tBeads.length?tBeads[tBeads.length-1].y+tBeadR+tBeadR*1.5:TH-tBeadR*3);
+    for(let i=tBeads.length-1;i>=0;i--)drawSphere(tBeads[i].x,tBeads[i].y,tBeads[i].r,col);
+    if(tFalling)drawSphere(tFalling.x,tFalling.y,tFalling.r,col);
+  }
+
+  let tLast=null;
+  function tLoop(ts){
+    if(!tLast)tLast=ts;
+    const dt=Math.min((ts-tLast)/1000,0.05);tLast=ts;
+    tPhysics(dt);tRender();requestAnimationFrame(tLoop);
+  }
+
+  function tResize(){
+    const wrap=document.getElementById('tsb-canvas-wrap');
+    if(!wrap)return;
+    const rect=wrap.getBoundingClientRect();
+    TDPR=window.devicePixelRatio||1;TW=rect.width;TH=rect.height;
+    canvas.width=TW*TDPR;canvas.height=TH*TDPR;
+    canvas.style.width=TW+'px';canvas.style.height=TH+'px';
+    ctx2.setTransform(TDPR,0,0,TDPR,0,0);
+    tInitBeads();
+  }
+
+  function launchFalling(){tFalling={x:tStrX,y:tTopY+tBeadR*0.5,vy:0,r:tBeadR};}
+
+  function doTsbCount(){
+    const d=curD(),ph=curPh();
+    tsbState.count++;tsbState.totalAll++;tsbUpdateUI();
+    if(tsbState.count>=ph.target){
+      if(d.phases){
+        if(tsbState.phaseIndex>=d.phases.length-1){
+          showTsbToast('✨ اكتملت تسبيحة الزهراء ع ✨');
+          tsbState.phaseIndex=0;tsbState.round++;
+        } else {
+          tsbState.phaseIndex++;
+          showTsbToast(`انتقلت إلى: ${d.phases[tsbState.phaseIndex].label}`);
+        }
+      } else {
+        showTsbToast(`🌙 اكتملت الجولة ${toAr2(tsbState.round)}`);
+        tsbState.round++;
+      }
+      tsbState.count=0;tsbUpdateUI();
+    }
+  }
+
+  function spawnRipple(x,y,wrap){
+    const el=document.createElement('div');el.className='tsb-ripple';const sz=70;
+    el.style.cssText=`width:${sz}px;height:${sz}px;left:${x-sz/2}px;top:${y-sz/2}px;`;
+    wrap.appendChild(el);setTimeout(()=>el.remove(),600);
+  }
+
+  const cWrap=document.getElementById('tsb-canvas-wrap');
+  let hintHidden=false;
+  function hideHint(){if(!hintHidden){swHint.style.opacity='0';hintHidden=true;}}
+  function getEY(e){return e.touches?e.touches[0].clientY:e.clientY;}
+
+  function onTDown(e){e.preventDefault();ensureTsbAudio();const y=getEY(e);tDrag.active=true;tDrag.startY=y;tDrag.lastY=y;tDrag.lastTime=performance.now();tDrag.triggered=false;tDrag.swipeVy=0;hideHint();}
+  function onTMove(e){
+    if(!tDrag.active)return;e.preventDefault();
+    const now=performance.now(),y=getEY(e);
+    const dy=y-tDrag.lastY,dt2=(now-tDrag.lastTime)/1000||0.016;
+    tDrag.swipeVy=dy/dt2;tDrag.lastY=y;tDrag.lastTime=now;
+    const pull=dy*0.55;
+    for(const b of tBeads){b.y+=pull;b.vy+=pull*6;}
+    if(tFalling){tFalling.y+=pull;tFalling.vy+=pull*4;}
+    if(y-tDrag.startY>=SW_THRESH&&!tDrag.triggered){
+      tDrag.triggered=true;tDrag.startY=y;
+      launchFalling();spawnRipple(tStrX,TH*0.3,cWrap);doTsbCount();
+    }
+  }
+  function onTUp(e){
+    if(!tDrag.active)return;e.preventDefault();tDrag.active=false;
+    if(!tDrag.triggered&&tDrag.swipeVy>200){launchFalling();spawnRipple(tStrX,TH*0.3,cWrap);doTsbCount();}
+  }
+
+  cWrap.addEventListener('touchstart',onTDown,{passive:false});
+  cWrap.addEventListener('touchmove',onTMove,{passive:false});
+  cWrap.addEventListener('touchend',onTUp,{passive:false});
+  cWrap.addEventListener('mousedown',onTDown,{passive:false});
+  cWrap.addEventListener('mousemove',onTMove,{passive:false});
+  window.addEventListener('mouseup',onTUp,{passive:false});
+
+  btnCount.addEventListener('click',()=>{launchFalling();doTsbCount();});
+  btnUndo.addEventListener('click',()=>{if(tsbState.count>0){tsbState.count--;tsbState.totalAll=Math.max(0,tsbState.totalAll-1);tsbUpdateUI();}});
+  btnReset.addEventListener('click',()=>{tsbState.count=0;tsbState.round=1;tsbState.phaseIndex=0;tsbState.totalAll=0;tsbUpdateUI();tInitBeads();});
+
+  function buildTsbPanel(){
+    elDList.innerHTML='';
+    TSB_DHIKR.forEach((d,i)=>{
+      const div=document.createElement('div');
+      div.className='tsb-dhikr-opt'+(i===tsbState.dhikrIndex&&!tsbState.customDhikr?' tsb-active':'');
+      div.innerHTML=`<span class="tsb-dot" style="background:${d.color};color:${d.color}"></span><span class="tsb-opt-text">${d.text}</span><span class="tsb-opt-count">${toAr2(d.phases?d.phases.map(p=>p.target).join('+'):d.target)}</span>`;
+      div.addEventListener('click',()=>{tsbState.dhikrIndex=i;tsbState.customDhikr=null;tsbState.count=0;tsbState.phaseIndex=0;tsbState.round=1;tsbUpdateUI();tInitBeads();elPanel.classList.remove('open');});
+      elDList.appendChild(div);
+    });
+  }
+
+  btnOpen.addEventListener('click',()=>{buildTsbPanel();elPanel.classList.add('open');});
+  elPanel.addEventListener('click',e=>{if(e.target===elPanel)elPanel.classList.remove('open');});
+  document.getElementById('tsb-custom-apply').addEventListener('click',()=>{
+    const txt=document.getElementById('tsb-custom-input').value.trim();
+    const num=parseInt(document.getElementById('tsb-custom-count').value)||33;
+    if(!txt)return;
+    tsbState.customDhikr={name:txt,text:txt,target:Math.min(Math.max(num,1),999),color:'#C9A84C',phases:null};
+    tsbState.count=0;tsbState.phaseIndex=0;tsbState.round=1;
+    tsbUpdateUI();tInitBeads();elPanel.classList.remove('open');
+  });
+
+  // Init tasbih when screen shown
+  window._tsbInit=function(){
+    tResize();
+    if(!tLast)requestAnimationFrame(ts=>{tLast=ts;requestAnimationFrame(tLoop);});
+    tsbUpdateUI();
   };
-  try { 
-    localStorage.setItem('nur_full_data', JSON.stringify(data)); 
-  } catch(e) { console.warn('Save failed', e); }
-}
-
-function loadAllData() {
-  try {
-    var saved = localStorage.getItem('nur_full_data');
-    if (saved) {
-      var d = JSON.parse(saved);
-      if (d.lat && d.lng && d.name) { 
-        lat = d.lat; 
-        lng = d.lng; 
-        locName = d.name; 
-      }
-      if (typeof d.sound === 'boolean') { 
-        aArm = d.sound; 
-      }
-      if (typeof d.hOffset === 'number') { 
-        hOffset = d.hOffset; 
-      }
-      return true;
-    }
-  } catch(e) { console.warn('Load failed', e); }
-  return false;
-}
-
-// ===== إدارة الصوت =====
-var audioCtx = null;
-var audioInitialized = false;
-
-function initAudio() {
-  if (!audioCtx) {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AC();
-    } catch(e) { return; }
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  audioInitialized = true;
-}
-
-function playChime() {
-  if (!aArm) return;
-  // إعادة تهيئة الصوت عند الحاجة
-  if (!audioCtx || audioCtx.state === 'closed') {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AC();
-    } catch(e) { return; }
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  if (audioCtx.state !== 'running') return;
-  
-  var t = audioCtx.currentTime;
-  var freqs = [523.25, 659.25, 783.99, 1046.5];
-  freqs.forEach(function(f, i) {
-    var o = audioCtx.createOscillator();
-    var g = audioCtx.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(f, t + i * 0.12);
-    g.gain.setValueAtTime(0.2, t + i * 0.12);
-    g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.5);
-    o.connect(g);
-    g.connect(audioCtx.destination);
-    o.start(t + i * 0.12);
-    o.stop(t + i * 0.12 + 0.5);
+  window.addEventListener('resize',()=>{
+    if(document.getElementById('tasbihScreen').classList.contains('active'))tResize();
   });
-}
-
-// ===== المتغيرات العامة =====
-var lat = 26.5258, lng = 49.9981, locName = "القطيف";
-var aArm = false;
-var hOffset = 0;
-var calY = 0, calM = 0;
-var lastTrig = "", initTrig = false;
-
-// ===== الكود الرئيسي =====
-(function(){
-var ld=document.getElementById("ld"),clk=document.getElementById("clk"),dt=document.getElementById("dt"),cn=document.getElementById("cn"),ct=document.getElementById("ct"),arc=document.getElementById("arc"),ab=document.getElementById("abtn"),cmn=document.getElementById("cmn"),cgr=document.getElementById("cgr"),cdg=document.getElementById("cdg"),thj=document.getElementById("thj"),pmb=document.getElementById("pmb"),nmb=document.getElementById("nmb"),rl=document.getElementById("rl");
-var incOffset=document.getElementById("incOffset"), decOffset=document.getElementById("decOffset");
-var todayEventBanner=document.getElementById("todayEventBanner");
-
-var compassIcon = document.getElementById("compassIcon"), compassModal = document.getElementById("compassModal"), closeCompassBtn = document.getElementById("closeCompass");
-var compassContainer = document.getElementById("compassContainer"), qiblaRing = document.getElementById("qiblaRing"), kaabaIcon = document.getElementById("kaabaIcon");
-var targetAngleText = document.getElementById("targetAngleText"), currentAngleText = document.getElementById("currentAngleText"), statusHint = document.getElementById("statusHint");
-
-var tasbihIcon = document.getElementById("tasbihIcon"), tasbihModal = document.getElementById("tasbihModal"), closeTasbihBtn = document.getElementById("closeTasbih");
-
-var pc={fajr:document.getElementById("pf"),sunrise:document.getElementById("ps"),dhuhr:document.getElementById("pd"),asr:document.getElementById("pa"),maghrib:document.getElementById("pm"),isha:document.getElementById("pi")};
-var te={fajr:document.getElementById("tf"),sunrise:document.getElementById("ts"),dhuhr:document.getElementById("td"),asr:document.getElementById("ta"),maghrib:document.getElementById("tm"),isha:document.getElementById("ti")};
-
-// تحميل البيانات
-loadAllData();
-if (locName) ld.textContent = locName;
-// تحديث واجهة التنبيهات حسب الحالة
-if (aArm) {
-  ab.innerHTML = "<span>✅</span> <span>التنبيهات مفعلة</span>";
-  ab.style.background = "rgba(16,185,129,0.1)";
-  ab.style.borderColor = "rgba(16,185,129,0.3)";
-  ab.style.color = "#6ee7b7";
-}
-
-function qiblaDirection(lat1,lon1,lat2,lon2){
- var dLon = toRad(lon2 - lon1);
- var y = Math.sin(dLon);
- var x = Math.cos(toRad(lat1))*Math.tan(toRad(lat2)) - Math.sin(toRad(lat1))*Math.cos(dLon);
- return toDeg(Math.atan2(y,x));
-}
-var KAABA_LAT = 21.4225, KAABA_LON = 39.8262;
-var qiblaDeg = qiblaDirection(lat,lng,KAABA_LAT,KAABA_LON);
-if(qiblaDeg<0) qiblaDeg+=360;
-
-var currentHeading = 0; 
-var isDragging = false;
-var startAngle = 0;
-
-function updateCompassView(heading) {
-    currentHeading = (heading + 360) % 360;
-    qiblaRing.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
-    kaabaIcon.style.transform = 'rotate(' + (qiblaDeg) + 'deg)';
-    targetAngleText.textContent = Math.round(qiblaDeg) + "°";
-    currentAngleText.textContent = Math.round(currentHeading) + "°";
-    
-    var diff = Math.abs(currentHeading - qiblaDeg);
-    if (diff > 180) diff = 360 - diff;
-    
-    if (diff <= 5) {
-        qiblaRing.classList.add("aligned");
-        statusHint.textContent = "أنت تواجه الكعبة المشرفة تماماً! 🕋";
-        statusHint.style.color = "#10b981";
-        if (window.navigator.vibrate) window.navigator.vibrate(40);
-    } else {
-        qiblaRing.classList.remove("aligned");
-        statusHint.textContent = "قم بتدوير الدائرة بيدك لتوجيه الهاتف نحو القبلة";
-        statusHint.style.color = "#94a3b8";
-    }
-}
-
-function getAngle(clientX, clientY) {
-    var rect = compassContainer.getBoundingClientRect();
-    var centerX = rect.left + rect.width / 2;
-    var centerY = rect.top + rect.height / 2;
-    return toDeg(Math.atan2(clientY - centerY, clientX - centerX));
-}
-
-function startDrag(e) {
-    isDragging = true;
-    var pageX = e.touches ? e.touches[0].clientX : e.clientX;
-    var pageY = e.touches ? e.touches[0].clientY : e.clientY;
-    startAngle = getAngle(pageX, pageY) - currentHeading;
-    e.preventDefault();
-}
-function doDrag(e) {
-    if (!isDragging) return;
-    var pageX = e.touches ? e.touches[0].clientX : e.clientX;
-    var pageY = e.touches ? e.touches[0].clientY : e.clientY;
-    var angle = getAngle(pageX, pageY);
-    updateCompassView(angle - startAngle);
-}
-function stopDrag() { isDragging = false; }
-
-compassContainer.addEventListener('mousedown', startDrag);
-compassContainer.addEventListener('mousemove', doDrag);
-window.addEventListener('mouseup', stopDrag);
-compassContainer.addEventListener('touchstart', startDrag, {passive: false});
-compassContainer.addEventListener('touchmove', doDrag, {passive: false});
-window.addEventListener('touchend', stopDrag);
-
-function handleOrientation(e) {
-    var heading = e.webkitCompassHeading || (e.alpha !== null ? 360 - e.alpha : null);
-    if (heading !== null && !isDragging) {
-        updateCompassView(heading);
-    }
-}
-
-compassIcon.onclick = function() {
-    compassModal.style.display = 'flex';
-    qiblaDeg = qiblaDirection(lat, lng, KAABA_LAT, KAABA_LON);
-    if(qiblaDeg < 0) qiblaDeg += 360;
-    updateCompassView(0);
-    
-    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(function(s){ if(s==='granted') window.addEventListener('deviceorientation', handleOrientation); });
-    } else {
-        window.addEventListener('deviceorientation', handleOrientation);
-    }
-};
-
-closeCompassBtn.onclick = function() {
-    compassModal.style.display = 'none';
-    window.removeEventListener('deviceorientation', handleOrientation);
-};
-
-function uc(){var n=new Date();clk.textContent=n.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true});dt.textContent=n.toLocaleDateString("ar-SA",{weekday:"long",year:"numeric",month:"long",day:"numeric"});}
-function ft(d){return d&&!isNaN(d.getTime())?d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",hour12:true}):"--:--";}
-
-// زر تفعيل التنبيهات
-ab.onclick = function() {
-  // تهيئة الصوت عند النقر
-  if (!audioCtx) {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AC();
-    } catch(e) {
-      alert('عذراً، متصفحك لا يدعم الصوت.');
-      return;
-    }
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  
-  aArm = !aArm;
-  if (aArm) {
-    ab.innerHTML = "<span>✅</span> <span>التنبيهات مفعلة</span>";
-    ab.style.background = "rgba(16,185,129,0.1)";
-    ab.style.borderColor = "rgba(16,185,129,0.3)";
-    ab.style.color = "#6ee7b7";
-    // تشغيل صوت تجريبي
-    try {
-      var t = audioCtx.currentTime;
-      var o = audioCtx.createOscillator();
-      var g = audioCtx.createGain();
-      o.type = 'sine';
-      o.frequency.value = 880;
-      g.gain.setValueAtTime(0.3, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-      o.connect(g);
-      g.connect(audioCtx.destination);
-      o.start(t);
-      o.stop(t + 0.3);
-    } catch(e) {}
-  } else {
-    ab.innerHTML = "<span>🔔</span> <span>تفعيل التنبيهات الصوتية</span>";
-    ab.style.background = "rgba(245,158,11,.1)";
-    ab.style.borderColor = "rgba(245,158,11,.3)";
-    ab.style.color = "#fcd34d";
-  }
-  saveAllData();
-};
-
-function rp(){
-  var n = new Date();
-  var tz = -n.getTimezoneOffset()/60;
-  var p = SPE.calc(lat, lng, tz, n);
-  Object.keys(te).forEach(function(k){ te[k].textContent = ft(p[k]); });
-  var now = n.getTime();
-  var cur = "isha", prev = p.isha, nx = "fajr", nxL = "الفجر";
-  if (now >= p.fajr.getTime() && now < p.sunrise.getTime()) { cur = "fajr"; prev = p.fajr; nx = "sunrise"; nxL = "الشروق"; }
-  else if (now >= p.sunrise.getTime() && now < p.dhuhr.getTime()) { cur = "sunrise"; prev = p.sunrise; nx = "dhuhr"; nxL = "الظهر"; }
-  else if (now >= p.dhuhr.getTime() && now < p.asr.getTime()) { cur = "dhuhr"; prev = p.dhuhr; nx = "asr"; nxL = "العصر"; }
-  else if (now >= p.asr.getTime() && now < p.maghrib.getTime()) { cur = "asr"; prev = p.asr; nx = "maghrib"; nxL = "المغرب"; }
-  else if (now >= p.maghrib.getTime() && now < p.isha.getTime()) { cur = "maghrib"; prev = p.maghrib; nx = "isha"; nxL = "العشاء"; }
-  
-  Object.values(pc).forEach(function(c){ c.classList.remove("active"); });
-  if (pc[cur]) pc[cur].classList.add("active");
-  
-  // تشغيل التنبيه عند تغيير الصلاة (مع تجنب الشروق لأنه لا يعتبر صلاة)
-  if (cur !== "sunrise" && (!initTrig || cur !== lastTrig)) {
-    playChime();
-    initTrig = true;
-  }
-  lastTrig = cur;
-  cn.textContent = nxL;
-  
-  var tN = p[nx];
-  if (nx === "fajr" && now >= p.isha.getTime()) {
-    var tom = new Date();
-    tom.setDate(tom.getDate() + 1);
-    tN = SPE.calc(lat, lng, tz, tom).fajr;
-  }
-  var diff = tN.getTime() - now;
-  if (diff > 0) {
-    var sec = Math.floor(diff/1000);
-    ct.textContent = String(Math.floor(sec/3600)).padStart(2,"0") + ":" + String(Math.floor((sec%3600)/60)).padStart(2,"0") + ":" + String(sec%60).padStart(2,"0");
-    var tw = tN.getTime() - prev.getTime();
-    if (tw > 0) {
-      var pct = diff/tw;
-      arc.style.transition = "none";
-      arc.setAttribute("stroke-dashoffset", 1068 * (1 - pct));
-      void arc.offsetWidth;
-      arc.style.transition = "stroke-dashoffset 1s linear";
-    }
-  } else {
-    ct.textContent = "00:00:00";
-    arc.setAttribute("stroke-dashoffset", "1068");
-  }
-}
-
-function getAdjustedHijri(dateObj) {
-  var targetDate = new Date(dateObj.getTime());
-  targetDate.setDate(targetDate.getDate() + hOffset);
-  return SCE.hijri(targetDate);
-}
-
-function rc(){
-  cmn.textContent = MIL_MONTH_NAMES[calM] + " " + calY;
-  var firstMilDate = new Date(calY, calM, 1);
-  var dim = new Date(calY, calM + 1, 0).getDate();
-  var hFirst = getAdjustedHijri(firstMilDate);
-  var hLast = getAdjustedHijri(new Date(calY, calM, dim));
-  cgr.textContent = SCE.monthName(hFirst.hMonth) + " " + hFirst.hYear + " - " + SCE.monthName(hLast.hMonth) + " " + hLast.hYear + " هـ";
-  cdg.innerHTML = "";
-  var sd = firstMilDate.getDay();
-  for(var i=0; i<sd; i++){ cdg.appendChild(document.createElement("div")); }
-  var now = new Date();
-  var todayEventText = "";
-  var todayEventType = "";
-  for(var d=1; d<=dim; d++){
-    var cell = document.createElement("div");
-    var currentMilDate = new Date(calY, calM, d);
-    var hObj = getAdjustedHijri(currentMilDate);
-    cell.innerHTML = "<span>" + d + "</span><span style='font-size:0.7rem;color:#94a3b8;margin-top:1px;font-weight:normal;'>" + hObj.hDay + "</span>";
-    var cls = "cal-day ";
-    if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) { cls += "today"; } else { cls += "normal"; }
-    var ev = findShiaEvent(hObj.hMonth, hObj.hDay);
-    if(ev) {
-        if(ev.t === "sorrow") cls += " special-sorrow";
-        else if(ev.t === "joy") cls += " special-joy";
-        else if(ev.t === "lunar") {
-            cls += " special-lunar";
-            cell.innerHTML += "<span style='font-size:0.55rem;color:#60a5fa;margin-top:1px;'>" + ev.sign + "</span>";
-        }
-        if(d === now.getDate() && calM === now.getMonth() && calY === now.getFullYear()) {
-            if(ev.t === "lunar") {
-                todayEventText = "🌙 منزلة " + ev.n.replace("منزلة ", "") + " (برج " + ev.sign + ")";
-                todayEventType = "lunar";
-            } else {
-                todayEventText = "مناسبة اليوم: " + ev.n + " (" + hObj.hDay + " " + SCE.monthName(hObj.hMonth) + ")";
-                todayEventType = ev.t;
-            }
-        }
-    }
-    cell.className = cls;
-    
-    cell.onclick = (function(day, month, year, hijriObj, eventObj) {
-        return function() {
-            showDayModal(day, month, year, hijriObj, eventObj);
-        };
-    })(d, calM, calY, hObj, ev);
-    
-    cdg.appendChild(cell);
-  }
-  if(todayEventText) { todayEventBanner.textContent = todayEventText; todayEventBanner.className = "event-banner " + todayEventType; } else { todayEventBanner.style.display = "none"; }
-}
-
-function ua(){
-  uc();
-  rp();
-  var now = new Date();
-  var tH = getAdjustedHijri(now);
-  var offsetText = hOffset !== 0 ? " (" + (hOffset > 0 ? "+" : "") + hOffset + " يوم)" : "";
-  thj.textContent = tH.hDay + " " + SCE.monthName(tH.hMonth) + " " + tH.hYear + " هـ" + offsetText;
-  if(calY === 0){ calY = now.getFullYear(); calM = now.getMonth(); }
-  rc();
-}
-
-function sv(la,lo,lb){
-  lat=la; lng=lo; locName=lb; ld.textContent=lb;
-  qiblaDeg = qiblaDirection(lat,lng,KAABA_LAT,KAABA_LON); if(qiblaDeg<0) qiblaDeg+=360;
-  saveAllData();
-}
-
-function triggerGPS() {
-  if (navigator.geolocation) {
-    if (window.location.protocol === 'file:') {
-      alert("💡 تنبيه الخصوصية والمنظومة:\nالـ GPS محظور عند تشغيل الملف مباشرة. يرجى رفعه عبر الـ https أو تشغيل السيرفر المحلي عبر بايثون.");
-      sv(26.5258, 49.9981, "القطيف (افتراضي)");
-      ua();
-      return;
-    }
-    ld.textContent = "📡 جاري الاتصال بالـ GPS...";
-    var optionsHigh = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
-    var optionsLow = { enableHighAccuracy: false, timeout: 6000, maximumAge: 60000 };
-
-    navigator.geolocation.getCurrentPosition(function(pos) {
-        sv(pos.coords.latitude, pos.coords.longitude, "📍 موقع دقيق (GPS)");
-        ua();
-    }, function(err) {
-        navigator.geolocation.getCurrentPosition(function(pos2) {
-            sv(pos2.coords.latitude, pos2.coords.longitude, "📍 موقع تقريبي (الشبكة)");
-            ua();
-        }, function(err2) {
-            alert("⚠️ لم نتمكن من الوصول للموقع الفعلي. تأكد من إعطاء صلاحية الموقع لمتصفح Safari من إعدادات الآيفون العامة.");
-            sv(26.5258, 49.9981, "القطيف (افتراضي)");
-            ua();
-        }, optionsLow);
-    }, optionsHigh);
-  } else {
-    alert("ميزة الـ GPS غير مدعومة في متصفحك الحالي.");
-  }
-}
-
-incOffset.onclick=function(){ hOffset++; saveAllData(); ua(); };
-decOffset.onclick=function(){ hOffset--; saveAllData(); ua(); };
-pmb.onclick=function(){calM--;if(calM<0){calM=11;calY--;}rc();};
-nmb.onclick=function(){calM++;if(calM>11){calM=0;calY++;}rc();};
-rl.onclick = function() { triggerGPS(); };
-
-setInterval(function(){uc();rp();},1000);
-document.addEventListener("visibilitychange",function(){if(!document.hidden)rp();});
-
-ua();
+  document.addEventListener('touchstart',()=>ensureTsbAudio(),{once:true,passive:true});
 })();
 
-/* ================================================================
-   المسبحة الرقمية (الكود الكامل)
-================================================================ */
-(function(){
-function toArabicNums(n) { return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]); }
-
-const DHIKR_LIST = [
-  { id:'subhan',  name:'سبحان الله',      text:'سُبْحَانَ اللهِ',      target:33,  color:'#C9813A', phases:null },
-  { id:'alhamd',  name:'الحمد لله',       text:'الْحَمْدُ للهِ',       target:33,  color:'#3ABAAB', phases:null },
-  { id:'akbar',   name:'الله أكبر',       text:'اللهُ أَكْبَرُ',       target:34,  color:'#9B3A3A', phases:null },
-  {
-    id:'zahraa', name:'تسبيح الزهراء ع', text:'اللهُ أَكْبَرُ', target:34, color:'#7B5EA7',
-    phases:[
-      { text:'اللهُ أَكْبَرُ',   label:'التكبير (٣٤)', target:34 },
-      { text:'الْحَمْدُ للهِ',   label:'التحميد (٣٣)', target:33 },
-      { text:'سُبْحَانَ اللهِ', label:'التسبيح (٣٣)', target:33 }
-    ]
-  },
-  { id:'tahleel', name:'لا إله إلا الله', text:'لَا إِلَهَ إِلَّا اللهُ', target:100, color:'#3A6FB5', phases:null }
-];
-
-let state = { dhikrIndex:0, phaseIndex:0, count:0, round:1, totalAll:0, customDhikr:null };
-function currentDhikr()  { return state.customDhikr || DHIKR_LIST[state.dhikrIndex]; }
-function currentPhase()  {
-  const d = currentDhikr();
-  if (d.phases) return d.phases[state.phaseIndex];
-  return { text: d.text, label:'', target: d.target };
+// ─── SCREENS ───────────────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-const elDhikrText   = document.getElementById('dhikr-text');
-const elPhaseLabel  = document.getElementById('dhikr-phase-label');
-const elCountNum    = document.getElementById('counter-num');
-const elCountOf     = document.getElementById('counter-target');
-const elRoundNum    = document.getElementById('round-num');
-const elTotal       = document.getElementById('total-display');
-const elCurrentName = document.getElementById('current-dhikr-name');
-const elToast       = document.getElementById('tasbih-toast');
-const elDhikrPanel  = document.getElementById('dhikr-panel-overlay');
-const elDhikrList   = document.getElementById('dhikr-list');
-const btnCount      = document.getElementById('btn-count');
-const btnUndo       = document.getElementById('btn-undo');
-const btnReset      = document.getElementById('btn-reset');
-const btnDhikrOpen  = document.getElementById('dhikr-selector-btn');
-const swipeHint     = document.getElementById('swipe-hint');
-const tasbihIcon    = document.getElementById('tasbihIcon');
-const tasbihModal   = document.getElementById('tasbihModal');
-const closeTasbih   = document.getElementById('closeTasbih');
-
-function updateUI() {
-  const ph = currentPhase();
-  const d  = currentDhikr();
-  elDhikrText.textContent  = ph.text;
-  elPhaseLabel.textContent = ph.label || '';
-  elCountNum.textContent   = toArabicNums(state.count);
-  elCountOf.textContent    = toArabicNums(ph.target);
-  elRoundNum.textContent   = `الجولة ${toArabicNums(state.round)}`;
-  elTotal.textContent      = toArabicNums(state.totalAll);
-  elCurrentName.textContent= d.name || d.text;
+// ─── ALERT TOGGLE ──────────────────────────────────────────────────────
+function updateAlertUI(){
+  const tog=document.getElementById('alertToggle');
+  tog.classList.toggle('on',alertsOn);
+  document.getElementById('alertBtn').textContent=alertsOn?'🔔':'🔕';
 }
 
-let toastTimer = null;
-function showToast(msg) {
-  elToast.textContent = msg;
-  elToast.classList.add('show');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => elToast.classList.remove('show'), 2200);
+// ─── H OFFSET ──────────────────────────────────────────────────────────
+function updateHOffUI(){
+  document.getElementById('hoffDisplay').textContent=(hOffset>=0?'+':'')+toAr(hOffset);
 }
 
-let audioCtxTasbih = null;
-function ensureAudioTasbih() {
-  if (!audioCtxTasbih) audioCtxTasbih = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtxTasbih.state === 'suspended') audioCtxTasbih.resume();
-}
-
-function playImpact(velocity) {
-  ensureAudioTasbih();
-  const ctx = audioCtxTasbih;
-  const t   = ctx.currentTime;
-  const intensity = Math.min(1, Math.max(0.15, velocity / 900));
-
-  const osc  = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(130, t);
-  osc.frequency.exponentialRampToValueAtTime(55, t + 0.045);
-  gain.gain.setValueAtTime(0.32 * intensity, t);
-  gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.055);
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.start(t); osc.stop(t + 0.06);
-
-  const bufLen = Math.floor(ctx.sampleRate * 0.018);
-  const buf    = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-  const data   = buf.getChannelData(0);
-  for (let i = 0; i < bufLen; i++) data[i] = Math.random() * 2 - 1;
-  const nSrc  = ctx.createBufferSource();
-  const bpf   = ctx.createBiquadFilter();
-  const nGain = ctx.createGain();
-  bpf.type = 'bandpass'; bpf.frequency.value = 700; bpf.Q.value = 1.1;
-  nSrc.buffer = buf;
-  nGain.gain.setValueAtTime(0.18 * intensity, t);
-  nGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.018);
-  nSrc.connect(bpf); bpf.connect(nGain); nGain.connect(ctx.destination);
-  nSrc.start(t);
-
-  const ring  = ctx.createOscillator();
-  const rGain = ctx.createGain();
-  ring.type = 'sine'; ring.frequency.value = 420;
-  rGain.gain.setValueAtTime(0.06 * intensity, t + 0.005);
-  rGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
-  ring.connect(rGain); rGain.connect(ctx.destination);
-  ring.start(t + 0.002); ring.stop(t + 0.13);
-}
-
-const canvas = document.getElementById('tasbih-canvas');
-const ctx2d  = canvas.getContext('2d');
-let W = 0, H = 0, DPR = window.devicePixelRatio || 1;
-
-const BEAD_COUNT      = 18;
-const GRAVITY         = 980;
-const DAMPING         = 0.68;
-const SPRING_K        = 700;
-const REST_RATIO      = 1.05;
-const COLLISION_DAMP  = 0.38;
-const FALL_GAP_RATIO  = 0.24;
-
-let beads = [], beadRadius = 0, stringX = 0, topAnchorY = 0, stackTopY = 0, fallingBead = null;
-let drag = { active: false, startY: 0, lastY: 0, lastTime: 0, swipeVy: 0, triggered: false };
-const SWIPE_THRESHOLD = 38;
-
-function beadColor() { return (state.customDhikr || DHIKR_LIST[state.dhikrIndex]).color; }
-
-function initBeads() {
-  beadRadius = Math.min(W * 0.075, 28);
-  const diam = beadRadius * 2;
-  stringX    = W / 2;
-  topAnchorY = H * 0.04;
-  stackTopY  = topAnchorY + H * FALL_GAP_RATIO;
-  fallingBead = null; drag.active = false; drag.triggered = false;
-  beads = [];
-  for (let i = 0; i < BEAD_COUNT; i++) {
-    beads.push({ x: stringX, y: stackTopY + i * diam * REST_RATIO, vy: 0, r: beadRadius });
+// ─── INIT ──────────────────────────────────────────────────────────────
+function init(){
+  // Restore settings
+  updateAlertUI();
+  updateHOffUI();
+  // استعادة المدينة المحفوظة أو تشغيل GPS
+  if(userLat && userLng){
+    calcPrayers(userLat, userLng);
+    document.getElementById('locText').textContent = cityName;
+    document.getElementById('locStatus').textContent = `📍 ${cityName}`;
+  } else {
+    // تشغيل GPS تلقائياً — محاولتان (High ثم Low accuracy)
+    document.getElementById('locStatus').textContent = '📡 جاري الاتصال بالـ GPS...';
+    triggerGPS();
+    // بعد 8 ثوانٍ إذا لا يزال بدون موقع — افتح المنتقي
+    setTimeout(function(){
+      if(!userLat) openCityPicker();
+    }, 8000);
   }
-}
 
-function physicsStep(dt) {
-  if (dt > 0.05) dt = 0.05;
-  const diam = beadRadius * 2;
-  const restDist = diam * REST_RATIO;
+  buildCalendar();
+  setupCompassDrag();
+  setupDeviceOrientation();
 
-  if (fallingBead) {
-    fallingBead.vy += GRAVITY * dt;
-    fallingBead.y  += fallingBead.vy * dt;
-    const top = beads[0];
-    if (fallingBead.y + fallingBead.r >= top.y - top.r) {
-      const impactVy = fallingBead.vy;
-      playImpact(Math.abs(impactVy));
-      if (navigator.vibrate) navigator.vibrate(12);
-      const transferred = impactVy * (1 - COLLISION_DAMP);
-      top.vy += transferred * 0.55;
-      fallingBead = null;
-      beads.pop();
-      beads.unshift({ x: stringX, y: top.y - diam, vy: transferred * 0.45, r: beadRadius });
+  // City picker
+  document.getElementById('cityPickerBtn').addEventListener('click', openCityPicker);
+  document.getElementById('cityClose').addEventListener('click',()=>document.getElementById('cityModal').classList.remove('open'));
+  document.getElementById('cityModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+  document.getElementById('citySearch').addEventListener('input',e=>buildCityList(e.target.value.trim()));
+  document.getElementById('manualApply').addEventListener('click',()=>{
+    const lat=parseFloat(document.getElementById('manualLat').value);
+    const lng=parseFloat(document.getElementById('manualLng').value);
+    if(isNaN(lat)||isNaN(lng)||lat<-90||lat>90||lng<-180||lng>180){
+      alert('الرجاء إدخال إحداثيات صحيحة');return;
     }
-  }
-
-  for (let i = 0; i < beads.length; i++) {
-    const b = beads[i]; b.x = stringX;
-    let springForce = 0;
-    if (i === 0) springForce = -SPRING_K * (b.y - stackTopY);
-    else springForce = -SPRING_K * (b.y - beads[i - 1].y - restDist);
-    b.vy += springForce * dt;
-    b.vy += GRAVITY * 0.035 * dt;
-    b.vy *= Math.pow(DAMPING, dt * 60);
-    b.y  += b.vy * dt;
-  }
-
-  for (let iter = 0; iter < 4; iter++) {
-    for (let i = 1; i < beads.length; i++) {
-      const a = beads[i-1], b = beads[i];
-      const gap = b.y - a.y;
-      if (gap < diam) { const push = (diam - gap) * 0.5; a.y -= push; b.y += push; }
-    }
-  }
-  const floor = H - beadRadius - 8;
-  for (const b of beads) { if (b.y > floor) { b.y = floor; b.vy = 0; } }
-}
-
-function hexToRGB(hex) {
-  const n = parseInt(hex.replace('#',''), 16);
-  return [(n>>16)&255, (n>>8)&255, n&255];
-}
-
-function drawSphere(x, y, r, hex) {
-  const [R,G,B] = hexToRGB(hex);
-  ctx2d.save();
-  ctx2d.shadowColor = 'rgba(0,0,0,0.6)'; ctx2d.shadowBlur = r * 0.9; ctx2d.shadowOffsetY = r * 0.28;
-  const gx = x - r * 0.28, gy = y - r * 0.32;
-  const grad = ctx2d.createRadialGradient(gx, gy, r*0.04, x, y, r*1.08);
-  grad.addColorStop(0,    `rgb(${Math.min(R+105,255)},${Math.min(G+95,255)},${Math.min(B+75,255)})`);
-  grad.addColorStop(0.32, `rgb(${R},${G},${B})`);
-  grad.addColorStop(0.72, `rgb(${Math.max(R-55,0)},${Math.max(G-50,0)},${Math.max(B-45,0)})`);
-  grad.addColorStop(1,    `rgb(${Math.max(R-85,0)},${Math.max(G-75,0)},${Math.max(B-65,0)})`);
-  ctx2d.beginPath(); ctx2d.arc(x, y, r, 0, Math.PI*2); ctx2d.fillStyle = grad; ctx2d.fill(); ctx2d.restore();
-
-  const spec = ctx2d.createRadialGradient(x-r*0.29, y-r*0.36, 0, x-r*0.26, y-r*0.30, r*0.40);
-  spec.addColorStop(0, 'rgba(255,255,255,0.78)'); spec.addColorStop(0.42, 'rgba(255,255,255,0.16)'); spec.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx2d.beginPath(); ctx2d.arc(x, y, r, 0, Math.PI*2); ctx2d.fillStyle = spec; ctx2d.fill();
-}
-
-function drawThread(x, y1, y2) {
-  const tg = ctx2d.createLinearGradient(x-2, 0, x+2, 0);
-  tg.addColorStop(0, 'rgba(175,155,115,0.22)'); tg.addColorStop(0.5, 'rgba(210,188,140,0.62)'); tg.addColorStop(1, 'rgba(175,155,115,0.22)');
-  ctx2d.beginPath(); ctx2d.moveTo(x, y1); ctx2d.lineTo(x, y2); ctx2d.strokeStyle = tg; ctx2d.lineWidth = 2.4; ctx2d.stroke();
-}
-
-function drawShahid(x, y) {
-  ctx2d.save(); const mH = beadRadius * 2.2, mW = beadRadius * 0.72;
-  const mg = ctx2d.createLinearGradient(x-mW, y, x+mW, y);
-  mg.addColorStop(0, '#7A5A1A'); mg.addColorStop(0.3,'#C9A84C'); mg.addColorStop(0.7,'#E8C97A'); mg.addColorStop(1,'#7A5A1A');
-  ctx2d.shadowColor = 'rgba(0,0,0,0.5)'; ctx2d.shadowBlur = 8;
-  ctx2d.beginPath(); ctx2d.roundRect(x-mW/2, y-mH/2, mW, mH, 4); ctx2d.fillStyle = mg; ctx2d.fill();
-  ctx2d.beginPath(); ctx2d.arc(x, y-mH/2, mW/2, Math.PI, 0); ctx2d.fillStyle = '#E8C97A'; ctx2d.fill();
-  ctx2d.beginPath(); ctx2d.rect(x-mW/2-2, y-2, mW+4, 4); ctx2d.fillStyle = '#E8C97A'; ctx2d.fill(); ctx2d.shadowBlur = 0;
-
-  const tTop = y + mH/2, tLen = beadRadius * 3.4, now = Date.now() * 0.0018;
-  for (let i = 0; i < 10; i++) {
-    const f = i / 9; const sx = x + (f - 0.5) * mW * 2.2; const wave = Math.sin(now + f * 2.6) * 3.2;
-    ctx2d.beginPath(); ctx2d.moveTo(sx, tTop); ctx2d.quadraticCurveTo(sx+wave, tTop+tLen*0.48, sx+wave*1.5, tTop+tLen);
-    ctx2d.strokeStyle = `rgba(201,168,76,${0.28 + 0.5 * Math.sin(f * Math.PI)})`; ctx2d.lineWidth = 1.1; ctx2d.stroke();
-  }
-  ctx2d.restore();
-}
-
-function render() {
-  ctx2d.clearRect(0, 0, canvas.width, canvas.height);
-  const col = beadColor();
-  const firstY = beads[0] ? beads[0].y - beadRadius : stackTopY;
-  drawThread(stringX, topAnchorY, firstY);
-  if (beads.length) drawThread(stringX, firstY, beads[beads.length-1].y + beadRadius);
-  drawShahid(stringX, beads.length ? beads[beads.length-1].y + beadRadius + beadRadius*1.5 : H - beadRadius*3);
-  for (let i = beads.length-1; i >= 0; i--) drawSphere(beads[i].x, beads[i].y, beads[i].r, col);
-  if (fallingBead) drawSphere(fallingBead.x, fallingBead.y, fallingBead.r, col);
-}
-
-let lastTime = null;
-function loop(ts) {
-  if (!lastTime) lastTime = ts;
-  const dt = Math.min((ts - lastTime) / 1000, 0.05); lastTime = ts;
-  physicsStep(dt); render(); requestAnimationFrame(loop);
-}
-
-function resize() {
-  const wrap = document.getElementById('canvas-wrap'); const rect = wrap.getBoundingClientRect();
-  DPR = window.devicePixelRatio || 1; W = rect.width; H = rect.height;
-  canvas.width = W * DPR; canvas.height = H * DPR; canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  ctx2d.setTransform(DPR, 0, 0, DPR, 0, 0); initBeads();
-}
-
-function launchFallingBead() { fallingBead = { x: stringX, y: topAnchorY + beadRadius * 0.5, vy: 0, r: beadRadius }; }
-
-function doCount() {
-  const d = currentDhikr(); const ph = currentPhase();
-  state.count++; state.totalAll++; updateUI();
-  if (state.count >= ph.target) {
-    if (d.phases) {
-      if (state.phaseIndex >= d.phases.length - 1) { showToast('✨ اكتملت تسبيحة الزهراء ع ✨'); state.phaseIndex = 0; state.round++; }
-      else { state.phaseIndex++; showToast(`انتقلت إلى: ${d.phases[state.phaseIndex].label}`); }
-    } else { showToast(`🌙 اكتملت الجولة ${toArabicNums(state.round)}`); state.round++; }
-    state.count = 0; updateUI();
-  }
-}
-
-function doUndo() { if (state.count > 0) { state.count--; state.totalAll = Math.max(0, state.totalAll-1); updateUI(); } }
-function doReset() { state.count = 0; state.round = 1; state.phaseIndex = 0; state.totalAll = 0; updateUI(); initBeads(); }
-
-function spawnRipple(x, y, wrap) {
-  const el = document.createElement('div'); el.className = 'ripple';
-  const sz = 70; el.style.cssText = `width:${sz}px;height:${sz}px;left:${x-sz/2}px;top:${y-sz/2}px;`;
-  wrap.appendChild(el); setTimeout(() => el.remove(), 600);
-}
-
-const canvasWrap = document.getElementById('canvas-wrap');
-let hintHidden = false;
-function hideHint() { if (!hintHidden) { swipeHint.style.opacity = '0'; hintHidden = true; } }
-function getY(e) { return e.touches ? e.touches[0].clientY : e.clientY; }
-
-function onPointerDown(e) {
-  e.preventDefault(); ensureAudioTasbih(); const y = getY(e);
-  drag.active = true; drag.startY = y; drag.lastY = y; drag.lastTime = performance.now(); drag.triggered = false; drag.swipeVy = 0;
-  hideHint();
-}
-function onPointerMove(e) {
-  if (!drag.active) return; e.preventDefault();
-  const now = performance.now(); const y = getY(e); const dy = y - drag.lastY; const dt = (now - drag.lastTime) / 1000 || 0.016;
-  drag.swipeVy = dy / dt; drag.lastY = y; drag.lastTime = now;
-  const pull = dy * 0.55;
-  for (const b of beads) { b.y += pull; b.vy += pull * 6; }
-  if (fallingBead) { fallingBead.y += pull; fallingBead.vy += pull * 4; }
-  const totalDy = y - drag.startY;
-  if (totalDy >= SWIPE_THRESHOLD && !drag.triggered) {
-    drag.triggered = true; drag.startY = y; launchFallingBead();
-    spawnRipple(stringX, H * 0.3, canvasWrap); doCount();
-  }
-}
-function onPointerUp(e) {
-  if (!drag.active) return; e.preventDefault(); drag.active = false;
-  if (!drag.triggered && drag.swipeVy > 200) { launchFallingBead(); spawnRipple(stringX, H * 0.3, canvasWrap); doCount(); }
-}
-
-canvasWrap.addEventListener('touchstart', onPointerDown, { passive: false });
-canvasWrap.addEventListener('touchmove',  onPointerMove, { passive: false });
-canvasWrap.addEventListener('touchend',   onPointerUp,   { passive: false });
-canvasWrap.addEventListener('mousedown', onPointerDown, { passive: false });
-canvasWrap.addEventListener('mousemove', onPointerMove, { passive: false });
-window.addEventListener('mouseup',   onPointerUp,   { passive: false });
-
-btnCount.addEventListener('click', e => { launchFallingBead(); doCount(); });
-btnUndo.addEventListener('click',  doUndo);
-btnReset.addEventListener('click', doReset);
-
-function buildDhikrPanel() {
-  elDhikrList.innerHTML = '';
-  DHIKR_LIST.forEach((d, i) => {
-    const div = document.createElement('div'); div.className = 'dhikr-option' + (i === state.dhikrIndex && !state.customDhikr ? ' active' : '');
-    div.innerHTML = `<span class="dhikr-color-dot" style="background:${d.color};color:${d.color}"></span><span class="dhikr-option-text">${d.text}</span><span class="dhikr-option-count">${toArabicNums(d.phases ? d.phases.map(p=>p.target).join('+') : d.target)}</span>`;
-    div.addEventListener('click', () => { state.dhikrIndex = i; state.customDhikr = null; state.count = 0; state.phaseIndex = 0; state.round = 1; updateUI(); initBeads(); closeDhikrPanel(); });
-    elDhikrList.appendChild(div);
+    setCity(`${lat.toFixed(3)}°، ${lng.toFixed(3)}°`,lat,lng);
+    document.getElementById('cityModal').classList.remove('open');
   });
+  document.getElementById('refreshLoc').addEventListener('click', tryGPS);
+
+  // Clock tick
+  updateClock();
+  setInterval(updateClock,1000);
+
+  // Calendar nav
+  document.getElementById('calPrev').addEventListener('click',()=>{calMonth--;if(calMonth<0){calMonth=11;calYear--;}buildCalendar();});
+  document.getElementById('calNext').addEventListener('click',()=>{calMonth++;if(calMonth>11){calMonth=0;calYear++;}buildCalendar();});
+
+  // Nav buttons
+  document.getElementById('tasbihNavBtn').addEventListener('click',()=>{showScreen('tasbihScreen');if(window._tsbInit)window._tsbInit();});
+  document.getElementById('backBtn').addEventListener('click',()=>showScreen('mainScreen'));
+
+  // Compass
+  document.getElementById('compassBtn').addEventListener('click',()=>{
+    if(userLat&&userLng){qiblaDir=calcQibla(userLat,userLng);}
+    updateCompassUI();
+    document.getElementById('compassModal').classList.add('open');
+  });
+  document.getElementById('compassClose').addEventListener('click',()=>document.getElementById('compassModal').classList.remove('open'));
+
+  // Day modal close
+  document.getElementById('dayClose').addEventListener('click',()=>document.getElementById('dayModal').classList.remove('open'));
+  document.getElementById('dayModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+  document.getElementById('compassModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+
+  // Alert toggle
+  document.getElementById('alertToggle').addEventListener('click',()=>{
+    alertsOn=!alertsOn;ST.set('alerts',alertsOn);updateAlertUI();
+    if(alertsOn)playTestSound();
+  });
+  document.getElementById('alertBtn').addEventListener('click',()=>{
+    alertsOn=!alertsOn;ST.set('alerts',alertsOn);updateAlertUI();
+    if(alertsOn)playTestSound();
+  });
+
+  // H offset
+  document.getElementById('hoffMinus').addEventListener('click',()=>{hOffset--;ST.set('hOffset',hOffset);updateHOffUI();buildCalendar();updateClock();});
+  document.getElementById('hoffPlus').addEventListener('click',()=>{hOffset++;ST.set('hOffset',hOffset);updateHOffUI();buildCalendar();updateClock();});
+
+  // iOS AudioContext unlock
+  document.addEventListener('touchstart',()=>{getAudioCtx();},{once:true,passive:true});
 }
-function openDhikrPanel()  { buildDhikrPanel(); elDhikrPanel.classList.add('open'); }
-function closeDhikrPanel() { elDhikrPanel.classList.remove('open'); }
-btnDhikrOpen.addEventListener('click', openDhikrPanel);
-elDhikrPanel.addEventListener('click', e => { if (e.target === elDhikrPanel) closeDhikrPanel(); });
 
-document.getElementById('btn-custom-apply').addEventListener('click', () => {
-  const txt = document.getElementById('custom-dhikr-input').value.trim();
-  const num = parseInt(document.getElementById('custom-dhikr-count').value) || 33;
-  if (!txt) return;
-  state.customDhikr = { name: txt, text: txt, target: Math.min(Math.max(num,1),999), color:'#C9A84C', phases:null };
-  state.count = 0; state.phaseIndex = 0; state.round = 1; updateUI(); initBeads(); closeDhikrPanel();
-});
-
-tasbihIcon.onclick = function() { tasbihModal.style.display = 'flex'; resize(); };
-closeTasbih.onclick = function() { tasbihModal.style.display = 'none'; };
-window.addEventListener('resize', () => { if(tasbihModal.style.display === 'flex') resize(); });
-
-updateUI();
-requestAnimationFrame(ts => { lastTime = ts; requestAnimationFrame(loop); });
-})();
+window.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
