@@ -56,14 +56,47 @@ body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
 .arc-name{font-size:18px;font-weight:600;color:var(--gold)}
 .arc-remain{font-size:24px;font-weight:300;color:var(--text);font-variant-numeric:tabular-nums}
 
-/* PRAYERS GRID */
-.prayers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px}
-@media(min-width:600px){.prayers-grid{grid-template-columns:repeat(6,1fr)}}
-.prayer-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:14px;padding:10px 6px;text-align:center;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .15s;cursor:default}
-.prayer-card.active-prayer{border-color:var(--gold);background:rgba(245,158,11,0.12);box-shadow:0 0 20px rgba(245,158,11,0.2)}
+/* CLOCK PANEL */
+.clock-panel{padding:20px 16px 16px;text-align:center}
+.digital-clock{font-size:38px;font-weight:300;letter-spacing:2px;font-variant-numeric:tabular-nums;color:var(--text);line-height:1}
+.clock-date{color:var(--muted);font-size:12px;margin-top:4px}
+.clock-hijri{color:var(--gold);font-size:13px;margin-top:3px;font-weight:600}
+
+/* NEXT PRAYER ARC — centered, big */
+.arc-wrap{display:flex;flex-direction:column;align-items:center;margin-top:14px;gap:4px;position:relative}
+.arc-svg{width:160px;height:160px}
+.arc-info{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.arc-label{color:var(--muted);font-size:10px;letter-spacing:.05em;text-transform:uppercase}
+.arc-name{font-size:20px;font-weight:700;color:var(--gold);margin:2px 0}
+.arc-remain{font-size:26px;font-weight:300;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:1px}
+
+/* PRAYERS GRID — 3 cols, right-to-left order fixed */
+.prayers-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:12px 16px;
+  direction:rtl;
+}
+.prayer-card{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  padding:12px 8px;
+  text-align:center;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  transition:transform .15s,background .2s;
+}
+.prayer-card.active-prayer{
+  border-color:var(--gold);
+  background:rgba(245,158,11,0.15);
+  box-shadow:0 0 20px rgba(245,158,11,0.2);
+  transform:scale(1.02);
+}
 .prayer-card:active{transform:scale(0.95)}
-.prayer-name{font-size:13px;color:var(--muted);margin-bottom:4px}
-.prayer-time{font-size:16px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.prayer-name{font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
+.prayer-time{font-size:18px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;direction:ltr}
 
 /* MAIN GRID */
 .main-grid{display:grid;grid-template-columns:1fr;gap:12px;padding:0 16px 16px;flex:1}
@@ -76,18 +109,36 @@ body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .cal-nav-btn{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .cal-nav-btn:active{opacity:.6}
-.cal-title{font-size:15px;font-weight:600}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-dow{font-size:10px;color:var(--muted);text-align:center;padding:4px 0}
-.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;transition:transform .1s;font-size:13px;position:relative}
-.cal-day:active{transform:scale(0.9)}
+.cal-title{font-size:15px;font-weight:700;color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-dow{font-size:10px;color:var(--muted);text-align:center;padding:4px 0;font-weight:600}
+.cal-day{
+  aspect-ratio:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:10px;cursor:pointer;
+  transition:transform .1s;
+  font-size:13px;position:relative;
+  border:1px solid transparent;
+}
+.cal-day:active{transform:scale(0.88)}
 .cal-day.empty{pointer-events:none}
-.cal-day.today{background:rgba(245,158,11,0.2);border:1px solid var(--gold)}
-.cal-day .gday{font-weight:600;line-height:1}
-.cal-day .hday{font-size:9px;color:var(--muted);line-height:1;margin-top:1px}
-.cal-day .sign{font-size:8px;line-height:1;margin-top:1px}
-.cal-day.ev-sorrow .gday{color:var(--red)}
-.cal-day.ev-joy .gday{color:var(--green)}
+.cal-day.today{
+  background:rgba(245,158,11,0.2);
+  border-color:var(--gold);
+  box-shadow:0 0 12px rgba(245,158,11,0.15);
+}
+.cal-day.today .gday{color:var(--gold);font-weight:800}
+.cal-day .gday{font-weight:600;line-height:1;font-size:14px}
+.cal-day .hday{font-size:9px;color:var(--muted);line-height:1;margin-top:2px}
+/* مناسبات الفرح — خلفية خضراء شفافة */
+.cal-day.ev-joy{background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3)}
+.cal-day.ev-joy .gday{color:#6ee7b7}
+/* مناسبات الحزن — خلفية حمراء شفافة */
+.cal-day.ev-sorrow{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3)}
+.cal-day.ev-sorrow .gday{color:#fca5a5}
+/* منازل القمر — خلفية زرقاء */
+.cal-day.ev-moon{background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.2)}
 .cal-day.ev-moon .gday{color:var(--blue)}
 
 /* TASBIH SCREEN - powered by new engine */
@@ -189,6 +240,7 @@ body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
 /* SPINNER */
 .spinner{width:20px;height:20px;border:2px solid var(--glass-border);border-top-color:var(--gold);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 </style>
 </head>
 <body>
@@ -210,12 +262,15 @@ body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
       <div class="digital-clock" id="clockDisplay">--:--:--</div>
       <div class="clock-date" id="clockDate">--</div>
       <div class="clock-hijri" id="clockHijri">-- -- --</div>
+      <div id="clockMoon" style="font-size:11px;color:var(--blue);margin-top:3px;letter-spacing:.3px">🌙 --</div>
+
+      <!-- قوس الصلاة القادمة — كبير في المنتصف -->
       <div class="arc-wrap">
-        <svg class="arc-svg" id="arcSVG" width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
-          <circle id="arcPath" cx="40" cy="40" r="34" fill="none" stroke="var(--gold)" stroke-width="6"
-            stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"
-            transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s linear"/>
+        <svg class="arc-svg" id="arcSVG" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+          <circle id="arcPath" cx="80" cy="80" r="68" fill="none" stroke="var(--gold)" stroke-width="10"
+            stroke-linecap="round" stroke-dasharray="427.3" stroke-dashoffset="427.3"
+            transform="rotate(-90 80 80)" style="transition:stroke-dashoffset 1s linear"/>
         </svg>
         <div class="arc-info">
           <div class="arc-label">الصلاة القادمة</div>
@@ -228,14 +283,32 @@ body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
     <!-- LOC STATUS -->
     <div class="loc-status" id="locStatus">جاري تحديد الموقع...</div>
 
-    <!-- PRAYERS -->
-    <div class="prayers-grid" id="prayersGrid" style="margin-bottom:12px">
-      <div class="prayer-card"><div class="prayer-name">الفجر</div><div class="prayer-time">--:--</div></div>
-      <div class="prayer-card"><div class="prayer-name">الشروق</div><div class="prayer-time">--:--</div></div>
-      <div class="prayer-card"><div class="prayer-name">الظهر</div><div class="prayer-time">--:--</div></div>
-      <div class="prayer-card"><div class="prayer-name">العصر</div><div class="prayer-time">--:--</div></div>
-      <div class="prayer-card"><div class="prayer-name">المغرب</div><div class="prayer-time">--:--</div></div>
-      <div class="prayer-card"><div class="prayer-name">العشاء</div><div class="prayer-time">--:--</div></div>
+    <!-- PRAYERS — ترتيب RTL: الصف الأول فجر|شروق|ظهر ، الثاني عصر|مغرب|عشاء -->
+    <div class="prayers-grid" id="prayersGrid">
+      <div class="prayer-card" id="pc-fajr">
+        <div class="prayer-name">🌙 الفجر</div>
+        <div class="prayer-time" id="pt-fajr">--:--</div>
+      </div>
+      <div class="prayer-card" id="pc-sunrise">
+        <div class="prayer-name">☀️ الشروق</div>
+        <div class="prayer-time" id="pt-sunrise">--:--</div>
+      </div>
+      <div class="prayer-card" id="pc-dhuhr">
+        <div class="prayer-name">🌞 الظهر</div>
+        <div class="prayer-time" id="pt-dhuhr">--:--</div>
+      </div>
+      <div class="prayer-card" id="pc-asr">
+        <div class="prayer-name">⛅ العصر</div>
+        <div class="prayer-time" id="pt-asr">--:--</div>
+      </div>
+      <div class="prayer-card" id="pc-maghrib">
+        <div class="prayer-name">🌅 المغرب</div>
+        <div class="prayer-time" id="pt-maghrib">--:--</div>
+      </div>
+      <div class="prayer-card" id="pc-isha">
+        <div class="prayer-name">🌙 العشاء</div>
+        <div class="prayer-time" id="pt-isha">--:--</div>
+      </div>
     </div>
 
     <!-- MAIN PANELS -->
@@ -383,17 +456,85 @@ body{padding:var(--safe-top) var(--safe-r) var(--safe-bot) var(--safe-l)}
 // ─── ARABIC NUMERALS ───────────────────────────────────────────────────
 const toAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 
-// ─── STORAGE ────────────────────────────────────────────────────────────
-const ST = {
-  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch{return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
-};
+// ─── STORAGE ENGINE (IndexedDB — يعمل مع file:// على iOS) ─────────────
+const ST = (() => {
+  const DB_NAME = 'noor_db', DB_VER = 1, STORE = 'kv';
+  let db = null;
+  let memCache = {};  // ذاكرة مؤقتة للقراءة الفورية
 
-let userLat = ST.get('lat', null);
-let userLng = ST.get('lng', null);
-let cityName = ST.get('city', 'غير محدد');
-let alertsOn = ST.get('alerts', false);
-let hOffset  = ST.get('hOffset', 0);
+  // فتح قاعدة البيانات
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      if (db) { resolve(db); return; }
+      if (!window.indexedDB) { reject('no-idb'); return; }
+      const req = indexedDB.open(DB_NAME, DB_VER);
+      req.onupgradeneeded = e => {
+        e.target.result.createObjectStore(STORE, { keyPath: 'k' });
+      };
+      req.onsuccess = e => { db = e.target.result; resolve(db); };
+      req.onerror   = () => reject(req.error);
+    });
+  }
+
+  // تحميل كل البيانات في الذاكرة عند البدء
+  async function loadAll() {
+    try {
+      const d = await openDB();
+      return new Promise((resolve) => {
+        const tx = d.transaction(STORE, 'readonly');
+        const req = tx.objectStore(STORE).getAll();
+        req.onsuccess = () => {
+          req.result.forEach(row => { memCache[row.k] = row.v; });
+          resolve(memCache);
+        };
+        req.onerror = () => resolve({});
+      });
+    } catch(e) {
+      // fallback: حاول localStorage
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          try { memCache[k] = JSON.parse(localStorage.getItem(k)); } catch{}
+        }
+      } catch{}
+      return memCache;
+    }
+  }
+
+  // حفظ قيمة (async في الخلفية)
+  function set(k, v) {
+    memCache[k] = v;  // تحديث فوري في الذاكرة
+    // IDB
+    openDB().then(d => {
+      try {
+        d.transaction(STORE, 'readwrite').objectStore(STORE).put({ k, v });
+      } catch(e) {}
+    }).catch(() => {
+      // fallback localStorage
+      try { localStorage.setItem(k, JSON.stringify(v)); } catch{}
+    });
+  }
+
+  // قراءة من الذاكرة (فورية — بعد loadAll)
+  function get(k, def) {
+    return k in memCache ? memCache[k] : def;
+  }
+
+  return { get, set, loadAll };
+})();
+
+// ─── تهيئة البيانات المحفوظة (async) ──────────────────────────────────
+let userLat = null, userLng = null, cityName = 'غير محدد';
+let alertsOn = false, hOffset = 0;
+
+async function loadSavedData() {
+  await ST.loadAll();
+  userLat   = ST.get('lat',     null);
+  userLng   = ST.get('lng',     null);
+  cityName  = ST.get('city',    'غير محدد');
+  alertsOn  = ST.get('alerts',  false);
+  hOffset   = ST.get('hOffset', 0);
+}
 
 // ─── SCE: SHIA CALENDAR ENGINE ─────────────────────────────────────────
 const SCE = (() => {
@@ -452,38 +593,173 @@ const SCE = (() => {
   return{hijri,monthName,daysInMonth,h2g,monthNames:MONTHS};
 })();
 
-// ─── SHIA EVENTS ───────────────────────────────────────────────────────
+// ─── SHIA EVENTS (قائمة كاملة) ─────────────────────────────────────────
 const shiaEvents=[
-  {m:1,d:1,t:'sorrow',n:'رأس السنة الهجرية - استشهاد الإمام علي بن أبي طالب (ذكرى)'},
-  {m:1,d:10,t:'sorrow',n:'يوم عاشوراء - استشهاد الإمام الحسين ﷺ'},
-  {m:2,d:20,t:'sorrow',n:'الأربعين - زيارة الأربعين'},
-  {m:2,d:28,t:'sorrow',n:'وفاة النبي محمد ﷺ واستشهاد الإمام الحسن ﷺ'},
-  {m:2,d:30,t:'sorrow',n:'استشهاد الإمام علي بن أبي طالب ﷺ'},
-  {m:3,d:8,t:'sorrow',n:'استشهاد السيدة فاطمة الزهراء ﷺ'},
-  {m:3,d:17,t:'joy',n:'مولد النبي محمد ﷺ ومولد الإمام الصادق ﷺ'},
-  {m:6,d:3,t:'sorrow',n:'استشهاد الإمام علي الهادي ﷺ'},
-  {m:7,d:13,t:'joy',n:'مولد الإمام علي بن أبي طالب ﷺ'},
-  {m:8,d:15,t:'joy',n:'مولد الإمام المهدي ﷺ'},
-  {m:9,d:1,t:'joy',n:'دخول شهر رمضان المبارك'},
-  {m:9,d:19,t:'sorrow',n:'ضرب الإمام علي ﷺ'},
-  {m:9,d:21,t:'sorrow',n:'استشهاد الإمام علي ﷺ'},
+  {m:1,d:1,t:'sorrow',n:'رأس السنة الهجرية'},
+  {m:1,d:2,t:'sorrow',n:'ورود القافلة الحسينية كربلاء'},
+  {m:1,d:7,t:'sorrow',n:'منع الماء عن معسكر الإمام الحسين ع'},
+  {m:1,d:9,t:'sorrow',n:'تاسوعاء الإمام الحسين ع'},
+  {m:1,d:10,t:'sorrow',n:'عاشوراء — شهادة الإمام الحسين ع'},
+  {m:1,d:12,t:'sorrow',n:'دفن الأجساد الطاهرة بكربلاء'},
+  {m:1,d:25,t:'sorrow',n:'شهادة الإمام علي بن الحسين السجاد ع'},
+  {m:2,d:7,t:'sorrow',n:'شهادة الإمام الحسن المجتبى ع'},
+  {m:2,d:20,t:'sorrow',n:'أربعينية الإمام الحسين ع'},
+  {m:2,d:28,t:'sorrow',n:'شهادة الرسول الأعظم ﷺ وشهادة الإمام الحسن ع'},
+  {m:2,d:29,t:'sorrow',n:'شهادة الإمام علي بن موسى الرضا ع'},
+  {m:3,d:8,t:'sorrow',n:'شهادة الإمام الحسن العسكري ع'},
+  {m:3,d:9,t:'joy',n:'فرحة الزهراء — تتويج الإمام المهدي عج'},
+  {m:3,d:17,t:'joy',n:'المولد النبوي الشريف — مولد الإمام الصادق ع'},
+  {m:4,d:8,t:'joy',n:'مولد الإمام الحسن العسكري ع'},
+  {m:4,d:10,t:'sorrow',n:'وفاة السيدة فاطمة المعصومة ع'},
+  {m:5,d:5,t:'joy',n:'مولد السيدة زينب ع بطلة كربلاء'},
+  {m:5,d:13,t:'sorrow',n:'شهادة السيدة فاطمة الزهراء ع — الرواية الثانية'},
+  {m:6,d:3,t:'sorrow',n:'شهادة السيدة فاطمة الزهراء ع — الرواية الثالثة'},
+  {m:6,d:20,t:'joy',n:'مولد السيدة فاطمة الزهراء ع'},
+  {m:7,d:1,t:'joy',n:'مولد الإمام محمد الباقر ع'},
+  {m:7,d:3,t:'sorrow',n:'شهادة الإمام علي الهادي ع'},
+  {m:7,d:10,t:'joy',n:'مولد الإمام محمد الجواد ع'},
+  {m:7,d:13,t:'joy',n:'مولد أمير المؤمنين الإمام علي بن أبي طالب ع'},
+  {m:7,d:25,t:'sorrow',n:'شهادة الإمام موسى بن جعفر الكاظم ع'},
+  {m:7,d:27,t:'joy',n:'المبعث النبوي الشريف'},
+  {m:8,d:3,t:'joy',n:'مولد الإمام الحسين ع'},
+  {m:8,d:4,t:'joy',n:'مولد أبو الفضل العباس ع'},
+  {m:8,d:5,t:'joy',n:'مولد الإمام علي بن الحسين السجاد ع'},
+  {m:8,d:11,t:'joy',n:'مولد علي الأكبر ع'},
+  {m:8,d:15,t:'joy',n:'مولد الإمام المهدي المنتظر عج'},
+  {m:9,d:1,t:'joy',n:'بدء شهر رمضان المبارك'},
+  {m:9,d:15,t:'joy',n:'مولد الإمام الحسن المجتبى ع'},
+  {m:9,d:19,t:'sorrow',n:'ضربة أمير المؤمنين ع في محرابه'},
+  {m:9,d:21,t:'sorrow',n:'شهادة أمير المؤمنين الإمام علي ع'},
+  {m:9,d:23,t:'joy',n:'ليلة القدر المباركة'},
   {m:10,d:1,t:'joy',n:'عيد الفطر المبارك'},
-  {m:10,d:25,t:'sorrow',n:'استشهاد الإمام الجواد ﷺ'},
+  {m:10,d:25,t:'sorrow',n:'شهادة الإمام جعفر بن محمد الصادق ع'},
+  {m:11,d:1,t:'joy',n:'مولد السيدة فاطمة المعصومة ع'},
+  {m:11,d:11,t:'joy',n:'مولد الإمام علي بن موسى الرضا ع'},
+  {m:11,d:29,t:'sorrow',n:'شهادة الإمام محمد بن علي الجواد ع'},
+  {m:12,d:1,t:'joy',n:'زواج أمير المؤمنين من السيدة الزهراء ع'},
+  {m:12,d:7,t:'sorrow',n:'شهادة الإمام محمد بن علي الباقر ع'},
   {m:12,d:10,t:'joy',n:'عيد الأضحى المبارك'},
-  {m:12,d:18,t:'joy',n:'عيد الغدير الأغر'},
+  {m:12,d:15,t:'joy',n:'مولد الإمام علي بن محمد الهادي ع'},
+  {m:12,d:18,t:'joy',n:'عيد الغدير الأغر — تنصيب الولاية'},
+  {m:12,d:24,t:'joy',n:'يوم المباهلة وتصدق أمير المؤمنين بالخاتم'},
 ];
 
-const LUNAR_MANSIONS=['الشرطين','البطين','الثريا','الدبران','الهقعة','الهنعة','الذراع','النثرة','الطرف','الجبهة','الزبرة','الصرفة','العوّاء','السماك','الغفر','الزبانى','الإكليل','القلب','الشولة','النعائم','البلدة','سعد الذابح','سعد بلع','سعد السعود','سعد الأخبية','فرغ الدلو المقدم','فرغ الدلو المؤخر','بطن الحوت'];
-const ZODIAC_SIGNS=['الحمل','الحمل','الثور','الثور','الجوزاء','الجوزاء','السرطان','السرطان','الأسد','الأسد','السنبلة','السنبلة','الميزان','الميزان','العقرب','العقرب','القوس','القوس','الجدي','الجدي','الدلو','الدلو','الحوت','الحوت','الحمل','الحمل','الحوت','الحوت'];
+// ─── محرك منازل القمر الفلكي ────────────────────────────────────────────
+// المنازل الـ 28 بأسمائها الكاملة وبداية كل منزلة (درجة البروج)
+const LUNAR_MANSIONS_DATA = [
+  {n:'الشرطان',   start:0},    // 1
+  {n:'البطين',    start:12.857},{n:'الثريا',    start:25.714},  // 2,3
+  {n:'الدبران',   start:38.571},{n:'الهقعة',    start:51.429},  // 4,5
+  {n:'الهنعة',    start:64.286},{n:'الذراع',    start:77.143},  // 6,7
+  {n:'النثرة',    start:90},   {n:'الطرف',     start:102.857}, // 8,9
+  {n:'الجبهة',    start:115.714},{n:'الزبرة',   start:128.571}, // 10,11
+  {n:'الصرفة',    start:141.429},{n:'العواء',   start:154.286}, // 12,13
+  {n:'السماك',    start:167.143},{n:'الغفر',    start:180},     // 14,15
+  {n:'الزبانا',   start:192.857},{n:'الإكليل',  start:205.714}, // 16,17
+  {n:'القلب',     start:218.571},{n:'الشولة',   start:231.429}, // 18,19
+  {n:'النعائم',   start:244.286},{n:'البلدة',   start:257.143}, // 20,21
+  {n:'سعد الذابح',start:270},   {n:'سعد بلع',  start:282.857}, // 22,23
+  {n:'سعد السعود',start:295.714},{n:'سعد الأخبية',start:308.571},// 24,25
+  {n:'الفرغ المقدم',start:321.429},{n:'الفرغ المؤخر',start:334.286},// 26,27
+  {n:'الحوت',     start:347.143}, // 28
+];
 
-function findShiaEvent(hm,hd){
-  const ev=shiaEvents.find(e=>e.m===hm&&e.d===hd);
-  if(ev)return ev;
-  if(hd>=1&&hd<=28){
-    const idx=hd-1;
-    return{t:'moon',n:`منزلة: ${LUNAR_MANSIONS[idx]} • برج: ${ZODIAC_SIGNS[idx]}`};
-  }
-  return null;
+const ZODIAC_NAMES = [
+  'الحمل','الثور','الجوزاء','السرطان','الأسد','السنبلة',
+  'الميزان','العقرب','القوس','الجدي','الدلو','الحوت'
+];
+
+// ─── حساب موقع القمر الفلكي ─────────────────────────────────────────────
+function calcMoonLongitude(date){
+  // Julian Day Number
+  var y=date.getFullYear(), mo=date.getMonth()+1, d=date.getDate();
+  if(mo<=2){y--;mo+=12;}
+  var A=Math.floor(y/100), B=2-A+Math.floor(A/4);
+  var JD=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(mo+1))+d+B-1524.5;
+  var T=(JD-2451545.0)/36525.0;
+
+  // متوسط خط الطول للقمر
+  var L0=218.3164477+481267.88123421*T-0.0015786*T*T+T*T*T/538841-T*T*T*T/65194000;
+  // متوسط الإطالة
+  var D=297.8501921+445267.1114034*T-0.0018819*T*T+T*T*T/545868-T*T*T*T/113065000;
+  // متوسط الشذوذ للشمس
+  var M=357.5291092+35999.0502909*T-0.0001536*T*T+T*T*T/24490000;
+  // متوسط الشذوذ للقمر
+  var Mp=134.9633964+477198.8675055*T+0.0087414*T*T+T*T*T/69699-T*T*T*T/14712000;
+  // حجة خط عرض القمر
+  var F=93.2720950+483202.0175233*T-0.0036539*T*T-T*T*T/3526000+T*T*T*T/863310000;
+
+  // تحويل للراديان
+  var r=Math.PI/180;
+  D*=r; M*=r; Mp*=r; F*=r;
+
+  // التصحيحات الرئيسية لخط الطول
+  var dL=
+    6288774*Math.sin(Mp)+
+    1274027*Math.sin(2*D-Mp)+
+    658314*Math.sin(2*D)+
+    213618*Math.sin(2*Mp)+
+    -185116*Math.sin(M)+
+    -114332*Math.sin(2*F)+
+    58793*Math.sin(2*D-2*Mp)+
+    57066*Math.sin(2*D-M-Mp)+
+    53322*Math.sin(2*D+Mp)+
+    45758*Math.sin(2*D-M)+
+    -40923*Math.sin(M-Mp)+
+    -34720*Math.sin(D)+
+    -30383*Math.sin(M+Mp)+
+    15327*Math.sin(2*D-2*F)+
+    -12528*Math.sin(Mp+2*F)+
+    10980*Math.sin(Mp-2*F)+
+    10675*Math.sin(4*D-Mp)+
+    10034*Math.sin(3*Mp)+
+    8548*Math.sin(4*D-2*Mp)+
+    -7888*Math.sin(2*D+M-Mp)+
+    -6766*Math.sin(2*D+M)+
+    -5163*Math.sin(D-Mp);
+
+  var lon = L0 + dL/1000000.0;
+  // تطبيق تصحيح الطول
+  lon = ((lon % 360) + 360) % 360;
+  return lon; // درجات البروج (0-360)
+}
+
+// ─── تحديد المنزلة من خط الطول ──────────────────────────────────────────
+function getMoonMansion(date){
+  var lon = calcMoonLongitude(date);
+  // كل منزلة = 360/28 = 12.857 درجة
+  var mansionWidth = 360/28;
+  var idx = Math.floor(lon / mansionWidth);
+  if(idx >= 28) idx = 27;
+  var mansion = LUNAR_MANSIONS_DATA[idx];
+  // البرج = كل 30 درجة
+  var zodiacIdx = Math.floor(lon / 30) % 12;
+  var zodiac = ZODIAC_NAMES[zodiacIdx];
+  // الدرجة داخل المنزلة
+  var degInMansion = (lon % mansionWidth).toFixed(1);
+  return {
+    name: mansion.n,
+    zodiac: zodiac,
+    longitude: lon.toFixed(2),
+    degree: degInMansion,
+    index: idx+1,
+  };
+}
+
+function findShiaEvent(hm, hd, date){
+  // أولاً: البحث في المناسبات
+  var ev = shiaEvents.find(function(e){ return e.m===hm && e.d===hd; });
+  if(ev) return ev;
+  // ثانياً: المنزلة الفلكية الحقيقية
+  var d = date || new Date();
+  var moon = getMoonMansion(d);
+  return {
+    t:'moon',
+    n:'منزلة ' + moon.name + ' ('+moon.index+'/28)',
+    sign: moon.zodiac,
+    longitude: moon.longitude,
+    degree: moon.degree
+  };
 }
 
 // ─── SPE: SOLAR PRAYER ENGINE (معادلة الملف المرجعي) ──────────────────
@@ -606,85 +882,97 @@ const PRAYER_KEYS=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
 // ─── CLOCK & PRAYER UPDATE ─────────────────────────────────────────────
 function updateClock(){
   const now=new Date();
-  const hh=String(now.getHours()).padStart(2,'0');
-  const mm=String(now.getMinutes()).padStart(2,'0');
-  const ss=String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clockDisplay').textContent=`${hh}:${mm}:${ss}`;
-  const h=SCE.hijri(now);
-  document.getElementById('clockHijri').textContent=`${toAr(h.hDay)} ${SCE.monthName(h.hMonth)} ${toAr(h.hYear)} هـ`;
+  let hh=now.getHours(), mm=now.getMinutes(), ss=now.getSeconds();
+  const ampm=hh>=12?'م':'ص';
+  hh=hh%12||12;
+  document.getElementById('clockDisplay').textContent=
+    `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')} ${ampm}`;
+  const hj=SCE.hijri(now);
+  document.getElementById('clockHijri').textContent=`${toAr(hj.hDay)} ${SCE.monthName(hj.hMonth)} ${toAr(hj.hYear)} هـ`;
+  // منزلة القمر الحالية
+  const moon=getMoonMansion(now);
+  const moonEl=document.getElementById('clockMoon');
+  if(moonEl) moonEl.textContent=`🌙 ${moon.name} • ${moon.zodiac} • ${moon.longitude}°`;
   const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
   document.getElementById('clockDate').textContent=`${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  // إعادة حساب أوقات الصلاة عند تغيير اليوم
+  const today=`${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+  if(userLat && userLng && today!==lastPrayerDate){
+    lastPrayerDate=today;
+    const tz=-now.getTimezoneOffset()/60;
+    prayerTimes=SPE.calc(userLat,userLng,tz,now);
+  }
   updatePrayerHighlight(now);
   updateArc(now);
-}
-
-function timeToMins(t){
-  if(!t||t==='--:--')return -1;
-  const[h,m]=t.split(':').map(Number);
-  return h*60+m;
 }
 
 function updatePrayerHighlight(now){
   if(!prayerTimes)return;
   const nowMs=now.getTime();
-  const keys=PRAYER_KEYS;
-  const names=PRAYER_NAMES;
-
-  // حساب الصلاة الحالية
-  let active=-1;
-  // ترتيب الصلوات الزمني
   const order=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+
+  // الصلاة الحالية
+  let activeKey=null;
   for(let i=order.length-1;i>=0;i--){
     const pt=prayerTimes[order[i]];
-    if(pt && pt.getTime()<=nowMs){active=i;break;}
+    if(pt && pt.getTime()<=nowMs){activeKey=order[i];break;}
   }
 
-  const cards=document.querySelectorAll('.prayer-card');
-  cards.forEach((c,i)=>{
-    c.classList.toggle('active-prayer',i===active);
-    const pt=c.querySelector('.prayer-time');
-    if(pt) pt.textContent=fmtPrayerTime(prayerTimes[keys[i]]);
-    const pn=c.querySelector('.prayer-name');
-    if(pn) pn.textContent=names[i];
+  // تحديث كل بطاقة بـ ID خاص
+  order.forEach(key=>{
+    const card=document.getElementById('pc-'+key);
+    const timeEl=document.getElementById('pt-'+key);
+    if(!card||!timeEl)return;
+    const t=prayerTimes[key];
+    // عرض الوقت بصيغة 12h
+    if(t&&!isNaN(t.getTime())){
+      let h=t.getHours(), m=t.getMinutes();
+      const ap=h>=12?'م':'ص';
+      h=h%12||12;
+      timeEl.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} ${ap}`;
+    } else {
+      timeEl.textContent='--:--';
+    }
+    card.classList.toggle('active-prayer', key===activeKey);
   });
 
   // تنبيه تغيير الصلاة (تجاهل الشروق)
-  const name=active>=0?names[active]:'';
-  if(name && name!==currentPrayer && name!=='الشروق' && alertsOn){playAdhanAlert(name);}
-  currentPrayer=name;
+  if(activeKey && activeKey!==currentPrayer && activeKey!=='sunrise' && alertsOn){
+    playAdhanAlert(activeKey);
+  }
+  currentPrayer=activeKey||'';
 }
 
 function updateArc(now){
   if(!prayerTimes)return;
   const nowMs=now.getTime();
   const order=['fajr','sunrise','dhuhr','asr','maghrib','isha'];
+  const names=['الفجر','الشروق','الظهر','العصر','المغرب','العشاء'];
 
-  // الصلاة القادمة
   let nextKey=null, nextMs=-1, prevMs=-1;
   for(let i=0;i<order.length;i++){
     const pt=prayerTimes[order[i]];
     if(pt && pt.getTime()>nowMs){
       nextKey=order[i];
       nextMs=pt.getTime();
-      // الصلاة السابقة
       const prevPt=i>0?prayerTimes[order[i-1]]:null;
-      prevMs=prevPt?prevPt.getTime():prayerTimes['fajr'].getTime()-86400000;
+      prevMs=prevPt?prevPt.getTime():nowMs-3600000;
       break;
     }
   }
 
-  // إذا انتهت كل صلوات اليوم → فجر الغد
   if(!nextKey){
-    const tz=-new Date().getTimezoneOffset()/60;
+    // فجر الغد
+    const tz=-now.getTimezoneOffset()/60;
     const tom=new Date(); tom.setDate(tom.getDate()+1);
-    const tomP=SPE.calc(userLat||26.5258, userLng||49.9981, tz, tom);
+    const tomP=SPE.calc(userLat||26.5258,userLng||49.9981,tz,tom);
     nextMs=tomP.fajr.getTime();
     nextKey='fajr';
     prevMs=prayerTimes['isha'].getTime();
   }
 
-  const nextName=PRAYER_NAMES[PRAYER_KEYS.indexOf(nextKey)];
+  const nextName=names[order.indexOf(nextKey)];
   const remain=Math.max(0,nextMs-nowMs);
   const h=Math.floor(remain/3600000);
   const m=Math.floor((remain%3600000)/60000);
@@ -693,12 +981,13 @@ function updateArc(now){
   document.getElementById('nextPrayerRemain').textContent=
     `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-  // قوس SVG
-  const span=nextMs-prevMs;
+  // قوس SVG — r=68, محيط=2π×68=427.3
+  const circ=2*Math.PI*68;
+  const span=Math.max(1,nextMs-prevMs);
   const elapsed=nowMs-prevMs;
-  const pct=span>0?Math.max(0,Math.min(1,elapsed/span)):0;
-  const circ=2*Math.PI*34;
-  document.getElementById('arcPath').style.strokeDashoffset=circ*(1-pct);
+  const pct=Math.max(0,Math.min(1,elapsed/span));
+  const arc=document.getElementById('arcPath');
+  if(arc) arc.style.strokeDashoffset=circ*(1-pct);
 }
 
 // ─── CITIES DATABASE ───────────────────────────────────────────────────
@@ -915,12 +1204,12 @@ function buildCalendar(){
   for(let d=1;d<=daysInM;d++){
     const date=new Date(calYear,calMonth,d);
     const hd=SCE.hijri(date);
-    const ev=findShiaEvent(hd.hMonth,hd.hDay);
+    const ev=findShiaEvent(hd.hMonth,hd.hDay,date);
     const c=document.createElement('div');
     c.className='cal-day';
     if(d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear())c.classList.add('today');
     if(ev){c.classList.add(ev.t==='sorrow'?'ev-sorrow':ev.t==='joy'?'ev-joy':'ev-moon');}
-    c.innerHTML=`<span class="gday">${d}</span><span class="hday">${toAr(hd.hDay)}</span>${ev&&ev.t==='moon'?`<span class="sign">⭐</span>`:''}`;
+    c.innerHTML=`<span class="gday">${d}</span><span class="hday">${toAr(hd.hDay)}</span>${ev&&ev.t==='moon'?`<span style="width:4px;height:4px;border-radius:50%;background:var(--blue);display:block;margin:1px auto 0"></span>`:''}`;
     c.addEventListener('click',()=>openDayModal(date,hd,ev));
     grid.appendChild(c);
   }
@@ -933,11 +1222,17 @@ function openDayModal(date,hd,ev){
   document.getElementById('dmHijri').textContent=`${toAr(hd.hDay)} ${SCE.monthName(hd.hMonth)} ${toAr(hd.hYear)} هـ`;
   const eDiv=document.getElementById('dmEvent');
   if(ev){
-    eDiv.textContent=ev.n;
-    eDiv.className=`day-modal-event ${ev.t}`;
+    if(ev.t==='moon'){
+      eDiv.className='day-modal-event moon';
+      eDiv.innerHTML=`🌙 <b>${ev.n}</b><br>
+        <span style="font-size:12px;opacity:.8">برج: ${ev.sign} • خط الطول: ${ev.longitude}° • درجة في المنزلة: ${ev.degree}°</span>`;
+    } else {
+      eDiv.className=`day-modal-event ${ev.t}`;
+      eDiv.textContent=ev.n;
+    }
   } else {
-    eDiv.textContent='لا توجد مناسبة مسجّلة';
     eDiv.className='day-modal-event';
+    eDiv.textContent='لا توجد مناسبة مسجّلة';
   }
   document.getElementById('dayModal').classList.add('open');
 }
@@ -1339,7 +1634,9 @@ function updateHOffUI(){
 }
 
 // ─── INIT ──────────────────────────────────────────────────────────────
-function init(){
+async function init(){
+  // تحميل البيانات المحفوظة أولاً
+  await loadSavedData();
   // Restore settings
   updateAlertUI();
   updateHOffUI();
@@ -1421,7 +1718,79 @@ function init(){
   document.addEventListener('touchstart',()=>{getAudioCtx();},{once:true,passive:true});
 }
 
-window.addEventListener('DOMContentLoaded',init);
+window.addEventListener('DOMContentLoaded', () => { init().catch(console.error); });
+
+// ─── تلميح الحفظ على الشاشة الرئيسية (مرة واحدة فقط) ──────────────────
+(function(){
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  const isFile = window.location.protocol === 'file:';
+
+  // انتظر حتى تُحمَّل البيانات ثم تحقق
+  window.addEventListener('DOMContentLoaded', async () => {
+    await ST.loadAll();
+    if (ST.get('nur_hint_shown', false)) return;
+    ST.set('nur_hint_shown', true);
+
+    setTimeout(() => {
+      if (!isIOS) return;
+      const d = document.createElement('div');
+      d.style.cssText = `
+        position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));
+        left:50%;transform:translateX(-50%);z-index:9999;
+        width:92%;max-width:340px;
+        background:linear-gradient(135deg,#1e1b4b,#0f172a);
+        border:1px solid rgba(245,158,11,.5);border-radius:20px;
+        padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.8);
+        font-family:-apple-system,sans-serif;text-align:center;
+        animation:slideUp .4s ease;
+      `;
+
+      if (isFile) {
+        d.innerHTML = `
+          <div style="font-size:28px;margin-bottom:6px">🕌</div>
+          <div style="color:#f59e0b;font-weight:700;font-size:14px;margin-bottom:8px">
+            أضف نور للشاشة الرئيسية
+          </div>
+          <div style="color:#cbd5e1;font-size:12px;line-height:1.8;margin-bottom:12px">
+            ١. اضغط <b style="color:#60a5fa">زر المشاركة ⎙</b> في Safari<br>
+            ٢. اختر <b style="color:#60a5fa">إضافة إلى الشاشة الرئيسية</b><br>
+            <span style="color:#10b981;font-size:11px">✅ بعدها يعمل ويحفظ بياناتك دائماً</span>
+          </div>
+          <button onclick="this.parentElement.remove()" style="
+            background:linear-gradient(135deg,#f59e0b,#fbbf24);
+            border:none;color:#000;padding:8px 24px;
+            border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+            فهمت ✓
+          </button>
+        `;
+      } else if (!isStandalone) {
+        d.innerHTML = `
+          <div style="color:#10b981;font-weight:700;font-size:14px;margin-bottom:6px">
+            📲 ثبّت نور على شاشتك
+          </div>
+          <div style="color:#94a3b8;font-size:11px;line-height:1.7">
+            اضغط <b style="color:#60a5fa">⎙ مشاركة</b> ← <b style="color:#60a5fa">إضافة للشاشة الرئيسية</b><br>
+            <span style="color:#10b981">يعمل كاملاً بدون إنترنت ✅</span>
+          </div>
+          <button onclick="this.parentElement.remove()" style="
+            margin-top:10px;background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.15);color:#e2e8f0;
+            padding:6px 20px;border-radius:8px;font-size:12px;cursor:pointer">
+            إغلاق
+          </button>
+        `;
+      } else {
+        return; // مثبّت بالفعل — لا تُظهر شيئاً
+      }
+
+      document.body.appendChild(d);
+      setTimeout(() => { try { d.remove(); } catch(e) {} }, 12000);
+    }, 3000);
+  });
+})();
+
+
 </script>
 </body>
 </html>
